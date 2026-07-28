@@ -27,8 +27,23 @@ struct OnboardingView: View {
 
                 Spacer()
 
-                // Permission card
+                // How the night works
             VStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("one session, all night")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                    Text("white noise while you sleep, fading to silence before yolo listens for you stirring — then a gentle wake, no later than your \"up by\" time.")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(16)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.white.opacity(0.05))
+                )
+
                 PermissionCard(
                     icon: "mic.fill",
                     title: "microphone",

@@ -45,36 +45,46 @@ class AppState: ObservableObject {
         }
     }
 
-    func recalculateWakeWindow() {
+    func recalculateWakeUpBy() {
         let calendar = Calendar.current
         let now = Date()
 
-        // Extract just the hour/minute from the selected times
-        let startHour = calendar.component(.hour, from: settings.wakeWindowStart)
-        let startMinute = calendar.component(.minute, from: settings.wakeWindowStart)
-        let endHour = calendar.component(.hour, from: settings.wakeWindowEnd)
-        let endMinute = calendar.component(.minute, from: settings.wakeWindowEnd)
+        // Extract just the hour/minute from the selected time
+        let hour = calendar.component(.hour, from: settings.wakeUpBy)
+        let minute = calendar.component(.minute, from: settings.wakeUpBy)
 
         // Get today at midnight
         let todayStart = calendar.startOfDay(for: now)
 
-        // Create today's start and end times
-        var startToday = calendar.date(bySettingHour: startHour, minute: startMinute, second: 0, of: todayStart)!
-        var endToday = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: todayStart)!
+        var upBy = calendar.date(bySettingHour: hour, minute: minute, second: 0, of: todayStart)!
 
-        // If end time is before start time, it means end is next day
-        if endToday <= startToday {
-            endToday = calendar.date(byAdding: .day, value: 1, to: endToday)!
+        // If we've already passed the time, use tomorrow
+        if now > upBy {
+            upBy = calendar.date(byAdding: .day, value: 1, to: upBy)!
         }
 
-        // If we've already passed the end time, use tomorrow's window
-        if now > endToday {
-            startToday = calendar.date(byAdding: .day, value: 1, to: startToday)!
-            endToday = calendar.date(byAdding: .day, value: 1, to: endToday)!
-        }
+        settings.wakeUpBy = upBy
+    }
 
-        settings.wakeWindowStart = startToday
-        settings.wakeWindowEnd = endToday
+    // MARK: - Derived timeline (always computed from wakeUpBy, never stored)
+
+    // Listening begins here (alarm mode only)
+    var windowStart: Date {
+        settings.wakeUpBy.addingTimeInterval(-settings.wakeWindowSeconds)
+    }
+
+    // White noise fade completes here: before the quiet gap in alarm mode,
+    // exactly at "up by" in no-alarm mode
+    var whiteNoiseEndTime: Date {
+        if settings.alarmEnabled {
+            return windowStart.addingTimeInterval(-settings.quietGapSeconds)
+        } else {
+            return settings.wakeUpBy
+        }
+    }
+
+    var fadeStartTime: Date {
+        whiteNoiseEndTime.addingTimeInterval(-settings.fadeOutSeconds)
     }
 
     func startMonitoring() {
@@ -101,11 +111,31 @@ class AppState: ObservableObject {
         currentScreen = .setup
     }
 
-    var wakeWindowFormatted: String {
+    // MARK: - Formatting
+
+    private static let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "h:mm a"
-        let start = formatter.string(from: settings.wakeWindowStart).lowercased()
-        let end = formatter.string(from: settings.wakeWindowEnd).lowercased()
-        return "\(start) - \(end)"
+        return formatter
+    }()
+
+    private func timeString(_ date: Date) -> String {
+        Self.timeFormatter.string(from: date).lowercased()
+    }
+
+    var upByFormatted: String {
+        "up by \(timeString(settings.wakeUpBy))"
+    }
+
+    // One-line preview of tonight's derived timeline, shown on the setup screen
+    var timelinePreview: String {
+        switch (settings.whiteNoiseEnabled, settings.alarmEnabled) {
+        case (true, true):
+            return "white noise until \(timeString(whiteNoiseEndTime)) · listening from \(timeString(windowStart)) · up by \(timeString(settings.wakeUpBy))"
+        case (true, false):
+            return "white noise fades out by \(timeString(settings.wakeUpBy)) — silence is your wake-up"
+        case (false, _):
+            return "listening from \(timeString(windowStart)) · up by \(timeString(settings.wakeUpBy))"
+        }
     }
 }

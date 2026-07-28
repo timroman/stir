@@ -88,7 +88,7 @@ struct LockScreenView: View {
                         .font(.headline.bold())
                         .foregroundColor(.white)
                 } else {
-                    Text("alarm \(context.state.wakeWindow)")
+                    Text(context.state.wakeWindow)
                         .font(.headline.bold())
                         .foregroundColor(.white)
                     Text(context.state.message)

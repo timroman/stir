@@ -26,36 +26,37 @@ struct SetupView: View {
 
                 Spacer()
 
-            // Wake window picker
-            VStack(spacing: 24) {
-                Text("wake window")
+            // The one nightly input: when do you need to be up?
+            VStack(spacing: 20) {
+                Text("up by")
                     .font(.headline)
                     .foregroundColor(.gray)
 
-                HStack(spacing: 20) {
-                    VStack(spacing: 8) {
-                        Text("earliest")
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                        DatePicker("", selection: $appState.settings.wakeWindowStart, displayedComponents: .hourAndMinute)
-                            .labelsHidden()
-                            .colorScheme(.dark)
-                            .textCase(.lowercase)
-                    }
+                DatePicker("", selection: $appState.settings.wakeUpBy, displayedComponents: .hourAndMinute)
+                    .labelsHidden()
+                    .colorScheme(.dark)
+                    .datePickerStyle(.wheel)
+                    .frame(height: 120)
 
-                    Text("to")
-                        .foregroundColor(.gray)
+                VStack(spacing: 12) {
+                    Toggle("white noise", isOn: $appState.settings.whiteNoiseEnabled)
+                        .onChange(of: appState.settings.whiteNoiseEnabled) { _, enabled in
+                            // A session with neither white noise nor alarm is nothing
+                            if !enabled {
+                                appState.settings.alarmEnabled = true
+                            }
+                        }
 
-                    VStack(spacing: 8) {
-                        Text("latest")
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                        DatePicker("", selection: $appState.settings.wakeWindowEnd, displayedComponents: .hourAndMinute)
-                            .labelsHidden()
-                            .colorScheme(.dark)
-                            .textCase(.lowercase)
-                    }
+                    Toggle("gentle alarm", isOn: $appState.settings.alarmEnabled)
+                        .disabled(!appState.settings.whiteNoiseEnabled)
                 }
+                .foregroundColor(.white.opacity(0.8))
+                .tint(.white.opacity(0.4))
+
+                Text(appState.timelinePreview)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
             }
             .padding(24)
             .background(Color.white.opacity(0.05))
@@ -66,7 +67,7 @@ struct SetupView: View {
             // Start button
             Button(action: {
                 withAnimation(.easeInOut(duration: 0.3)) {
-                    appState.recalculateWakeWindow()
+                    appState.recalculateWakeUpBy()
                     appState.startMonitoring()
                 }
             }) {

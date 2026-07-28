@@ -1,26 +1,30 @@
 # yolo alarm
 
-**Wake up ready to live.**
+**Sleep soundly, wake up ready to live.**
 
-yolo alarm wakes you gently when your body is ready. Set a wake window, and the app listens for the subtle sounds of you naturally stirring to wake you at the perfect moment.
+yolo alarm covers your whole night. White noise helps you fall and stay asleep, fades to silence before your wake window, then yolo listens for the subtle sounds of you naturally stirring and wakes you at the perfect moment — never later than your "up by" time.
 
 ## Features
 
-- **Wake Window** - Set your earliest and latest wake times
+- **One Nightly Input** - Just set the time you want to be up by
+- **White Noise** - White, pink, or brown noise and nature sounds all night, with crossfade looping
+- **Gradual Fade** - White noise fades out smoothly, ending a quiet gap before listening begins
 - **Smart Detection** - Adjustable sensitivity detects subtle movements or only louder sounds
 - **Gentle Alarm** - Volume builds gradually over 60 seconds
+- **No-Alarm Mode** - The gentlest wake: when the white noise is gone, it's time
 - **Multiple Sounds** - Gentle chimes, soft bells, ocean waves, or import your own
 - **Haptic Patterns** - Heartbeat, pulse, escalating, or steady vibrations
 - **Color Themes** - Ocean, Sunset, Forest, Lavender, Midnight, Coral
-- **Live Activity** - See your alarm status on your lock screen
+- **Live Activity** - See your night's status on your lock screen
 - **Private by Design** - All processing on-device, nothing recorded or sent anywhere
 
 ## How It Works
 
-1. Set your wake window (e.g., 6:30 - 7:00 AM)
-2. Tap Start and sleep
-3. When yolo detects you stirring, it gently wakes you
-4. Start your day feeling ready
+1. Set the time you want to be up by (e.g., 7:00 AM)
+2. Tap Start and drift off to white noise
+3. The white noise fades out before your wake window opens
+4. When yolo detects you stirring, it gently wakes you — or the alarm fires at your "up by" time
+5. Start your day feeling ready
 
 ## Requirements
 

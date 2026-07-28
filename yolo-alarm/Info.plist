@@ -23,7 +23,7 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>yolo alarm needs microphone access to detect when you start moving around during your wake window.</string>
+	<string>yolo alarm needs microphone access to detect when you start moving around during your wake window. the mic session stays ready overnight while white noise plays, but nothing is evaluated or recorded before your wake window begins.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
 	<key>UIBackgroundModes</key>

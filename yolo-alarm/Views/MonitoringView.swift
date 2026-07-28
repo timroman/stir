@@ -1,12 +1,25 @@
 import SwiftUI
+import AVFoundation
+
+// The phases of a night session, derived each tick from the clock — never stored
+enum SessionPhase: Equatable {
+    case whiteNoise   // white noise playing at full volume
+    case fading       // white noise fading out
+    case quiet        // silence before the wake window (alarm mode)
+    case wakeWindow   // calibrating/listening (alarm mode)
+    case complete     // fade finished in no-alarm mode; silence is the wake-up
+}
 
 struct MonitoringView: View {
     @EnvironmentObject var appState: AppState
     @StateObject private var audioMonitor = AudioMonitor()
     @StateObject private var motionMonitor = MotionMonitor()
+    @StateObject private var whiteNoisePlayer = WhiteNoisePlayer()
     @State private var currentTime = Date()
     @State private var hasStarted = false
-    @State private var wakeWindowTimer: Timer?
+    @State private var sessionTimer: Timer?
+    @State private var phase: SessionPhase = .whiteNoise
+    @State private var hasStartedWhiteNoise = false
 
     var body: some View {
         ZStack {
@@ -20,18 +33,21 @@ struct MonitoringView: View {
                     .font(.system(size: 72, weight: .thin, design: .rounded))
                     .foregroundColor(.white.opacity(0.3))
 
-                // Wake window
-                Text("alarm \(appState.wakeWindowFormatted)")
+                Text(appState.upByFormatted)
                     .font(.subheadline)
                     .foregroundColor(.white.opacity(0.2))
                     .padding(.top, 8)
 
-                // Status info - only show when calibrating or listening
+                // Status info
                 VStack(spacing: 8) {
-                    if audioMonitor.monitoringState != .idle {
-                        Text(statusText)
-                            .font(.caption.bold())
-                            .foregroundColor(statusColor)
+                    Text(statusText)
+                        .font(.caption.bold())
+                        .foregroundColor(statusColor)
+
+                    if phase == .fading {
+                        ProgressView(value: Double(whiteNoisePlayer.fadeProgress))
+                            .progressViewStyle(LinearProgressViewStyle(tint: .white.opacity(0.4)))
+                            .frame(width: 120)
                     }
 
                     if audioMonitor.monitoringState.isCalibrating {
@@ -73,20 +89,17 @@ struct MonitoringView: View {
 
                 Spacer()
 
-                // Stop button - subtle
+                // Stop button - subtle; reads "done" once a no-alarm session completes
                 Button(action: {
-                    print("🛑 Stop button tapped")
                     withAnimation(.easeInOut(duration: 0.3)) {
-                        stopWakeWindowTimer()
-                        audioMonitor.stop()
-                        YOLOLiveActivity.stop()
+                        endSession()
                         appState.stopMonitoring()
                     }
                 }) {
                     VStack(spacing: 8) {
                         Image(systemName: "chevron.up")
                             .font(.caption)
-                        Text("stop")
+                        Text(phase == .complete ? "done" : "stop")
                             .font(.subheadline)
                     }
                     .foregroundColor(.white.opacity(0.3))
@@ -95,11 +108,11 @@ struct MonitoringView: View {
             }
         }
         .animation(.easeInOut(duration: 0.6), value: audioMonitor.monitoringState)
+        .animation(.easeInOut(duration: 0.6), value: phase)
         .task {
-            await startMonitoringAsync()
+            await startSessionAsync()
         }
         .onReceive(audioMonitor.$monitoringState) { state in
-            // Update Live Activity with current status
             switch state {
             case .idle:
                 break
@@ -122,8 +135,10 @@ struct MonitoringView: View {
             }
         }
         .onDisappear {
-            // Clean up when view disappears
-            stopWakeWindowTimer()
+            // Clean up monitors but leave the Live Activity alone — when the alarm
+            // fires this view disappears while the activity must stay in alarm state
+            stopSessionTimer()
+            whiteNoisePlayer.stop()
             audioMonitor.stop()
             motionMonitor.stop()
         }
@@ -136,89 +151,195 @@ struct MonitoringView: View {
     }
 
     private var statusText: String {
-        switch audioMonitor.monitoringState {
-        case .idle:
-            return "waiting"
-        case .calibrating:
-            return "calibrating..."
-        case .listening:
-            return "listening"
+        switch phase {
+        case .whiteNoise:
+            return "white noise"
+        case .fading:
+            return "fading out..."
+        case .quiet:
+            return "quiet"
+        case .complete:
+            return "white noise ended — good morning"
+        case .wakeWindow:
+            switch audioMonitor.monitoringState {
+            case .idle: return "waiting"
+            case .calibrating: return "calibrating..."
+            case .listening: return "listening"
+            }
         }
     }
 
     private var statusColor: Color {
-        switch audioMonitor.monitoringState {
-        case .idle:
-            return .orange.opacity(0.8)
-        case .calibrating:
-            return .yellow.opacity(0.8)
-        case .listening:
-            return .green.opacity(0.8)
+        switch phase {
+        case .whiteNoise, .fading:
+            return .white.opacity(0.5)
+        case .quiet, .complete:
+            return .white.opacity(0.4)
+        case .wakeWindow:
+            switch audioMonitor.monitoringState {
+            case .idle: return .orange.opacity(0.8)
+            case .calibrating: return .yellow.opacity(0.8)
+            case .listening: return .green.opacity(0.8)
+            }
         }
     }
 
-    private func startMonitoringAsync() async {
+    private func startSessionAsync() async {
         guard !hasStarted else { return }
         hasStarted = true
 
-        audioMonitor.sensitivityMultiplier = appState.settings.sensitivityMultiplier
+        if appState.settings.alarmEnabled {
+            audioMonitor.sensitivityMultiplier = appState.settings.sensitivityMultiplier
 
-        // Start audio engine NOW while device is unlocked
-        // This ensures the audio session is established before the device locks
-        audioMonitor.start()
-
-        // Start Live Activity
-        YOLOLiveActivity.start(wakeWindow: appState.wakeWindowFormatted, theme: appState.settings.colorTheme)
-
-        // Start wake window timer
-        startWakeWindowTimer()
-
-        // Check immediately
-        checkWakeWindow()
-    }
-
-    private func startWakeWindowTimer() {
-        wakeWindowTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [self] _ in
-            Task { @MainActor in
-                currentTime = Date()
-                checkWakeWindow()
+            // Start audio engine NOW while device is unlocked. This establishes the
+            // shared .playAndRecord session before the device locks; white noise
+            // plays through it and the app stays alive all night.
+            audioMonitor.start()
+        } else {
+            // No-alarm mode: mic never activates. Playback-only session keeps the
+            // app alive in the background while white noise plays.
+            do {
+                let session = AVAudioSession.sharedInstance()
+                try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+                try session.setActive(true)
+            } catch {
+                print("❌ Failed to configure playback session: \(error)")
             }
         }
-        print("⏰ Wake window timer started")
+
+        YOLOLiveActivity.start(wakeWindow: appState.upByFormatted, theme: appState.settings.colorTheme)
+
+        startSessionTimer()
+        tick()
     }
 
-    private func stopWakeWindowTimer() {
-        wakeWindowTimer?.invalidate()
-        wakeWindowTimer = nil
+    private func startSessionTimer() {
+        sessionTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [self] _ in
+            Task { @MainActor in
+                currentTime = Date()
+                tick()
+            }
+        }
+        print("⏰ Session timer started")
     }
 
-    private func checkWakeWindow() {
+    private func stopSessionTimer() {
+        sessionTimer?.invalidate()
+        sessionTimer = nil
+    }
+
+    // Drives the whole night: white noise → fade → quiet → wake window → alarm.
+    // All boundaries are recomputed from appState each tick.
+    private func tick() {
         let now = Date()
-        let windowStart = appState.settings.wakeWindowStart
-        let windowEnd = appState.settings.wakeWindowEnd
+        let settings = appState.settings
+        let fadeStart = appState.fadeStartTime
+        let whiteNoiseEnd = appState.whiteNoiseEndTime
 
-        let inWakeWindow = now >= windowStart && now <= windowEnd
+        // White noise lifecycle
+        if settings.whiteNoiseEnabled {
+            if !hasStartedWhiteNoise && now < whiteNoiseEnd {
+                // Also covers a late bedtime landing mid-fade: start, then the fade
+                // branch below compresses the remaining fade time
+                hasStartedWhiteNoise = true
+                startWhiteNoise()
+            }
 
-        // Start calibration when wake window begins (audio engine already running)
-        if inWakeWindow && audioMonitor.monitoringState == .idle {
-            audioMonitor.startCalibration()
+            if whiteNoisePlayer.isPlaying && !whiteNoisePlayer.isFadingOut && now >= fadeStart {
+                whiteNoisePlayer.startFadeOut(duration: whiteNoiseEnd.timeIntervalSince(now)) {
+                    // Player stops itself; phase transition happens on the next tick
+                }
+            }
+
+            // Safety: never let white noise bleed past its end time
+            if whiteNoisePlayer.isPlaying && now >= whiteNoiseEnd {
+                whiteNoisePlayer.stop()
+            }
         }
 
-        // Start motion monitoring when calibration completes and we're listening
-        if audioMonitor.monitoringState.isListening &&
-           appState.settings.motionDetectionEnabled &&
-           !motionMonitor.isMonitoring {
-            motionMonitor.start()
+        // Alarm-mode monitoring (unchanged from pre-merge behavior)
+        if settings.alarmEnabled {
+            let windowStart = appState.windowStart
+            let inWakeWindow = now >= windowStart && now <= settings.wakeUpBy
+
+            // Start calibration when the wake window begins (audio engine already running)
+            if inWakeWindow && audioMonitor.monitoringState == .idle {
+                audioMonitor.startCalibration()
+            }
+
+            // Start motion monitoring when calibration completes and we're listening
+            if audioMonitor.monitoringState.isListening &&
+               settings.motionDetectionEnabled &&
+               !motionMonitor.isMonitoring {
+                motionMonitor.start()
+            }
+
+            // Fallback alarm at "up by"
+            if now >= settings.wakeUpBy && appState.currentScreen == .monitoring {
+                triggerAlarm()
+                return
+            }
         }
 
-        // Fallback alarm at end time
-        if now >= windowEnd && appState.currentScreen == .monitoring {
-            triggerAlarm()
+        updatePhase(now: now)
+    }
+
+    private func updatePhase(now: Date) {
+        let newPhase: SessionPhase
+        if appState.settings.alarmEnabled {
+            if now >= appState.windowStart {
+                newPhase = .wakeWindow
+            } else if now >= appState.whiteNoiseEndTime || !appState.settings.whiteNoiseEnabled {
+                newPhase = .quiet
+            } else if whiteNoisePlayer.isFadingOut {
+                newPhase = .fading
+            } else {
+                newPhase = .whiteNoise
+            }
+        } else {
+            if now >= appState.whiteNoiseEndTime || !whiteNoisePlayer.isPlaying && hasStartedWhiteNoise {
+                newPhase = .complete
+            } else if whiteNoisePlayer.isFadingOut {
+                newPhase = .fading
+            } else {
+                newPhase = .whiteNoise
+            }
         }
+
+        guard newPhase != phase else { return }
+        phase = newPhase
+
+        // Wake-window Live Activity updates come from AudioMonitor state changes
+        switch newPhase {
+        case .whiteNoise: YOLOLiveActivity.updateStatus("white noise")
+        case .fading: YOLOLiveActivity.updateStatus("fading out...")
+        case .quiet: YOLOLiveActivity.updateStatus("quiet")
+        case .complete: YOLOLiveActivity.updateStatus("good morning")
+        case .wakeWindow: break
+        }
+    }
+
+    private func startWhiteNoise() {
+        let settings = appState.settings
+        if let customId = settings.whiteNoiseCustomSoundId,
+           let custom = CustomSoundManager.shared.customSounds.first(where: { $0.id == customId }) {
+            whiteNoisePlayer.playCustomSound(custom, volume: settings.whiteNoiseVolume)
+        } else {
+            whiteNoisePlayer.play(sound: settings.whiteNoiseSound, volume: settings.whiteNoiseVolume)
+        }
+    }
+
+    private func endSession() {
+        stopSessionTimer()
+        whiteNoisePlayer.stop()
+        audioMonitor.stop()
+        motionMonitor.stop()
+        YOLOLiveActivity.stop()
     }
 
     private func triggerAlarm() {
-        stopWakeWindowTimer()
+        stopSessionTimer()
+        whiteNoisePlayer.stop()
         audioMonitor.stop()
         motionMonitor.stop()
         YOLOLiveActivity.triggerAlarm(message: appState.settings.tagline)

@@ -26,6 +26,40 @@ struct SettingsView: View {
                     Text("how do you want to start the day?")
                 }
 
+                // Night timeline Section
+                Section {
+                    Stepper(value: $appState.settings.wakeWindowMinutes, in: 10...90, step: 5) {
+                        HStack {
+                            Text("wake window")
+                            Spacer()
+                            Text("\(appState.settings.wakeWindowMinutes) min")
+                                .foregroundColor(.gray)
+                        }
+                    }
+
+                    Stepper(value: $appState.settings.quietGapMinutes, in: 0...120, step: 5) {
+                        HStack {
+                            Text("quiet gap")
+                            Spacer()
+                            Text("\(appState.settings.quietGapMinutes) min")
+                                .foregroundColor(.gray)
+                        }
+                    }
+
+                    Stepper(value: $appState.settings.fadeOutMinutes, in: 5...60, step: 5) {
+                        HStack {
+                            Text("fade-out")
+                            Spacer()
+                            Text("\(appState.settings.fadeOutMinutes) min")
+                                .foregroundColor(.gray)
+                        }
+                    }
+                } header: {
+                    Text("night timeline")
+                } footer: {
+                    Text("listening starts a wake window before your \"up by\" time. white noise fades out over the fade-out duration, finishing a quiet gap before listening begins.")
+                }
+
                 // Sensitivity Section
                 Section {
                     HStack {
@@ -117,7 +151,67 @@ struct SettingsView: View {
                         }
                     }
                 } header: {
-                    Text("sound")
+                    Text("alarm sound")
+                }
+
+                // White Noise Section
+                Section {
+                    HStack {
+                        Image(systemName: "speaker.fill")
+                            .foregroundColor(.gray)
+                        Slider(value: $appState.settings.whiteNoiseVolume, in: 0.1...1.0, step: 0.05)
+                        Image(systemName: "speaker.wave.3.fill")
+                            .foregroundColor(.gray)
+                    }
+
+                    ForEach(WhiteNoiseSound.SoundCategory.allCases, id: \.self) { category in
+                        let sounds = WhiteNoiseSound.allCases.filter { $0.category == category }
+                        if !sounds.isEmpty {
+                            DisclosureGroup(category.rawValue) {
+                                ForEach(sounds) { sound in
+                                    WhiteNoiseRowView(
+                                        sound: sound,
+                                        isSelected: !appState.settings.isUsingCustomWhiteNoise && appState.settings.whiteNoiseSound == sound,
+                                        onSelect: {
+                                            appState.settings.whiteNoiseSound = sound
+                                            appState.settings.whiteNoiseCustomSoundId = nil
+                                        },
+                                        onPreview: {
+                                            previewWhiteNoise(sound)
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    DisclosureGroup("custom") {
+                        ForEach(soundManager.customSounds) { sound in
+                            CustomSoundRowView(
+                                sound: sound,
+                                isSelected: appState.settings.whiteNoiseCustomSoundId == sound.id,
+                                onSelect: {
+                                    appState.settings.whiteNoiseCustomSoundId = sound.id
+                                },
+                                onPreview: {
+                                    previewCustomSound(sound)
+                                },
+                                onDelete: {
+                                    if appState.settings.whiteNoiseCustomSoundId == sound.id {
+                                        appState.settings.whiteNoiseCustomSoundId = nil
+                                    }
+                                    if appState.settings.customSoundId == sound.id {
+                                        appState.settings.customSoundId = nil
+                                    }
+                                    soundManager.deleteSound(sound)
+                                }
+                            )
+                        }
+                    }
+                } header: {
+                    Text("white noise")
+                } footer: {
+                    Text("imported sounds are shared between alarm and white noise")
                 }
 
                 // Haptic Section
@@ -255,6 +349,17 @@ struct SettingsView: View {
     }
 
     private func previewSound(_ sound: AlarmSound) {
+        stopPreview()
+
+        guard let url = Bundle.main.url(forResource: sound.rawValue, withExtension: "mp3") else {
+            print("Sound file not found: \(sound.rawValue).mp3")
+            return
+        }
+
+        playPreviewWithFade(url: url)
+    }
+
+    private func previewWhiteNoise(_ sound: WhiteNoiseSound) {
         stopPreview()
 
         guard let url = Bundle.main.url(forResource: sound.rawValue, withExtension: "mp3") else {
@@ -470,6 +575,37 @@ struct CustomSoundRowView: View {
 
 struct SoundRowView: View {
     let sound: AlarmSound
+    let isSelected: Bool
+    let onSelect: () -> Void
+    let onPreview: () -> Void
+
+    var body: some View {
+        HStack {
+            Button(action: onSelect) {
+                HStack {
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(isSelected ? .blue : .gray)
+                    Text(sound.displayName)
+                        .foregroundColor(.primary)
+                }
+            }
+            .buttonStyle(.plain)
+
+            Spacer()
+
+            Button(action: onPreview) {
+                Image(systemName: "play.circle")
+                    .font(.title2)
+                    .foregroundColor(.blue)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+struct WhiteNoiseRowView: View {
+    let sound: WhiteNoiseSound
     let isSelected: Bool
     let onSelect: () -> Void
     let onPreview: () -> Void
