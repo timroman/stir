@@ -209,6 +209,10 @@ struct MonitoringView: View {
             // shared .playAndRecord session before the device locks; white noise
             // plays through it and the app stays alive all night.
             audioMonitor.start()
+
+            // System-level can't-oversleep net (iOS 26+); fires 2 min after "up by"
+            // unless the session is stopped or the alarm is dismissed first
+            AlarmBackstop.schedule(upBy: appState.settings.wakeUpBy, tagline: appState.settings.tagline)
         } else {
             // No-alarm mode: mic never activates. Playback-only session keeps the
             // app alive in the background while white noise plays.
@@ -349,6 +353,7 @@ struct MonitoringView: View {
         audioMonitor.stop()
         motionMonitor.stop()
         YOLOLiveActivity.stop()
+        AlarmBackstop.cancelBackstop()
     }
 
     private func triggerAlarm() {

@@ -39,6 +39,7 @@ struct AlarmView: View {
                     withAnimation(.easeInOut(duration: 0.3)) {
                         alarmPlayer.stop()
                         YOLOLiveActivity.stop()
+                        AlarmBackstop.cancelBackstop()
                         appState.dismissAlarm()
                     }
                 }) {

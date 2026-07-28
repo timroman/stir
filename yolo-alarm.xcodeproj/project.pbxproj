@@ -16,6 +16,7 @@
 		3ABE2E0E0D02C91896328456 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FCDF6AC22296E09FCCD7E3C /* OnboardingView.swift */; };
 		4764F13FA55548070AA168C8 /* AlarmSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A00BE92D1485B9A2872850F /* AlarmSettings.swift */; };
 		5BE546144CE3EAEAFB88A058 /* brown_noise.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 39568BD615B2B666619EC3E3 /* brown_noise.mp3 */; };
+		670802C1636CDC546F894874 /* AlarmBackstop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D7400AD2318D700CC25C0D /* AlarmBackstop.swift */; };
 		7998065F0F8561A037A40047 /* YOLOActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67388184290D327DF4202190 /* YOLOActivityAttributes.swift */; };
 		7C9EB35BD7C6C9B98D9F43D9 /* yolo-alarm-widgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C3B763A525240E675695EEF3 /* yolo-alarm-widgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7EB2E382760483EE21497E30 /* WhiteNoisePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1233E05C43F942D486F23E /* WhiteNoisePlayer.swift */; };
@@ -76,6 +77,7 @@
 		5F3C0FBB678703C58D8ACC83 /* YOLOWidgetsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YOLOWidgetsBundle.swift; sourceTree = "<group>"; };
 		620B1172DBDCB985BA0B192D /* YOLOLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YOLOLiveActivity.swift; sourceTree = "<group>"; };
 		6601E390A303B04CD4CF17BE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		66D7400AD2318D700CC25C0D /* AlarmBackstop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmBackstop.swift; sourceTree = "<group>"; };
 		67388184290D327DF4202190 /* YOLOActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YOLOActivityAttributes.swift; sourceTree = "<group>"; };
 		68898C605615624FA534CAA4 /* YOLOLiveActivityWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YOLOLiveActivityWidget.swift; sourceTree = "<group>"; };
 		7001B0E502069E2604A24C42 /* AudioMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioMonitor.swift; sourceTree = "<group>"; };
@@ -207,6 +209,7 @@
 		F8580187154BC2C384DA3754 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				66D7400AD2318D700CC25C0D /* AlarmBackstop.swift */,
 				7001B0E502069E2604A24C42 /* AudioMonitor.swift */,
 				D1210B3E6A7ACD598E37BE8B /* CustomSoundManager.swift */,
 				A6DEE97446DACFD8B5FF4960 /* MotionMonitor.swift */,
@@ -327,6 +330,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				670802C1636CDC546F894874 /* AlarmBackstop.swift in Sources */,
 				4764F13FA55548070AA168C8 /* AlarmSettings.swift in Sources */,
 				099AEB6D6435BD3BE53AC5F8 /* AlarmView.swift in Sources */,
 				912A7AB2DBB83A823CE7AB2C /* AppState.swift in Sources */,

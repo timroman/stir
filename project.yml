@@ -63,6 +63,7 @@ targets:
           - audio
         NSMicrophoneUsageDescription: "yolo alarm needs microphone access to detect when you start moving around during your wake window. the mic session stays ready overnight while white noise plays, but nothing is evaluated or recorded before your wake window begins."
         NSSupportsLiveActivities: true
+        NSAlarmKitUsageDescription: "yolo alarm schedules a backup system alarm at your 'up by' time so you never oversleep, even if the app is closed overnight."
         ITSAppUsesNonExemptEncryption: false
     entitlements:
       path: yolo-alarm/yolo-alarm.entitlements
