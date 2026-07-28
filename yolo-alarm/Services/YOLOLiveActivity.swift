@@ -4,18 +4,16 @@ import SwiftUI
 
 enum YOLOLiveActivity {
     private static var currentActivity: Activity<YOLOActivityAttributes>?
-    private static var accentColor: (red: Double, green: Double, blue: Double) = (0.95, 0.6, 0.4) // Default sunset
+    private static let accentColor = NightSky.dawnAmberComponents
     private static var currentWakeWindow: String = ""
 
-    static func start(wakeWindow: String, theme: ColorTheme) {
+    static func start(wakeWindow: String) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else {
             print("Live Activities not enabled")
             return
         }
 
-        // Store the accent color and wake window for updates
-        let color = theme.accentColorComponents
-        accentColor = color
+        let color = accentColor
         currentWakeWindow = wakeWindow
 
         let attributes = YOLOActivityAttributes(startTime: Date())

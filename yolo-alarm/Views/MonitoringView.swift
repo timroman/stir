@@ -20,28 +20,39 @@ struct MonitoringView: View {
     @State private var sessionTimer: Timer?
     @State private var phase: SessionPhase = .whiteNoise
     @State private var hasStartedWhiteNoise = false
+    @State private var sessionStart = Date()
 
     var body: some View {
         ZStack {
-            AppGradient.background(for: appState.settings.colorTheme)
+            SkyBackground(colors: NightSky.colors(
+                now: currentTime,
+                sessionStart: sessionStart,
+                upBy: appState.settings.wakeUpBy
+            ))
+            .animation(.easeInOut(duration: 2), value: currentTime)
 
             VStack {
+                MoonView()
+                    .padding(.top, 24)
+
                 Spacer()
 
-                // Current time - large and subtle
+                // Current time - large and quiet
                 Text(timeString)
-                    .font(.system(size: 72, weight: .thin, design: .rounded))
-                    .foregroundColor(.white.opacity(0.3))
+                    .font(.system(size: 72, weight: .ultraLight))
+                    .foregroundColor(.white.opacity(0.85))
 
                 Text(appState.upByFormatted)
-                    .font(.subheadline)
-                    .foregroundColor(.white.opacity(0.2))
+                    .font(.system(size: 13))
+                    .foregroundColor(.white.opacity(0.45))
                     .padding(.top, 8)
 
                 // Status info
                 VStack(spacing: 8) {
                     Text(statusText)
-                        .font(.caption.bold())
+                        .font(.system(size: 12, weight: .semibold))
+                        .kerning(2)
+                        .textCase(.uppercase)
                         .foregroundColor(statusColor)
 
                     if phase == .fading {
@@ -172,14 +183,16 @@ struct MonitoringView: View {
     private var statusColor: Color {
         switch phase {
         case .whiteNoise, .fading:
-            return .white.opacity(0.5)
-        case .quiet, .complete:
-            return .white.opacity(0.4)
+            return NightSky.cream.opacity(0.7)
+        case .quiet:
+            return .white.opacity(0.45)
+        case .complete:
+            return NightSky.dawnAmber
         case .wakeWindow:
             switch audioMonitor.monitoringState {
-            case .idle: return .orange.opacity(0.8)
-            case .calibrating: return .yellow.opacity(0.8)
-            case .listening: return .green.opacity(0.8)
+            case .idle: return .white.opacity(0.45)
+            case .calibrating: return NightSky.dawnAmber.opacity(0.8)
+            case .listening: return NightSky.dawnAmber
             }
         }
     }
@@ -187,6 +200,7 @@ struct MonitoringView: View {
     private func startSessionAsync() async {
         guard !hasStarted else { return }
         hasStarted = true
+        sessionStart = Date()
 
         if appState.settings.alarmEnabled {
             audioMonitor.sensitivityMultiplier = appState.settings.sensitivityMultiplier
@@ -207,7 +221,7 @@ struct MonitoringView: View {
             }
         }
 
-        YOLOLiveActivity.start(wakeWindow: appState.upByFormatted, theme: appState.settings.colorTheme)
+        YOLOLiveActivity.start(wakeWindow: appState.upByFormatted)
 
         startSessionTimer()
         tick()

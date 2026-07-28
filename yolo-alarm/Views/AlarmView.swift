@@ -13,7 +13,8 @@ struct AlarmView: View {
 
     var body: some View {
         ZStack {
-            AppGradient.radialBackground(for: appState.settings.colorTheme)
+            // Full sunrise — the one bright screen in the app
+            SkyBackground(colors: NightSky.colors(NightSky.sunrise))
 
             VStack(spacing: 40) {
                 Spacer()

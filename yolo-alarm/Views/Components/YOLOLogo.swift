@@ -65,7 +65,7 @@ struct YOLOLogoImage: View {
 
 #Preview {
     ZStack {
-        AppGradient.background
+        SkyBackground(colors: NightSky.colors(NightSky.dusk))
         VStack {
             YOLOLogoImage(height: 100)
         }

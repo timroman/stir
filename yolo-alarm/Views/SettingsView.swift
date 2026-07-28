@@ -246,40 +246,6 @@ struct SettingsView: View {
                     Text("haptics")
                 }
 
-                // Color Theme Section
-                Section {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))], spacing: 12) {
-                        ForEach(ColorTheme.allCases) { theme in
-                            Button(action: {
-                                appState.settings.colorTheme = theme
-                            }) {
-                                VStack(spacing: 6) {
-                                    Circle()
-                                        .fill(
-                                            LinearGradient(
-                                                colors: theme.gradientColors,
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
-                                        )
-                                        .frame(width: 44, height: 44)
-                                        .overlay(
-                                            Circle()
-                                                .stroke(appState.settings.colorTheme == theme ? Color.white : Color.clear, lineWidth: 2)
-                                        )
-                                    Text(theme.displayName)
-                                        .font(.caption2)
-                                        .foregroundColor(appState.settings.colorTheme == theme ? .white : .gray)
-                                }
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .padding(.vertical, 8)
-                } header: {
-                    Text("theme")
-                }
-
                 // About Section
                 Section {
                     VStack(alignment: .leading, spacing: 12) {

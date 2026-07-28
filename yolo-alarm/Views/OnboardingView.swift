@@ -7,7 +7,7 @@ struct OnboardingView: View {
 
     var body: some View {
         ZStack {
-            AppGradient.meshBackground
+            SkyBackground(colors: NightSky.colors(NightSky.dusk))
 
             VStack(spacing: 40) {
                 Spacer()

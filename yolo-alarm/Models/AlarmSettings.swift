@@ -12,7 +12,6 @@ struct AlarmSettings: Codable {
     var hapticEnabled: Bool
     var hapticType: HapticType
     var hapticIntensity: Float
-    var colorTheme: ColorTheme
     var motionDetectionEnabled: Bool  // Trigger alarm on device movement
 
     var whiteNoiseEnabled: Bool
@@ -75,7 +74,6 @@ struct AlarmSettings: Codable {
             hapticEnabled: true,
             hapticType: .heartbeat,
             hapticIntensity: 0.7,
-            colorTheme: .ocean,
             motionDetectionEnabled: true,
             whiteNoiseEnabled: true,
             whiteNoiseSound: .oceanWaves,
@@ -91,7 +89,7 @@ struct AlarmSettings: Codable {
     private enum CodingKeys: String, CodingKey {
         case wakeUpBy, wakeWindowMinutes, alarmEnabled
         case sensitivityValue, volume, selectedSound, customSoundId, tagline
-        case hapticEnabled, hapticType, hapticIntensity, colorTheme, motionDetectionEnabled
+        case hapticEnabled, hapticType, hapticIntensity, motionDetectionEnabled
         case whiteNoiseEnabled, whiteNoiseSound, whiteNoiseVolume, whiteNoiseCustomSoundId
         case fadeOutMinutes, quietGapMinutes
         // Legacy keys (pre-merge yolo alarm), read-only
@@ -100,7 +98,7 @@ struct AlarmSettings: Codable {
 
     init(wakeUpBy: Date, wakeWindowMinutes: Int, alarmEnabled: Bool, sensitivityValue: Float,
          volume: Float, selectedSound: AlarmSound, customSoundId: UUID?, tagline: String,
-         hapticEnabled: Bool, hapticType: HapticType, hapticIntensity: Float, colorTheme: ColorTheme,
+         hapticEnabled: Bool, hapticType: HapticType, hapticIntensity: Float,
          motionDetectionEnabled: Bool, whiteNoiseEnabled: Bool, whiteNoiseSound: WhiteNoiseSound,
          whiteNoiseVolume: Float, whiteNoiseCustomSoundId: UUID?, fadeOutMinutes: Int, quietGapMinutes: Int) {
         self.wakeUpBy = wakeUpBy
@@ -114,7 +112,6 @@ struct AlarmSettings: Codable {
         self.hapticEnabled = hapticEnabled
         self.hapticType = hapticType
         self.hapticIntensity = hapticIntensity
-        self.colorTheme = colorTheme
         self.motionDetectionEnabled = motionDetectionEnabled
         self.whiteNoiseEnabled = whiteNoiseEnabled
         self.whiteNoiseSound = whiteNoiseSound
@@ -152,7 +149,6 @@ struct AlarmSettings: Codable {
         hapticEnabled = try container.decodeIfPresent(Bool.self, forKey: .hapticEnabled) ?? defaults.hapticEnabled
         hapticType = try container.decodeIfPresent(HapticType.self, forKey: .hapticType) ?? defaults.hapticType
         hapticIntensity = try container.decodeIfPresent(Float.self, forKey: .hapticIntensity) ?? defaults.hapticIntensity
-        colorTheme = try container.decodeIfPresent(ColorTheme.self, forKey: .colorTheme) ?? defaults.colorTheme
         motionDetectionEnabled = try container.decodeIfPresent(Bool.self, forKey: .motionDetectionEnabled) ?? defaults.motionDetectionEnabled
         whiteNoiseEnabled = try container.decodeIfPresent(Bool.self, forKey: .whiteNoiseEnabled) ?? defaults.whiteNoiseEnabled
         whiteNoiseSound = try container.decodeIfPresent(WhiteNoiseSound.self, forKey: .whiteNoiseSound) ?? defaults.whiteNoiseSound
@@ -175,7 +171,6 @@ struct AlarmSettings: Codable {
         try container.encode(hapticEnabled, forKey: .hapticEnabled)
         try container.encode(hapticType, forKey: .hapticType)
         try container.encode(hapticIntensity, forKey: .hapticIntensity)
-        try container.encode(colorTheme, forKey: .colorTheme)
         try container.encode(motionDetectionEnabled, forKey: .motionDetectionEnabled)
         try container.encode(whiteNoiseEnabled, forKey: .whiteNoiseEnabled)
         try container.encode(whiteNoiseSound, forKey: .whiteNoiseSound)
@@ -251,28 +246,6 @@ enum WhiteNoiseSound: String, Codable, CaseIterable, Identifiable {
     enum SoundCategory: String, CaseIterable {
         case noise = "noise"
         case nature = "nature"
-    }
-}
-
-enum ColorTheme: String, Codable, CaseIterable, Identifiable {
-    case ocean = "ocean"
-    case sunset = "sunset"
-    case forest = "forest"
-    case lavender = "lavender"
-    case midnight = "midnight"
-    case coral = "coral"
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .ocean: return "ocean"
-        case .sunset: return "sunset"
-        case .forest: return "forest"
-        case .lavender: return "lavender"
-        case .midnight: return "midnight"
-        case .coral: return "coral"
-        }
     }
 }
 
