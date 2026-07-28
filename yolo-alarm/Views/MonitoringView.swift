@@ -21,6 +21,7 @@ struct MonitoringView: View {
     @State private var phase: SessionPhase = .whiteNoise
     @State private var hasStartedWhiteNoise = false
     @State private var sessionStart = Date()
+    @State private var showTime = false
 
     var body: some View {
         ZStack {
@@ -32,20 +33,39 @@ struct MonitoringView: View {
             .animation(.easeInOut(duration: 2), value: currentTime)
 
             VStack {
-                MoonView()
-                    .padding(.top, 24)
-
                 Spacer()
 
-                // Current time - large and quiet
-                Text(timeString)
-                    .font(.system(size: 72, weight: .ultraLight))
-                    .foregroundColor(.white.opacity(0.85))
+                // Clockless night face: the arc answers "is it time yet" —
+                // the actual time appears only on tap
+                NightArcFace(
+                    now: currentTime,
+                    sessionStart: sessionStart,
+                    upBy: appState.settings.wakeUpBy,
+                    fadeStart: appState.fadeStartTime,
+                    whiteNoiseEnd: appState.whiteNoiseEndTime,
+                    windowStart: appState.windowStart,
+                    whiteNoiseEnabled: appState.settings.whiteNoiseEnabled,
+                    alarmEnabled: appState.settings.alarmEnabled
+                )
+                .frame(height: 150)
+                .padding(.horizontal, 28)
+                .offset(burnInOffset)
 
-                Text(appState.upByFormatted)
-                    .font(.system(size: 13))
-                    .foregroundColor(.white.opacity(0.45))
-                    .padding(.top, 8)
+                // Tap-to-reveal time
+                Group {
+                    if showTime {
+                        VStack(spacing: 4) {
+                            Text(timeString)
+                                .font(.system(size: 40, weight: .ultraLight))
+                                .foregroundColor(.white.opacity(0.85))
+                            Text(appState.upByFormatted)
+                                .font(.system(size: 12))
+                                .foregroundColor(.white.opacity(0.45))
+                        }
+                        .transition(.opacity)
+                    }
+                }
+                .frame(height: 76)
 
                 // Status info
                 VStack(spacing: 8) {
@@ -120,8 +140,15 @@ struct MonitoringView: View {
         }
         .animation(.easeInOut(duration: 0.6), value: audioMonitor.monitoringState)
         .animation(.easeInOut(duration: 0.6), value: phase)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            revealTime()
+        }
         .task {
             await startSessionAsync()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIDevice.batteryStateDidChangeNotification)) { _ in
+            updateIdleTimer()
         }
         .onReceive(audioMonitor.$monitoringState) { state in
             switch state {
@@ -152,6 +179,8 @@ struct MonitoringView: View {
             whiteNoisePlayer.stop()
             audioMonitor.stop()
             motionMonitor.stop()
+            UIApplication.shared.isIdleTimerDisabled = false
+            UIDevice.current.isBatteryMonitoringEnabled = false
         }
     }
 
@@ -197,10 +226,33 @@ struct MonitoringView: View {
         }
     }
 
+    // Keep the display alive through the night — but only while docked, so a
+    // forgotten un-docked phone doesn't drain overnight
+    private func updateIdleTimer() {
+        let state = UIDevice.current.batteryState
+        UIApplication.shared.isIdleTimerDisabled = (state == .charging || state == .full)
+    }
+
+    private func revealTime() {
+        withAnimation(.easeInOut(duration: 0.3)) { showTime = true }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
+            withAnimation(.easeInOut(duration: 0.6)) { showTime = false }
+        }
+    }
+
+    // A slow pixel drift so the arc and moon never burn into an OLED panel
+    private var burnInOffset: CGSize {
+        let minute = Double(Calendar.current.component(.minute, from: currentTime))
+        return CGSize(width: 5 * sin(minute / 60 * 2 * .pi),
+                      height: 4 * cos(minute / 60 * 2 * .pi))
+    }
+
     private func startSessionAsync() async {
         guard !hasStarted else { return }
         hasStarted = true
         sessionStart = Date()
+        UIDevice.current.isBatteryMonitoringEnabled = true
+        updateIdleTimer()
 
         if appState.settings.alarmEnabled {
             audioMonitor.sensitivityMultiplier = appState.settings.sensitivityMultiplier
