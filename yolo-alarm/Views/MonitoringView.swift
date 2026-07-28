@@ -21,7 +21,7 @@ struct MonitoringView: View {
     @State private var phase: SessionPhase = .whiteNoise
     @State private var hasStartedWhiteNoise = false
     @State private var sessionStart = Date()
-    @State private var showTime = false
+    @StateObject private var moonTracker = MoonTracker()
 
     var body: some View {
         ZStack {
@@ -35,8 +35,9 @@ struct MonitoringView: View {
             VStack {
                 Spacer()
 
-                // Clockless night face: the arc answers "is it time yet" —
-                // the actual time appears only on tap
+                // Clockless night face: nothing here represents the time.
+                // The sky and the cresting sun answer "is it time yet"; the
+                // moon is the real moon at its actual place in the sky.
                 NightArcFace(
                     now: currentTime,
                     sessionStart: sessionStart,
@@ -45,27 +46,12 @@ struct MonitoringView: View {
                     whiteNoiseEnd: appState.whiteNoiseEndTime,
                     windowStart: appState.windowStart,
                     whiteNoiseEnabled: appState.settings.whiteNoiseEnabled,
-                    alarmEnabled: appState.settings.alarmEnabled
+                    alarmEnabled: appState.settings.alarmEnabled,
+                    moonPosition: moonTracker.position
                 )
-                .frame(height: 150)
+                .frame(height: 190)
                 .padding(.horizontal, 28)
                 .offset(burnInOffset)
-
-                // Tap-to-reveal time
-                Group {
-                    if showTime {
-                        VStack(spacing: 4) {
-                            Text(timeString)
-                                .font(.system(size: 40, weight: .ultraLight))
-                                .foregroundColor(.white.opacity(0.85))
-                            Text(appState.upByFormatted)
-                                .font(.system(size: 12))
-                                .foregroundColor(.white.opacity(0.45))
-                        }
-                        .transition(.opacity)
-                    }
-                }
-                .frame(height: 76)
 
                 // Status info
                 VStack(spacing: 8) {
@@ -140,10 +126,6 @@ struct MonitoringView: View {
         }
         .animation(.easeInOut(duration: 0.6), value: audioMonitor.monitoringState)
         .animation(.easeInOut(duration: 0.6), value: phase)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            revealTime()
-        }
         .task {
             await startSessionAsync()
         }
@@ -233,13 +215,6 @@ struct MonitoringView: View {
         UIApplication.shared.isIdleTimerDisabled = (state == .charging || state == .full)
     }
 
-    private func revealTime() {
-        withAnimation(.easeInOut(duration: 0.3)) { showTime = true }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
-            withAnimation(.easeInOut(duration: 0.6)) { showTime = false }
-        }
-    }
-
     // A slow pixel drift so the arc and moon never burn into an OLED panel
     private var burnInOffset: CGSize {
         let minute = Double(Calendar.current.component(.minute, from: currentTime))
@@ -253,6 +228,7 @@ struct MonitoringView: View {
         sessionStart = Date()
         UIDevice.current.isBatteryMonitoringEnabled = true
         updateIdleTimer()
+        moonTracker.start()
 
         if appState.settings.alarmEnabled {
             audioMonitor.sensitivityMultiplier = appState.settings.sensitivityMultiplier
@@ -302,6 +278,7 @@ struct MonitoringView: View {
     // All boundaries are recomputed from appState each tick.
     private func tick() {
         let now = Date()
+        moonTracker.refresh(at: now)
         let settings = appState.settings
         let fadeStart = appState.fadeStartTime
         let whiteNoiseEnd = appState.whiteNoiseEndTime

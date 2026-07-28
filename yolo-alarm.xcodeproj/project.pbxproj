@@ -28,6 +28,7 @@
 		912A7AB2DBB83A823CE7AB2C /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7FE4C6A4E6FD844824A8519 /* AppState.swift */; };
 		9318F65B63BD79BBE535A7CA /* SkyBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968CAE667A926097AE0A46C0 /* SkyBackground.swift */; };
 		9DEEE17A3AB1D45123BEBC5D /* MotionMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6DEE97446DACFD8B5FF4960 /* MotionMonitor.swift */; };
+		A3F789FC7CC8837604E3CEA2 /* MoonTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA604C9FC95A2D315AEED53B /* MoonTracker.swift */; };
 		A96853DCF5893DD642B53A42 /* SetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23E31E74833149F53797816B /* SetupView.swift */; };
 		AA4AEF46898A5D4ABFE8B245 /* YOLOLiveActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68898C605615624FA534CAA4 /* YOLOLiveActivityWidget.swift */; };
 		AAD3C374E1FEF2584C87D67D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6601E390A303B04CD4CF17BE /* Assets.xcassets */; };
@@ -89,6 +90,7 @@
 		9E78B708BA69D23CA1B4AE33 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A6DEE97446DACFD8B5FF4960 /* MotionMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionMonitor.swift; sourceTree = "<group>"; };
 		AA1233E05C43F942D486F23E /* WhiteNoisePlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteNoisePlayer.swift; sourceTree = "<group>"; };
+		AA604C9FC95A2D315AEED53B /* MoonTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoonTracker.swift; sourceTree = "<group>"; };
 		ACE30BDE1C735E9B187E46F7 /* yolo-logo-white.svg */ = {isa = PBXFileReference; path = "yolo-logo-white.svg"; sourceTree = "<group>"; };
 		C3B763A525240E675695EEF3 /* yolo-alarm-widgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = "yolo-alarm-widgets.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C41A0CE3668197663487CE71 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -215,6 +217,7 @@
 				66D7400AD2318D700CC25C0D /* AlarmBackstop.swift */,
 				7001B0E502069E2604A24C42 /* AudioMonitor.swift */,
 				D1210B3E6A7ACD598E37BE8B /* CustomSoundManager.swift */,
+				AA604C9FC95A2D315AEED53B /* MoonTracker.swift */,
 				A6DEE97446DACFD8B5FF4960 /* MotionMonitor.swift */,
 				AA1233E05C43F942D486F23E /* WhiteNoisePlayer.swift */,
 				620B1172DBDCB985BA0B192D /* YOLOLiveActivity.swift */,
@@ -341,6 +344,7 @@
 				0D16690200072F5519295FDE /* ContentView.swift in Sources */,
 				811E23103498143CC52F85C0 /* CustomSoundManager.swift in Sources */,
 				B77939E82A7A079B93E585DD /* MonitoringView.swift in Sources */,
+				A3F789FC7CC8837604E3CEA2 /* MoonTracker.swift in Sources */,
 				9DEEE17A3AB1D45123BEBC5D /* MotionMonitor.swift in Sources */,
 				418A59142A8BD598D04ABF1F /* NightArcFace.swift in Sources */,
 				3ABE2E0E0D02C91896328456 /* OnboardingView.swift in Sources */,

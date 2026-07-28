@@ -1,10 +1,11 @@
 import SwiftUI
 
-// The clockless night face: the whole night drawn as a horizon arc. The moon
-// is the "now" marker traveling from bedtime (left) to "up by" (right); the
-// traveled arc dims behind it, phases color the segments, and the sun crests
-// the right horizon as the wake window opens. Where the moon sits — and how
-// warm the sky is — answers "is it time yet" without a numeral on screen.
+// The clockless night face. The arc is the night's *plan* — phase-colored
+// segments from bedtime to "up by" — with no marker for the current moment:
+// nothing on this screen represents the time. The sun cresting the right
+// horizon is the only "is it time yet" signal. The moon is the real moon:
+// rendered at its actual altitude and azimuth, so when it touches the horizon
+// line here, it's rising or setting outside the window.
 struct NightArcFace: View {
     let now: Date
     let sessionStart: Date
@@ -14,6 +15,7 @@ struct NightArcFace: View {
     let windowStart: Date
     let whiteNoiseEnabled: Bool
     let alarmEnabled: Bool
+    let moonPosition: MoonTracker.MoonPosition?
 
     var body: some View {
         GeometryReader { geo in
@@ -24,17 +26,12 @@ struct NightArcFace: View {
                 NightArcShape()
                     .stroke(Color.white.opacity(0.14), style: StrokeStyle(lineWidth: 2, lineCap: .round))
 
-                // Phase segments over the remaining night
+                // The night's plan, phase-colored
                 ForEach(segments, id: \.from) { segment in
                     NightArcShape()
-                        .trim(from: max(segment.from, tNow), to: segment.to)
+                        .trim(from: segment.from, to: segment.to)
                         .stroke(segment.color, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                 }
-
-                // Traveled night, barely there
-                NightArcShape()
-                    .trim(from: 0, to: tNow)
-                    .stroke(Color.white.opacity(0.08), style: StrokeStyle(lineWidth: 2, lineCap: .round))
 
                 // The sun waits below the right horizon and crests into the wake window
                 if sunProgress > 0 {
@@ -55,23 +52,46 @@ struct NightArcFace: View {
                         .opacity(0.35 + 0.65 * sunProgress)
                 }
 
-                // The moon is "now" — tonight's real phase
-                MoonPhaseView(size: 26)
-                    .position(arcPoint(tNow, w: w, h: h))
+                // The real moon, where it actually is in the sky
+                if let moonPoint = moonScreenPosition(w: w, h: h) {
+                    MoonPhaseView(size: 26)
+                        .position(moonPoint.point)
+                        .opacity(moonPoint.opacity)
+                }
             }
         }
     }
 
     private var night: TimeInterval { upBy.timeIntervalSince(sessionStart) }
 
-    private var tNow: Double {
-        guard night > 0 else { return 1 }
-        return min(max(now.timeIntervalSince(sessionStart) / night, 0), 1)
-    }
-
     private func fraction(_ date: Date) -> Double {
         guard night > 0 else { return 1 }
         return min(max(date.timeIntervalSince(sessionStart) / night, 0), 1)
+    }
+
+    // Map the moon's real altitude/azimuth into the face. Facing south:
+    // east (moonrise) on the left edge, west (moonset) on the right, the arc's
+    // baseline as the horizon. A moon within a few degrees below the horizon
+    // shows faintly at the line — the catchable rising/setting moment.
+    private func moonScreenPosition(w: CGFloat, h: CGFloat) -> (point: CGPoint, opacity: Double)? {
+        guard let moon = moonPosition else { return nil }
+
+        let altDeg = moon.altitude * 180 / .pi
+        guard altDeg > -6 else { return nil }  // well below the horizon: not shown
+
+        // Azimuth from south, west positive; clamp east/west extremes to edges
+        let azDeg = moon.azimuth * 180 / .pi
+        let xFraction = min(max((azDeg + 90) / 180, 0), 1)
+        let x = 16 + (w - 32) * xFraction
+
+        let horizonY = h - 6
+        let topY: CGFloat = 10
+        let altFraction = min(max(altDeg / 75, 0), 1)
+        let y = horizonY - (horizonY - topY) * altFraction
+
+        // Fade in through the horizon-crossing band
+        let opacity = altDeg < 4 ? 0.35 + 0.65 * (altDeg + 6) / 10 : 1.0
+        return (CGPoint(x: x, y: min(y, horizonY)), opacity)
     }
 
     private struct Segment {
@@ -214,7 +234,8 @@ struct MoonPhaseView: View {
             whiteNoiseEnd: Date().addingTimeInterval(3600 * 7),
             windowStart: Date().addingTimeInterval(3600 * 7.5),
             whiteNoiseEnabled: true,
-            alarmEnabled: true
+            alarmEnabled: true,
+            moonPosition: MoonTracker.MoonPosition(altitude: 0.6, azimuth: -0.8)
         )
         .frame(height: 140)
         .padding(.horizontal, 30)

@@ -1,0 +1,120 @@
+import Foundation
+import CoreLocation
+import Combine
+
+// The real moon: altitude and azimuth right now, from the observer's location.
+// Low-precision Meeus series (the suncalc formulation, ~1° accuracy) — entirely
+// on-device, no network. Location is a one-shot coarse fix, cached so the moon
+// still renders offline or before the first fix of the night.
+@MainActor
+final class MoonTracker: NSObject, ObservableObject {
+    struct MoonPosition {
+        let altitude: Double  // radians, 0 = on the horizon
+        let azimuth: Double   // radians, measured from south, west positive
+    }
+
+    @Published private(set) var position: MoonPosition?
+
+    private let manager = CLLocationManager()
+    private var coordinate: CLLocationCoordinate2D? {
+        didSet { refresh() }
+    }
+
+    private static let latKey = "moonTrackerLat"
+    private static let lonKey = "moonTrackerLon"
+
+    override init() {
+        super.init()
+        manager.delegate = self
+        manager.desiredAccuracy = kCLLocationAccuracyReduced
+
+        let defaults = UserDefaults.standard
+        if defaults.object(forKey: Self.latKey) != nil {
+            coordinate = CLLocationCoordinate2D(
+                latitude: defaults.double(forKey: Self.latKey),
+                longitude: defaults.double(forKey: Self.lonKey)
+            )
+        }
+    }
+
+    func start() {
+        switch manager.authorizationStatus {
+        case .notDetermined:
+            manager.requestWhenInUseAuthorization()
+        case .authorizedWhenInUse, .authorizedAlways:
+            manager.requestLocation()
+        default:
+            break  // No location, no moon — never nag
+        }
+        refresh()
+    }
+
+    func refresh(at date: Date = Date()) {
+        guard let coordinate else {
+            position = nil
+            return
+        }
+        position = Self.moonPosition(date: date,
+                                     latitude: coordinate.latitude,
+                                     longitude: coordinate.longitude)
+    }
+
+    // MARK: - Astronomy
+
+    private static let rad = Double.pi / 180
+    private static let obliquity = 23.4397 * rad
+
+    static func moonPosition(date: Date, latitude: Double, longitude: Double) -> MoonPosition {
+        let d = date.timeIntervalSince1970 / 86_400 - 10_957.5  // days since J2000
+
+        // Ecliptic coordinates
+        let L = rad * (218.316 + 13.176396 * d)   // mean longitude
+        let M = rad * (134.963 + 13.064993 * d)   // mean anomaly
+        let F = rad * (93.272 + 13.229350 * d)    // mean distance
+
+        let lon = L + rad * 6.289 * sin(M)
+        let lat = rad * 5.128 * sin(F)
+
+        // Equatorial coordinates
+        let ra = atan2(sin(lon) * cos(obliquity) - tan(lat) * sin(obliquity), cos(lon))
+        let dec = asin(sin(lat) * cos(obliquity) + cos(lat) * sin(obliquity) * sin(lon))
+
+        // Local hour angle
+        let lw = rad * -longitude
+        let phi = rad * latitude
+        let siderealTime = rad * (280.16 + 360.9856235 * d) - lw
+        let h = siderealTime - ra
+
+        let altitude = asin(sin(phi) * sin(dec) + cos(phi) * cos(dec) * cos(h))
+        let azimuth = atan2(sin(h), cos(h) * sin(phi) - tan(dec) * cos(phi))
+
+        return MoonPosition(altitude: altitude, azimuth: azimuth)
+    }
+}
+
+extension MoonTracker: CLLocationManagerDelegate {
+    nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        Task { @MainActor in
+            switch manager.authorizationStatus {
+            case .authorizedWhenInUse, .authorizedAlways:
+                manager.requestLocation()
+            default:
+                break
+            }
+        }
+    }
+
+    nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.last else { return }
+        Task { @MainActor in
+            let defaults = UserDefaults.standard
+            defaults.set(location.coordinate.latitude, forKey: Self.latKey)
+            defaults.set(location.coordinate.longitude, forKey: Self.lonKey)
+            self.coordinate = location.coordinate
+        }
+    }
+
+    nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print("🌙 Location fix failed: \(error.localizedDescription)")
+    }
+}
