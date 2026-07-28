@@ -11,6 +11,8 @@ final class MoonTracker: NSObject, ObservableObject {
     struct MoonPosition {
         let altitude: Double  // radians, 0 = on the horizon
         let azimuth: Double   // radians, measured from south, west positive
+        let hourAngle: Double // radians, 0 = culmination (highest point), west positive
+        let horizonCos: Double // cos of the rise/set hour angle: where the horizon cuts the diurnal circle
     }
 
     @Published private(set) var position: MoonPosition?
@@ -88,7 +90,14 @@ final class MoonTracker: NSObject, ObservableObject {
         let altitude = asin(sin(phi) * sin(dec) + cos(phi) * cos(dec) * cos(h))
         let azimuth = atan2(sin(h), cos(h) * sin(phi) - tan(dec) * cos(phi))
 
-        return MoonPosition(altitude: altitude, azimuth: azimuth)
+        // Wrap the hour angle to (-π, π]: 0 at culmination, ±π at the low point
+        let wrapped = atan2(sin(h), cos(h))
+        // Standard rise/set condition: cos H₀ = -tan φ · tan δ. Clamped values
+        // mean the moon is circumpolar (never sets / never rises) tonight.
+        let horizonCos = min(max(-tan(phi) * tan(dec), -1), 1)
+
+        return MoonPosition(altitude: altitude, azimuth: azimuth,
+                            hourAngle: wrapped, horizonCos: horizonCos)
     }
 }
 

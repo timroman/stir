@@ -1,10 +1,12 @@
 import SwiftUI
 
-// The clockless night face: the screen is the sky, and the only object in it
-// is the real moon at its actual altitude and azimuth (bottom edge = horizon,
-// facing south: east left, west right). Moon position doesn't correlate with
-// the time of day — nothing on this screen does. The warming sky gradient is
-// the sole "is it time yet" signal.
+// The clockless night face: the moon's actual daily track drawn as a full
+// circle, the horizon as a line cutting through it, and the moon at its true
+// position on the ring — dim below the horizon, bright above. The ring makes
+// the position legible: you can watch the moon approach the rise or set
+// crossing hours ahead. Position on the ring is the hour angle — astronomy,
+// not the clock — so nothing on this screen correlates with the time of day.
+// The warming sky gradient remains the sole "is it time yet" signal.
 struct SkyFace: View {
     let moonPosition: MoonTracker.MoonPosition?
 
@@ -12,37 +14,61 @@ struct SkyFace: View {
         GeometryReader { geo in
             let w = geo.size.width
             let h = geo.size.height
-            ZStack {
-                if let moon = moonScreenPosition(w: w, h: h) {
+            let radius = min(w, h) * 0.36
+            let center = CGPoint(x: w / 2, y: h * 0.44)
+
+            if let moon = moonPosition {
+                // Horizon chord: the diurnal circle crosses it at the rise
+                // and set points
+                let horizonY = center.y - radius * CGFloat(moon.horizonCos)
+
+                // Moon at its hour angle: culmination top, rise on the left,
+                // set on the right, anti-culmination at the bottom
+                let moonPoint = CGPoint(
+                    x: center.x + radius * CGFloat(sin(moon.hourAngle)),
+                    y: center.y - radius * CGFloat(cos(moon.hourAngle))
+                )
+                let belowHorizon = moonPoint.y > horizonY
+
+                ZStack {
+                    // Ground: everything below the horizon
+                    Rectangle()
+                        .fill(Color.black.opacity(0.16))
+                        .frame(width: w, height: max(h - horizonY, 0))
+                        .position(x: w / 2, y: horizonY + max(h - horizonY, 0) / 2)
+
+                    // Horizon line
+                    Rectangle()
+                        .fill(Color.white.opacity(0.25))
+                        .frame(width: w, height: 1)
+                        .position(x: w / 2, y: horizonY)
+
+                    // The moon's track
+                    Circle()
+                        .stroke(Color.white.opacity(0.15), lineWidth: 1.5)
+                        .frame(width: radius * 2, height: radius * 2)
+                        .position(center)
+
+                    // Rise and set crossings, faintly marked
+                    if abs(moon.horizonCos) < 1 {
+                        let dx = radius * CGFloat(sin(acos(moon.horizonCos)))
+                        Circle()
+                            .fill(Color.white.opacity(0.3))
+                            .frame(width: 4, height: 4)
+                            .position(x: center.x - dx, y: horizonY)
+                        Circle()
+                            .fill(Color.white.opacity(0.3))
+                            .frame(width: 4, height: 4)
+                            .position(x: center.x + dx, y: horizonY)
+                    }
+
                     MoonPhaseView(size: 30)
-                        .position(moon.point)
-                        .opacity(moon.opacity)
+                        .position(moonPoint)
+                        .opacity(belowHorizon ? 0.4 : 1.0)
                 }
             }
         }
         .ignoresSafeArea()
-    }
-
-    // Map real altitude/azimuth onto the screen. A moon within a few degrees
-    // below the horizon shows faintly at the bottom edge — the catchable
-    // rising/setting moment.
-    private func moonScreenPosition(w: CGFloat, h: CGFloat) -> (point: CGPoint, opacity: Double)? {
-        guard let moon = moonPosition else { return nil }
-
-        let altDeg = moon.altitude * 180 / .pi
-        guard altDeg > -6 else { return nil }
-
-        let azDeg = moon.azimuth * 180 / .pi
-        let xFraction = min(max((azDeg + 90) / 180, 0), 1)
-        let x = 28 + (w - 56) * xFraction
-
-        let horizonY = h - 40
-        let topY = h * 0.12
-        let altFraction = min(max(altDeg / 75, 0), 1)
-        let y = horizonY - (horizonY - topY) * altFraction
-
-        let opacity = altDeg < 4 ? 0.35 + 0.65 * (altDeg + 6) / 10 : 1.0
-        return (CGPoint(x: x, y: min(y, horizonY)), opacity)
     }
 }
 
@@ -126,6 +152,8 @@ struct MoonPhaseView: View {
 #Preview("Sky face") {
     ZStack {
         SkyBackground(colors: NightSky.colors(NightSky.preDawn))
-        SkyFace(moonPosition: MoonTracker.MoonPosition(altitude: 0.5, azimuth: -0.7))
+        SkyFace(moonPosition: MoonTracker.MoonPosition(
+            altitude: 0.5, azimuth: -0.7, hourAngle: -0.9, horizonCos: -0.2
+        ))
     }
 }
