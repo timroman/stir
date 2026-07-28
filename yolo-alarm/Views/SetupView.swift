@@ -8,7 +8,7 @@ struct SetupView: View {
         ZStack {
             SkyBackground(colors: NightSky.colors(NightSky.dusk))
 
-            VStack(spacing: 32) {
+            VStack(spacing: 40) {
                 Spacer()
 
                 // App logo
@@ -27,7 +27,7 @@ struct SetupView: View {
                 Spacer()
 
             // The one nightly input: when do you need to be up?
-            VStack(spacing: 18) {
+            VStack(spacing: 14) {
                 Text("up by")
                     .font(.system(size: 12, weight: .semibold))
                     .kerning(2.5)
@@ -38,32 +38,8 @@ struct SetupView: View {
                     .labelsHidden()
                     .colorScheme(.dark)
                     .datePickerStyle(.wheel)
-                    .frame(height: 110)
-
-                HorizonArc(
-                    fadeFraction: fadeFraction,
-                    startLabel: "tonight",
-                    fadeLabel: fadeLabel,
-                    endLabel: upByLabel
-                )
-                .padding(.horizontal, 4)
-
-                HStack(spacing: 10) {
-                    TogglePill(title: "white noise", isOn: $appState.settings.whiteNoiseEnabled)
-                        .onChange(of: appState.settings.whiteNoiseEnabled) { _, enabled in
-                            // A session with neither white noise nor alarm is nothing
-                            if !enabled {
-                                appState.settings.alarmEnabled = true
-                            }
-                        }
-                    TogglePill(title: "gentle alarm", isOn: $appState.settings.alarmEnabled)
-                        .disabled(!appState.settings.whiteNoiseEnabled)
-                        .opacity(appState.settings.whiteNoiseEnabled ? 1 : 0.5)
-                }
+                    .frame(height: 130)
             }
-            .padding(22)
-            .background(Color.black.opacity(0.18))
-            .cornerRadius(20)
 
             Spacer()
 
@@ -104,50 +80,6 @@ struct SetupView: View {
             SettingsView()
                 .presentationDragIndicator(.visible)
         }
-    }
-
-    // Fade start as a fraction of tonight (now → up by), for the arc marker
-    private var fadeFraction: Double? {
-        guard appState.settings.whiteNoiseEnabled else { return nil }
-        let night = appState.settings.wakeUpBy.timeIntervalSince(Date())
-        guard night > 0 else { return nil }
-        let untilFade = appState.fadeStartTime.timeIntervalSince(Date())
-        return min(max(untilFade / night, 0.05), 0.95)
-    }
-
-    private var fadeLabel: String? {
-        guard appState.settings.whiteNoiseEnabled else { return nil }
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm"
-        return "fade \(formatter.string(from: appState.fadeStartTime))"
-    }
-
-    private var upByLabel: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm a"
-        return formatter.string(from: appState.settings.wakeUpBy).lowercased()
-    }
-}
-
-struct TogglePill: View {
-    let title: String
-    @Binding var isOn: Bool
-
-    var body: some View {
-        Button(action: { isOn.toggle() }) {
-            Text(title)
-                .font(.system(size: 13, weight: .medium))
-                .foregroundColor(isOn ? Color(red: 0.09, green: 0.13, blue: 0.27) : .white.opacity(0.55))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .background(
-                    Capsule().fill(isOn ? NightSky.cream.opacity(0.9) : Color.white.opacity(0.08))
-                )
-                .overlay(
-                    Capsule().stroke(Color.white.opacity(isOn ? 0 : 0.22), lineWidth: 1)
-                )
-        }
-        .buttonStyle(.plain)
     }
 }
 

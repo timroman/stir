@@ -32,28 +32,15 @@ struct MonitoringView: View {
             ))
             .animation(.easeInOut(duration: 2), value: currentTime)
 
+            // Clockless night face: the whole screen is the sky, the real moon
+            // its only object. The warming gradient is the wake signal.
+            SkyFace(moonPosition: moonTracker.position)
+                .offset(burnInOffset)
+
             VStack {
                 Spacer()
 
-                // Clockless night face: nothing here represents the time.
-                // The sky and the cresting sun answer "is it time yet"; the
-                // moon is the real moon at its actual place in the sky.
-                NightArcFace(
-                    now: currentTime,
-                    sessionStart: sessionStart,
-                    upBy: appState.settings.wakeUpBy,
-                    fadeStart: appState.fadeStartTime,
-                    whiteNoiseEnd: appState.whiteNoiseEndTime,
-                    windowStart: appState.windowStart,
-                    whiteNoiseEnabled: appState.settings.whiteNoiseEnabled,
-                    alarmEnabled: appState.settings.alarmEnabled,
-                    moonPosition: moonTracker.position
-                )
-                .frame(height: 190)
-                .padding(.horizontal, 28)
-                .offset(burnInOffset)
-
-                // Status info
+                // Status info — kept low, out of the sky
                 VStack(spacing: 8) {
                     Text(statusText)
                         .font(.system(size: 12, weight: .semibold))
@@ -102,9 +89,7 @@ struct MonitoringView: View {
                         }
                     }
                 }
-                .padding(.top, 20)
-
-                Spacer()
+                .padding(.bottom, 28)
 
                 // Stop button - subtle; reads "done" once a no-alarm session completes
                 Button(action: {
@@ -215,7 +200,7 @@ struct MonitoringView: View {
         UIApplication.shared.isIdleTimerDisabled = (state == .charging || state == .full)
     }
 
-    // A slow pixel drift so the arc and moon never burn into an OLED panel
+    // A slow pixel drift so the moon never burns into an OLED panel
     private var burnInOffset: CGSize {
         let minute = Double(Calendar.current.component(.minute, from: currentTime))
         return CGSize(width: 5 * sin(minute / 60 * 2 * .pi),

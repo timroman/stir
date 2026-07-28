@@ -26,6 +26,26 @@ struct SettingsView: View {
                     Text("how do you want to start the day?")
                 }
 
+                // Night Section
+                Section {
+                    Toggle("white noise", isOn: $appState.settings.whiteNoiseEnabled)
+                        .onChange(of: appState.settings.whiteNoiseEnabled) { _, enabled in
+                            // A session with neither white noise nor alarm is nothing
+                            if !enabled {
+                                appState.settings.alarmEnabled = true
+                            }
+                        }
+
+                    Toggle("gentle alarm", isOn: $appState.settings.alarmEnabled)
+                        .disabled(!appState.settings.whiteNoiseEnabled)
+                } header: {
+                    Text("night")
+                } footer: {
+                    if !appState.settings.alarmEnabled {
+                        Text("alarm off: white noise fades to silence at your \"up by\" time — when you don't hear it, it's time. the microphone is never used.")
+                    }
+                }
+
                 // Night timeline Section
                 Section {
                     Stepper(value: $appState.settings.wakeWindowMinutes, in: 10...90, step: 5) {
