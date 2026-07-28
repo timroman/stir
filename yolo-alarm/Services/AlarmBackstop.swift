@@ -16,6 +16,10 @@ enum AlarmBackstop {
     private static let alarmIdKey = "backstopAlarmId"
 
     static func schedule(upBy: Date, tagline: String) {
+        #if DEBUG
+        // Screenshot/test sessions aren't real nights
+        if ProcessInfo.processInfo.arguments.contains("-noBackstop") { return }
+        #endif
         #if canImport(AlarmKit)
         if #available(iOS 26.0, *) {
             Task {

@@ -37,7 +37,33 @@ class AppState: ObservableObject {
         if !hasCompletedOnboarding {
             currentScreen = .onboarding
         }
+
+        #if DEBUG
+        applyLaunchOverrides()
+        #endif
     }
+
+    #if DEBUG
+    // Test support: jump straight to a screen with a synthetic session, e.g.
+    //   -screen monitoring -upByMinutes 12
+    private func applyLaunchOverrides() {
+        let args = ProcessInfo.processInfo.arguments
+        if let index = args.firstIndex(of: "-upByMinutes"), index + 1 < args.count,
+           let minutes = Double(args[index + 1]) {
+            settings.wakeUpBy = Date().addingTimeInterval(minutes * 60)
+        }
+        if let index = args.firstIndex(of: "-screen"), index + 1 < args.count {
+            switch args[index + 1] {
+            case "setup": currentScreen = .setup
+            case "monitoring":
+                currentScreen = .monitoring
+                isMonitoring = true
+            case "alarm": currentScreen = .alarm
+            default: break
+            }
+        }
+    }
+    #endif
 
     func saveSettings() {
         if let encoded = try? JSONEncoder().encode(settings) {
