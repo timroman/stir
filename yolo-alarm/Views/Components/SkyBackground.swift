@@ -10,8 +10,10 @@ enum NightSky {
     static let dusk: [RGB] = [
         (0.10, 0.13, 0.27), (0.14, 0.18, 0.36), (0.23, 0.25, 0.43), (0.43, 0.33, 0.44)
     ]
+    // Middle of the night: essentially black (OLED-off), the faintest blue
+    // breath at the horizon so the screen reads as sky, not a dead panel
     static let deepNight: [RGB] = [
-        (0.03, 0.04, 0.11), (0.05, 0.08, 0.18), (0.09, 0.13, 0.29), (0.14, 0.17, 0.33)
+        (0.0, 0.0, 0.0), (0.0, 0.0, 0.01), (0.01, 0.02, 0.05), (0.03, 0.04, 0.09)
     ]
     static let preDawn: [RGB] = [
         (0.04, 0.06, 0.14), (0.09, 0.14, 0.30), (0.20, 0.25, 0.43), (0.48, 0.35, 0.42)
