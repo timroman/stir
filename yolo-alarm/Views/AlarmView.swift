@@ -117,7 +117,11 @@ class HapticManager: ObservableObject {
         self.isRunning = true
 
         do {
-            hapticEngine = try CHHapticEngine()
+            // Attach to the app's audio session: a default-initialized engine
+            // runs its own session, which can silence the alarm's AVAudioPlayers
+            // on device the moment it starts (simulators have no haptics, so
+            // this never reproduces there)
+            hapticEngine = try CHHapticEngine(audioSession: AVAudioSession.sharedInstance())
             hapticEngine?.isAutoShutdownEnabled = false
             hapticEngine?.playsHapticsOnly = true
 
@@ -371,6 +375,18 @@ class AlarmPlayer: ObservableObject {
             print("🔔 Alarm started with crossfade looping, ramping volume over \(rampDuration) seconds")
             startVolumeRamp()
             scheduleCrossfade()
+
+            // Diagnostics: leave evidence in the device log for overnight failures
+            let session = AVAudioSession.sharedInstance()
+            print("🔔 Post-play state — playing: \(playerA?.isPlaying ?? false), systemVolume: \(session.outputVolume), route: \(session.currentRoute.outputs.map(\.portName).joined(separator: ","))")
+
+            // Watchdog: if playback died within 5s (e.g. session stolen), restart it
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
+                guard let self, let active = self.activePlayer, !active.isPlaying else { return }
+                print("⚠️ Alarm playback died after start — reactivating session and restarting")
+                try? AVAudioSession.sharedInstance().setActive(true)
+                active.play()
+            }
         } catch {
             print("Failed to play alarm: \(error)")
             playFallbackSound()
