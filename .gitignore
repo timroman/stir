@@ -26,3 +26,5 @@ AppStore/
 *.log
 *.tmp
 fastlane/.env
+*.ipa
+*.dSYM.zip
