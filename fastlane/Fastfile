@@ -29,7 +29,7 @@ platform :ios do
       xcargs: "-allowProvisioningUpdates " \
               "-authenticationKeyID #{ENV.fetch('ASC_KEY_ID')} " \
               "-authenticationKeyIssuerID #{ENV.fetch('ASC_ISSUER_ID')} " \
-              "-authenticationKeyPath #{File.expand_path(ENV.fetch('ASC_KEY_PATH'))}"
+              "-authenticationKeyPath #{File.expand_path(ENV.fetch('ASC_KEY_PATH')).shellescape}"
     )
   end
 
