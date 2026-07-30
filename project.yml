@@ -1,52 +1,52 @@
-name: yolo-alarm
+name: stir
 options:
-  bundleIdPrefix: com.yoloalarm
+  bundleIdPrefix: com.pureinference
   deploymentTarget:
     iOS: "17.0"
   xcodeVersion: "15.0"
   generateEmptyDirectories: true
 
 schemes:
-  yolo-alarm:
+  stir:
     build:
       targets:
-        yolo-alarm: all
-        yolo-alarm-widgets: all
+        stir: all
+        stir-widgets: all
     run:
-      executable: yolo-alarm
+      executable: stir
     profile:
-      executable: yolo-alarm
+      executable: stir
     archive:
-      executable: yolo-alarm
+      executable: stir
 
 settings:
   base:
     DEVELOPMENT_TEAM: 86CCQ2AT2P
-    MARKETING_VERSION: "1.0.2"
+    MARKETING_VERSION: "1.0.0"
     CURRENT_PROJECT_VERSION: "1"
 
 targets:
-  yolo-alarm:
+  stir:
     type: application
     platform: iOS
     sources:
-      - path: yolo-alarm
+      - path: stir
         excludes:
           - "**/*.md"
     resources:
-      - path: yolo-alarm/Resources
+      - path: stir/Resources
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.yoloalarm.app
-        INFOPLIST_FILE: yolo-alarm/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.pureinference.stir
+        INFOPLIST_FILE: stir/Info.plist
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         SUPPORTS_LIVE_ACTIVITIES: YES
         ENABLE_PREVIEWS: YES
     info:
-      path: yolo-alarm/Info.plist
+      path: stir/Info.plist
       properties:
-        CFBundleDisplayName: yolo alarm
-        CFBundleName: yolo-alarm
+        CFBundleDisplayName: stir
+        CFBundleName: stir
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UILaunchScreen: {}
@@ -61,36 +61,36 @@ targets:
           - UIInterfaceOrientationLandscapeRight
         UIBackgroundModes:
           - audio
-        NSMicrophoneUsageDescription: "yolo alarm needs microphone access to detect when you start moving around during your wake window. the mic session stays ready overnight while white noise plays, but nothing is evaluated or recorded before your wake window begins."
+        NSMicrophoneUsageDescription: "stir needs microphone access to detect when you start moving around during your wake window. the mic session stays ready overnight while white noise plays, but nothing is evaluated or recorded before your wake window begins."
         NSSupportsLiveActivities: true
-        NSLocationWhenInUseUsageDescription: "yolo alarm uses your approximate location only to draw the real moon's position in the night sky. It never leaves your device."
-        NSAlarmKitUsageDescription: "yolo alarm schedules a backup system alarm at your 'up by' time so you never oversleep, even if the app is closed overnight."
+        NSLocationWhenInUseUsageDescription: "stir uses your approximate location only to draw the real sun and moon in the night sky. It never leaves your device."
+        NSAlarmKitUsageDescription: "stir schedules a backup system alarm at your 'up by' time so you never oversleep, even if the app is closed overnight."
         ITSAppUsesNonExemptEncryption: false
     entitlements:
-      path: yolo-alarm/yolo-alarm.entitlements
+      path: stir/stir.entitlements
       properties:
         com.apple.security.app-sandbox: true
     dependencies:
-      - target: yolo-alarm-widgets
+      - target: stir-widgets
 
-  yolo-alarm-widgets:
+  stir-widgets:
     type: app-extension
     platform: iOS
     sources:
-      - path: yolo-alarm-widgets
-      - path: yolo-alarm/Models/YOLOActivityAttributes.swift
+      - path: stir-widgets
+      - path: stir/Models/StirActivityAttributes.swift
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.yoloalarm.app.widgets
-        INFOPLIST_FILE: yolo-alarm-widgets/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.pureinference.stir.widgets
+        INFOPLIST_FILE: stir-widgets/Info.plist
         SKIP_INSTALL: YES
         CODE_SIGN_STYLE: Automatic
         LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks"
     info:
-      path: yolo-alarm-widgets/Info.plist
+      path: stir-widgets/Info.plist
       properties:
-        CFBundleDisplayName: yolo-alarm-widgets
-        CFBundleName: yolo-alarm-widgets
+        CFBundleDisplayName: stir-widgets
+        CFBundleName: stir-widgets
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         NSExtension:

@@ -1,0 +1,53 @@
+# stir — App Store automation
+#
+# Auth: create an App Store Connect API key (Users and Access → Integrations)
+# and set these in fastlane/.env (never committed):
+#   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH (path to the .p8)
+
+default_platform(:ios)
+
+platform :ios do
+  before_all do
+    app_store_connect_api_key(
+      key_id: ENV.fetch("ASC_KEY_ID"),
+      issuer_id: ENV.fetch("ASC_ISSUER_ID"),
+      key_filepath: ENV.fetch("ASC_KEY_PATH")
+    )
+  end
+
+  desc "Regenerate the Xcode project and build a signed release archive"
+  lane :build do
+    sh("cd .. && xcodegen generate")
+    build_app(
+      project: "stir.xcodeproj",
+      scheme: "stir",
+      export_method: "app-store"
+    )
+  end
+
+  desc "Upload a new build to TestFlight"
+  lane :beta do
+    build
+    upload_to_testflight(skip_waiting_for_build_processing: true)
+  end
+
+  desc "Upload build + metadata to App Store Connect for review submission"
+  lane :release do
+    build
+    upload_to_app_store(
+      force: true,                 # skip the HTML report prompt (non-interactive)
+      precheck_include_in_app_purchases: false,
+      submit_for_review: false     # Tim presses the final submit button
+    )
+  end
+
+  desc "Push metadata (description, keywords, URLs) without a new build"
+  lane :metadata do
+    upload_to_app_store(
+      force: true,
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      precheck_include_in_app_purchases: false
+    )
+  end
+end

@@ -25,3 +25,4 @@ AppStore/
 # Misc
 *.log
 *.tmp
+fastlane/.env

@@ -1,0 +1,591 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0F08CD2BC5F32273F82B96DD /* StirActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 215AA25344A9487DF7470C5A /* StirActivityAttributes.swift */; };
+		1CECD3B6EEF2C04D67BA8C48 /* StirWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D967D9651F113BF861322057 /* StirWidgetsBundle.swift */; };
+		1EC0E4D1F404A3D35A7D3EA4 /* MoonTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729BE7AC31F3154804BA8103 /* MoonTracker.swift */; };
+		34094B5B13B9CE4EE4361C94 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C096FB9AF8CC1928E5E6D814 /* ContentView.swift */; };
+		346816F88DB0726F288F922B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E8E59A5489F47D0C5609FA /* SettingsView.swift */; };
+		47D55C3F880552757AEE8905 /* white_noise.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 6A946A717AA4B3E946EDA112 /* white_noise.mp3 */; };
+		4CB566500EE190C66DC31437 /* AlarmView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 578132549736F67419B80C91 /* AlarmView.swift */; };
+		4D262D905818DCEB7438F820 /* brown_noise.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = C9DEFEE2059084ED2DEDD2C5 /* brown_noise.mp3 */; };
+		6A2530B36AFB7962F93F5CE4 /* soft_bells.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F6E554669BCF3C3AD855F0DD /* soft_bells.mp3 */; };
+		7119947825CDB959A1BAA17C /* ocean_waves.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 39DFE9CAF6A75D245F5712F9 /* ocean_waves.mp3 */; };
+		73845E6ACCD1398A3B009D33 /* AlarmSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B3E00A25A378A0362F269D /* AlarmSettings.swift */; };
+		74977CE7F28C965C76C737F3 /* MotionMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F4F559E78A903A55E4D4BBB /* MotionMonitor.swift */; };
+		7826572FE29DADAAC94558B9 /* stir-widgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0A071C0386AD2E344CD2F932 /* stir-widgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7878A5F394A1701332787793 /* gentle_chime.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 03587498C88B0E56E5EDF7FE /* gentle_chime.mp3 */; };
+		8E05EB85F46DDEF023BD88D5 /* StirApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6920E7F867445AF620D0B82C /* StirApp.swift */; };
+		9035EC9A9EF010110E1EC5CF /* StirLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 013A3DB4AA7DE7AC2CB9AB58 /* StirLiveActivity.swift */; };
+		90407EF71A837592C1778647 /* StirActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 215AA25344A9487DF7470C5A /* StirActivityAttributes.swift */; };
+		95C453D9D54405094DCECAAF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CCB7677DAB034D6E2618FC61 /* Assets.xcassets */; };
+		970D17B50020B2BFEB7E12C4 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47835E81DADDAD004379F272 /* OnboardingView.swift */; };
+		99AD63ECFBFADA2FB18BA31D /* AlarmBackstop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3621C1610B2466A837426511 /* AlarmBackstop.swift */; };
+		A40697DB09197D46B4A1D820 /* TechnicalDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92CE2A370C6733D8946E2B62 /* TechnicalDetailsView.swift */; };
+		AD93BA919195EEE1E8C3FAB2 /* NightArcFace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 129BD251B689B48CAC132AAC /* NightArcFace.swift */; };
+		C6D51E60FE5A12A3449B418F /* SetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDBE9CD3509B6BB7BF2CDD44 /* SetupView.swift */; };
+		D894633ABBE270C557DF59E0 /* CustomSoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4118C77059DF41F2AEAD8B28 /* CustomSoundManager.swift */; };
+		DAAA9A9E9A8AFA26D311F199 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3319761B25C1F5A15016A2BA /* AppState.swift */; };
+		DE92A3386EA9651D8271E799 /* WhiteNoisePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA11DE98D22F3DAA607833D /* WhiteNoisePlayer.swift */; };
+		E1C1DEEC8095485C1078A3F4 /* StirLiveActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 853556B5111816A761906A57 /* StirLiveActivityWidget.swift */; };
+		E91C552CD2DA8D221DD1DFC7 /* MonitoringView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B91E7E22556C9596A1B5132B /* MonitoringView.swift */; };
+		EB0358F235F25624ABEF7C05 /* AudioMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DA05CC505629D8A8D20C6E0 /* AudioMonitor.swift */; };
+		EE6CFE8D013583095DCF7650 /* pink_noise.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 2CC09BE101FE57BE483DA9E4 /* pink_noise.mp3 */; };
+		FFE6492399AECB4B851D5F57 /* SkyBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 219EC465F7D7DCA21637D4E0 /* SkyBackground.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0CD6E5AE2C7A9EBDF3C6C2ED /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B43AABF8073846C254D3A09C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6A2F584E673A6C413700D5EA;
+			remoteInfo = "stir-widgets";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		7B1229E6C615DD7350AF98C7 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				7826572FE29DADAAC94558B9 /* stir-widgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		013A3DB4AA7DE7AC2CB9AB58 /* StirLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StirLiveActivity.swift; sourceTree = "<group>"; };
+		03587498C88B0E56E5EDF7FE /* gentle_chime.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = gentle_chime.mp3; sourceTree = "<group>"; };
+		0474E340F6E092672F4901CE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		04B3E00A25A378A0362F269D /* AlarmSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmSettings.swift; sourceTree = "<group>"; };
+		081BE086EEDA7E75EC23D9A3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		0A071C0386AD2E344CD2F932 /* stir-widgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = "stir-widgets.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0DA05CC505629D8A8D20C6E0 /* AudioMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioMonitor.swift; sourceTree = "<group>"; };
+		129BD251B689B48CAC132AAC /* NightArcFace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightArcFace.swift; sourceTree = "<group>"; };
+		215AA25344A9487DF7470C5A /* StirActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StirActivityAttributes.swift; sourceTree = "<group>"; };
+		219EC465F7D7DCA21637D4E0 /* SkyBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkyBackground.swift; sourceTree = "<group>"; };
+		2CC09BE101FE57BE483DA9E4 /* pink_noise.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = pink_noise.mp3; sourceTree = "<group>"; };
+		31E8E59A5489F47D0C5609FA /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		3319761B25C1F5A15016A2BA /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		3621C1610B2466A837426511 /* AlarmBackstop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmBackstop.swift; sourceTree = "<group>"; };
+		39DFE9CAF6A75D245F5712F9 /* ocean_waves.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = ocean_waves.mp3; sourceTree = "<group>"; };
+		3F4F559E78A903A55E4D4BBB /* MotionMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionMonitor.swift; sourceTree = "<group>"; };
+		4118C77059DF41F2AEAD8B28 /* CustomSoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSoundManager.swift; sourceTree = "<group>"; };
+		47835E81DADDAD004379F272 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		578132549736F67419B80C91 /* AlarmView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmView.swift; sourceTree = "<group>"; };
+		5F7410581F11A69054872151 /* stir.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = stir.entitlements; sourceTree = "<group>"; };
+		6920E7F867445AF620D0B82C /* StirApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StirApp.swift; sourceTree = "<group>"; };
+		6A946A717AA4B3E946EDA112 /* white_noise.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = white_noise.mp3; sourceTree = "<group>"; };
+		729BE7AC31F3154804BA8103 /* MoonTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoonTracker.swift; sourceTree = "<group>"; };
+		853556B5111816A761906A57 /* StirLiveActivityWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StirLiveActivityWidget.swift; sourceTree = "<group>"; };
+		92CE2A370C6733D8946E2B62 /* TechnicalDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnicalDetailsView.swift; sourceTree = "<group>"; };
+		ACA11DE98D22F3DAA607833D /* WhiteNoisePlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteNoisePlayer.swift; sourceTree = "<group>"; };
+		AEFC8AF87B6E2ECC24F4F346 /* stir.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = stir.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B91E7E22556C9596A1B5132B /* MonitoringView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitoringView.swift; sourceTree = "<group>"; };
+		C096FB9AF8CC1928E5E6D814 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C9DEFEE2059084ED2DEDD2C5 /* brown_noise.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = brown_noise.mp3; sourceTree = "<group>"; };
+		CCB7677DAB034D6E2618FC61 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CDBE9CD3509B6BB7BF2CDD44 /* SetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupView.swift; sourceTree = "<group>"; };
+		D967D9651F113BF861322057 /* StirWidgetsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StirWidgetsBundle.swift; sourceTree = "<group>"; };
+		F6E554669BCF3C3AD855F0DD /* soft_bells.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = soft_bells.mp3; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		09EAE397EDEFAD480231094A /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				3621C1610B2466A837426511 /* AlarmBackstop.swift */,
+				0DA05CC505629D8A8D20C6E0 /* AudioMonitor.swift */,
+				4118C77059DF41F2AEAD8B28 /* CustomSoundManager.swift */,
+				729BE7AC31F3154804BA8103 /* MoonTracker.swift */,
+				3F4F559E78A903A55E4D4BBB /* MotionMonitor.swift */,
+				013A3DB4AA7DE7AC2CB9AB58 /* StirLiveActivity.swift */,
+				ACA11DE98D22F3DAA607833D /* WhiteNoisePlayer.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		34D89E233C5A20C3266B913E /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				129BD251B689B48CAC132AAC /* NightArcFace.swift */,
+				219EC465F7D7DCA21637D4E0 /* SkyBackground.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		57E92CA17EE6E663B3888FCE = {
+			isa = PBXGroup;
+			children = (
+				DB594A77EEF43D3AC5854A3A /* stir */,
+				7858166B9BE629BAF4EE46FA /* stir-widgets */,
+				A6C2AB7759C42395113BA2DC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7858166B9BE629BAF4EE46FA /* stir-widgets */ = {
+			isa = PBXGroup;
+			children = (
+				0474E340F6E092672F4901CE /* Info.plist */,
+				853556B5111816A761906A57 /* StirLiveActivityWidget.swift */,
+				D967D9651F113BF861322057 /* StirWidgetsBundle.swift */,
+			);
+			path = "stir-widgets";
+			sourceTree = "<group>";
+		};
+		8EE132780EEEECA434BFC5BF /* App */ = {
+			isa = PBXGroup;
+			children = (
+				6920E7F867445AF620D0B82C /* StirApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		9EF424F260DE2FE9A5FA60F8 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				578132549736F67419B80C91 /* AlarmView.swift */,
+				C096FB9AF8CC1928E5E6D814 /* ContentView.swift */,
+				B91E7E22556C9596A1B5132B /* MonitoringView.swift */,
+				47835E81DADDAD004379F272 /* OnboardingView.swift */,
+				31E8E59A5489F47D0C5609FA /* SettingsView.swift */,
+				CDBE9CD3509B6BB7BF2CDD44 /* SetupView.swift */,
+				92CE2A370C6733D8946E2B62 /* TechnicalDetailsView.swift */,
+				34D89E233C5A20C3266B913E /* Components */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A6C2AB7759C42395113BA2DC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0A071C0386AD2E344CD2F932 /* stir-widgets.appex */,
+				AEFC8AF87B6E2ECC24F4F346 /* stir.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B3350F4275F9662E5F725F49 /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				C9DEFEE2059084ED2DEDD2C5 /* brown_noise.mp3 */,
+				03587498C88B0E56E5EDF7FE /* gentle_chime.mp3 */,
+				39DFE9CAF6A75D245F5712F9 /* ocean_waves.mp3 */,
+				2CC09BE101FE57BE483DA9E4 /* pink_noise.mp3 */,
+				F6E554669BCF3C3AD855F0DD /* soft_bells.mp3 */,
+				6A946A717AA4B3E946EDA112 /* white_noise.mp3 */,
+			);
+			path = Sounds;
+			sourceTree = "<group>";
+		};
+		DB594A77EEF43D3AC5854A3A /* stir */ = {
+			isa = PBXGroup;
+			children = (
+				081BE086EEDA7E75EC23D9A3 /* Info.plist */,
+				5F7410581F11A69054872151 /* stir.entitlements */,
+				8EE132780EEEECA434BFC5BF /* App */,
+				DE1BF0E2A349C2423C11DA44 /* Models */,
+				F86430F0B8BB231ED2A8FF10 /* Resources */,
+				09EAE397EDEFAD480231094A /* Services */,
+				9EF424F260DE2FE9A5FA60F8 /* Views */,
+			);
+			path = stir;
+			sourceTree = "<group>";
+		};
+		DE1BF0E2A349C2423C11DA44 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				04B3E00A25A378A0362F269D /* AlarmSettings.swift */,
+				3319761B25C1F5A15016A2BA /* AppState.swift */,
+				215AA25344A9487DF7470C5A /* StirActivityAttributes.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		F86430F0B8BB231ED2A8FF10 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				CCB7677DAB034D6E2618FC61 /* Assets.xcassets */,
+				B3350F4275F9662E5F725F49 /* Sounds */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6A2F584E673A6C413700D5EA /* stir-widgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 51DEF17BECEC66E9DD9E684C /* Build configuration list for PBXNativeTarget "stir-widgets" */;
+			buildPhases = (
+				3BCE18B88F0572432425099F /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "stir-widgets";
+			packageProductDependencies = (
+			);
+			productName = "stir-widgets";
+			productReference = 0A071C0386AD2E344CD2F932 /* stir-widgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		EA296BB176E9CCDC4ABAEF39 /* stir */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DC5CEBD74A9A8185B0C772AB /* Build configuration list for PBXNativeTarget "stir" */;
+			buildPhases = (
+				FE6B7CC9398821ECFCF3DE6A /* Sources */,
+				E1DE00A31E67C942A08DA84E /* Resources */,
+				7B1229E6C615DD7350AF98C7 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B0969B52ED53C2004B9455DC /* PBXTargetDependency */,
+			);
+			name = stir;
+			packageProductDependencies = (
+			);
+			productName = stir;
+			productReference = AEFC8AF87B6E2ECC24F4F346 /* stir.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B43AABF8073846C254D3A09C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					6A2F584E673A6C413700D5EA = {
+						DevelopmentTeam = 86CCQ2AT2P;
+						ProvisioningStyle = Automatic;
+					};
+					EA296BB176E9CCDC4ABAEF39 = {
+						DevelopmentTeam = 86CCQ2AT2P;
+					};
+				};
+			};
+			buildConfigurationList = 61721F7956A25866686C65DD /* Build configuration list for PBXProject "stir" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 57E92CA17EE6E663B3888FCE;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				EA296BB176E9CCDC4ABAEF39 /* stir */,
+				6A2F584E673A6C413700D5EA /* stir-widgets */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E1DE00A31E67C942A08DA84E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				95C453D9D54405094DCECAAF /* Assets.xcassets in Resources */,
+				4D262D905818DCEB7438F820 /* brown_noise.mp3 in Resources */,
+				7878A5F394A1701332787793 /* gentle_chime.mp3 in Resources */,
+				7119947825CDB959A1BAA17C /* ocean_waves.mp3 in Resources */,
+				EE6CFE8D013583095DCF7650 /* pink_noise.mp3 in Resources */,
+				6A2530B36AFB7962F93F5CE4 /* soft_bells.mp3 in Resources */,
+				47D55C3F880552757AEE8905 /* white_noise.mp3 in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3BCE18B88F0572432425099F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0F08CD2BC5F32273F82B96DD /* StirActivityAttributes.swift in Sources */,
+				E1C1DEEC8095485C1078A3F4 /* StirLiveActivityWidget.swift in Sources */,
+				1CECD3B6EEF2C04D67BA8C48 /* StirWidgetsBundle.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE6B7CC9398821ECFCF3DE6A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				99AD63ECFBFADA2FB18BA31D /* AlarmBackstop.swift in Sources */,
+				73845E6ACCD1398A3B009D33 /* AlarmSettings.swift in Sources */,
+				4CB566500EE190C66DC31437 /* AlarmView.swift in Sources */,
+				DAAA9A9E9A8AFA26D311F199 /* AppState.swift in Sources */,
+				EB0358F235F25624ABEF7C05 /* AudioMonitor.swift in Sources */,
+				34094B5B13B9CE4EE4361C94 /* ContentView.swift in Sources */,
+				D894633ABBE270C557DF59E0 /* CustomSoundManager.swift in Sources */,
+				E91C552CD2DA8D221DD1DFC7 /* MonitoringView.swift in Sources */,
+				1EC0E4D1F404A3D35A7D3EA4 /* MoonTracker.swift in Sources */,
+				74977CE7F28C965C76C737F3 /* MotionMonitor.swift in Sources */,
+				AD93BA919195EEE1E8C3FAB2 /* NightArcFace.swift in Sources */,
+				970D17B50020B2BFEB7E12C4 /* OnboardingView.swift in Sources */,
+				346816F88DB0726F288F922B /* SettingsView.swift in Sources */,
+				C6D51E60FE5A12A3449B418F /* SetupView.swift in Sources */,
+				FFE6492399AECB4B851D5F57 /* SkyBackground.swift in Sources */,
+				90407EF71A837592C1778647 /* StirActivityAttributes.swift in Sources */,
+				8E05EB85F46DDEF023BD88D5 /* StirApp.swift in Sources */,
+				9035EC9A9EF010110E1EC5CF /* StirLiveActivity.swift in Sources */,
+				A40697DB09197D46B4A1D820 /* TechnicalDetailsView.swift in Sources */,
+				DE92A3386EA9651D8271E799 /* WhiteNoisePlayer.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B0969B52ED53C2004B9455DC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6A2F584E673A6C413700D5EA /* stir-widgets */;
+			targetProxy = 0CD6E5AE2C7A9EBDF3C6C2ED /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		3450581912860C648B410097 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "stir-widgets/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pureinference.stir.widgets;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4A05F40C17B121792DBCA7A4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = stir/stir.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = stir/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.pureinference.stir;
+				SDKROOT = iphoneos;
+				SUPPORTS_LIVE_ACTIVITIES = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5550ADB188F7DDB84ABA80B0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 86CCQ2AT2P;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		9BDCCC3EAB39B7B61C91AA64 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "stir-widgets/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pureinference.stir.widgets;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		ABCB93717CF6186C24E30BFA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = stir/stir.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = stir/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.pureinference.stir;
+				SDKROOT = iphoneos;
+				SUPPORTS_LIVE_ACTIVITIES = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		BF64A32A071FA63858198CC5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 86CCQ2AT2P;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		51DEF17BECEC66E9DD9E684C /* Build configuration list for PBXNativeTarget "stir-widgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3450581912860C648B410097 /* Debug */,
+				9BDCCC3EAB39B7B61C91AA64 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		61721F7956A25866686C65DD /* Build configuration list for PBXProject "stir" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF64A32A071FA63858198CC5 /* Debug */,
+				5550ADB188F7DDB84ABA80B0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DC5CEBD74A9A8185B0C772AB /* Build configuration list for PBXNativeTarget "stir" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4A05F40C17B121792DBCA7A4 /* Debug */,
+				ABCB93717CF6186C24E30BFA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B43AABF8073846C254D3A09C /* Project object */;
+}

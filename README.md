@@ -1,8 +1,8 @@
-# yolo alarm
+# stir
 
 **Sleep soundly, wake up ready to live.**
 
-yolo alarm covers your whole night. White noise helps you fall and stay asleep, fades to silence before your wake window, then yolo listens for the subtle sounds of you naturally stirring and wakes you at the perfect moment — never later than your "up by" time.
+stir covers your whole night. White noise helps you fall and stay asleep, fades to silence before your wake window, then stir listens for the subtle sounds of you naturally stirring and wakes you at the perfect moment — never later than your "up by" time.
 
 ## Features
 
@@ -23,7 +23,7 @@ yolo alarm covers your whole night. White noise helps you fall and stay asleep, 
 1. Set the time you want to be up by (e.g., 7:00 AM)
 2. Tap Start and drift off to white noise
 3. The white noise fades out before your wake window opens
-4. When yolo detects you stirring, it gently wakes you — or the alarm fires at your "up by" time
+4. When stir detects you stirring, it gently wakes you — or the alarm fires at your "up by" time
 5. Start your day feeling ready
 
 ## Requirements
@@ -42,19 +42,19 @@ brew install xcodegen
 xcodegen generate
 
 # Open in Xcode
-open yolo-alarm.xcodeproj
+open stir.xcodeproj
 ```
 
 ## Privacy
 
-yolo alarm uses your microphone solely to detect movement sounds during your wake window. Audio is processed on your device in real-time. Nothing is ever recorded, stored, or sent anywhere.
+stir uses your microphone solely to detect movement sounds during your wake window. Audio is processed on your device in real-time. Nothing is ever recorded, stored, or sent anywhere.
 
 ## Links
 
-- [Website](https://timroman.github.io/yolo-alarm/)
-- [Privacy Policy](https://timroman.github.io/yolo-alarm/privacy.html)
-- [App Store](https://apps.apple.com/app/yolo-alarm)
+- [Website](https://timroman.github.io/stir/)
+- [Privacy Policy](https://timroman.github.io/stir/privacy.html)
+- [App Store](https://apps.apple.com/app/stir)
 
 ## License
 
-Copyright 2025. All rights reserved.
+MIT licensed — see LICENSE. © 2026 Pure Inference Ventures, LLC.
