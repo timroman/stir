@@ -16,6 +16,7 @@ final class MoonTracker: NSObject, ObservableObject {
     }
 
     @Published private(set) var position: MoonPosition?
+    @Published private(set) var sunPosition: MoonPosition?
 
     private let manager = CLLocationManager()
     private var coordinate: CLLocationCoordinate2D? {
@@ -54,11 +55,15 @@ final class MoonTracker: NSObject, ObservableObject {
     func refresh(at date: Date = Date()) {
         guard let coordinate else {
             position = nil
+            sunPosition = nil
             return
         }
         position = Self.moonPosition(date: date,
                                      latitude: coordinate.latitude,
                                      longitude: coordinate.longitude)
+        sunPosition = Self.sunPosition(date: date,
+                                       latitude: coordinate.latitude,
+                                       longitude: coordinate.longitude)
     }
 
     // MARK: - Astronomy
@@ -94,6 +99,33 @@ final class MoonTracker: NSObject, ObservableObject {
         let wrapped = atan2(sin(h), cos(h))
         // Standard rise/set condition: cos H₀ = -tan φ · tan δ. Clamped values
         // mean the moon is circumpolar (never sets / never rises) tonight.
+        let horizonCos = min(max(-tan(phi) * tan(dec), -1), 1)
+
+        return MoonPosition(altitude: altitude, azimuth: azimuth,
+                            hourAngle: wrapped, horizonCos: horizonCos)
+    }
+
+    // The sun, same formulation (suncalc's low-precision series)
+    static func sunPosition(date: Date, latitude: Double, longitude: Double) -> MoonPosition {
+        let d = date.timeIntervalSince1970 / 86_400 - 10_957.5
+
+        // Ecliptic longitude from mean anomaly + equation of center + perihelion
+        let m = rad * (357.5291 + 0.98560028 * d)
+        let c = rad * (1.9148 * sin(m) + 0.02 * sin(2 * m) + 0.0003 * sin(3 * m))
+        let p = rad * 102.9372
+        let lon = m + c + p + .pi
+
+        let ra = atan2(sin(lon) * cos(obliquity), cos(lon))
+        let dec = asin(sin(lon) * sin(obliquity))
+
+        let lw = rad * -longitude
+        let phi = rad * latitude
+        let siderealTime = rad * (280.16 + 360.9856235 * d) - lw
+        let h = siderealTime - ra
+
+        let altitude = asin(sin(phi) * sin(dec) + cos(phi) * cos(dec) * cos(h))
+        let azimuth = atan2(sin(h), cos(h) * sin(phi) - tan(dec) * cos(phi))
+        let wrapped = atan2(sin(h), cos(h))
         let horizonCos = min(max(-tan(phi) * tan(dec), -1), 1)
 
         return MoonPosition(altitude: altitude, azimuth: azimuth,

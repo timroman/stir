@@ -44,44 +44,22 @@ enum NightSky {
         palette.map { Color(red: $0.r, green: $0.g, blue: $0.b) }
     }
 
-    // The sky for a moment in the night. Deep night for most of the session,
-    // warming through pre-dawn and dawn as "up by" approaches, then to full
-    // sunrise in the 20 minutes after it. A fresh session settles from dusk
-    // into deep night over the first 45 minutes.
-    static func colors(now: Date, sessionStart: Date, upBy: Date) -> [Color] {
+    // The sky for a moment in the night. Full dark from the moment the session
+    // starts — the app is opened at bedtime, in the dark — warming through
+    // pre-dawn and dawn as "up by" approaches, then to full sunrise in the
+    // 20 minutes after it.
+    static func colors(now: Date, upBy: Date) -> [Color] {
         let remaining = upBy.timeIntervalSince(now)
 
-        let base: [Color]
         if remaining <= 0 {
-            base = lerp(dawn, sunrise, -remaining / 1200)
+            return lerp(dawn, sunrise, -remaining / 1200)
         } else if remaining <= 1200 {          // last 20 min: pre-dawn → dawn
-            base = lerp(preDawn, dawn, 1 - remaining / 1200)
+            return lerp(preDawn, dawn, 1 - remaining / 1200)
         } else if remaining <= 5400 {          // 90 → 20 min out: night → pre-dawn
-            base = lerp(deepNight, preDawn, 1 - (remaining - 1200) / 4200)
+            return lerp(deepNight, preDawn, 1 - (remaining - 1200) / 4200)
         } else {
-            base = colors(deepNight)
+            return colors(deepNight)
         }
-
-        // Settle from dusk into the night sky after bedtime
-        let elapsed = now.timeIntervalSince(sessionStart)
-        if elapsed < 2700, remaining > 0 {
-            let settled = base
-            let duskColors = colors(dusk)
-            let t = max(elapsed / 2700, 0)
-            return zip(duskColors, settled).map { d, s in
-                blend(d, s, t)
-            }
-        }
-        return base
-    }
-
-    private static func blend(_ a: Color, _ b: Color, _ t: Double) -> Color {
-        let ca = UIColor(a), cb = UIColor(b)
-        var ar: CGFloat = 0, ag: CGFloat = 0, ab: CGFloat = 0, aa: CGFloat = 0
-        var br: CGFloat = 0, bg: CGFloat = 0, bb: CGFloat = 0, ba: CGFloat = 0
-        ca.getRed(&ar, green: &ag, blue: &ab, alpha: &aa)
-        cb.getRed(&br, green: &bg, blue: &bb, alpha: &ba)
-        return Color(red: ar + (br - ar) * t, green: ag + (bg - ag) * t, blue: ab + (bb - ab) * t)
     }
 }
 

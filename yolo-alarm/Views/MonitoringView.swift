@@ -20,21 +20,20 @@ struct MonitoringView: View {
     @State private var sessionTimer: Timer?
     @State private var phase: SessionPhase = .whiteNoise
     @State private var hasStartedWhiteNoise = false
-    @State private var sessionStart = Date()
     @StateObject private var moonTracker = MoonTracker()
 
     var body: some View {
         ZStack {
             SkyBackground(colors: NightSky.colors(
                 now: currentTime,
-                sessionStart: sessionStart,
                 upBy: appState.settings.wakeUpBy
             ))
             .animation(.easeInOut(duration: 2), value: currentTime)
 
-            // Clockless night face: the whole screen is the sky, the real moon
-            // its only object. The warming gradient is the wake signal.
-            SkyFace(moonPosition: moonTracker.position)
+            // The night face: real sun and moon riding their diurnal rings
+            // over a shared horizon. The warming gradient is the wake signal.
+            SkyFace(moonPosition: moonTracker.position,
+                    sunPosition: moonTracker.sunPosition)
                 .offset(burnInOffset)
 
             VStack {
@@ -210,7 +209,7 @@ struct MonitoringView: View {
     private func startSessionAsync() async {
         guard !hasStarted else { return }
         hasStarted = true
-        sessionStart = Date()
+
         UIDevice.current.isBatteryMonitoringEnabled = true
         updateIdleTimer()
         moonTracker.start()
