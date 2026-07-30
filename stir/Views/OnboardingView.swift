@@ -1,9 +1,44 @@
 import SwiftUI
 import AVFoundation
+import CoreLocation
+#if canImport(AlarmKit)
+import AlarmKit
+#endif
+
+// Requests when-in-use location during onboarding so the prompt never
+// interrupts a night session
+@MainActor
+final class OnboardingLocation: NSObject, ObservableObject, CLLocationManagerDelegate {
+    @Published var granted = false
+    private let manager = CLLocationManager()
+
+    override init() {
+        super.init()
+        manager.delegate = self
+        refresh()
+    }
+
+    func refresh() {
+        switch manager.authorizationStatus {
+        case .authorizedWhenInUse, .authorizedAlways: granted = true
+        default: granted = false
+        }
+    }
+
+    func request() {
+        manager.requestWhenInUseAuthorization()
+    }
+
+    nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        Task { @MainActor in self.refresh() }
+    }
+}
 
 struct OnboardingView: View {
     @EnvironmentObject var appState: AppState
     @State private var microphoneGranted = false
+    @State private var alarmsGranted = false
+    @StateObject private var location = OnboardingLocation()
     @State private var showingDetails = false
 
     var body: some View {
@@ -35,6 +70,7 @@ struct OnboardingView: View {
                     Text("white noise while you sleep, fading to silence before stir listens for you stirring — then a gentle wake, no later than your \"up by\" time.")
                         .font(.caption)
                         .foregroundColor(.gray)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(16)
@@ -53,14 +89,38 @@ struct OnboardingView: View {
                     .foregroundColor(.white.opacity(0.7))
                 }
 
+                // All permissions up front, each explained — so no prompt ever
+                // interrupts a night
                 PermissionCard(
                     icon: "mic.fill",
                     title: "microphone",
-                    description: "required to detect noise and wake you up",
+                    description: "required — how stir hears you naturally stirring during your wake window",
                     isGranted: microphoneGranted,
                     isActive: !microphoneGranted
                 ) {
                     requestMicrophonePermission()
+                }
+
+                PermissionCard(
+                    icon: "moon.stars.fill",
+                    title: "location",
+                    description: "places the real sun and moon in your night sky. approximate, never leaves your phone",
+                    isGranted: location.granted,
+                    isActive: !location.granted
+                ) {
+                    location.request()
+                }
+
+                if alarmKitAvailable {
+                    PermissionCard(
+                        icon: "alarm.fill",
+                        title: "backup alarm",
+                        description: "a system alarm at your \"up by\" time — fires even if the app closes overnight",
+                        isGranted: alarmsGranted,
+                        isActive: !alarmsGranted
+                    ) {
+                        requestAlarmPermission()
+                    }
                 }
             }
             .padding(.horizontal, 24)
@@ -102,6 +162,13 @@ struct OnboardingView: View {
         }
     }
 
+    private var alarmKitAvailable: Bool {
+        #if canImport(AlarmKit)
+        if #available(iOS 26.0, *) { return true }
+        #endif
+        return false
+    }
+
     private func checkExistingPermissions() {
         // Check microphone
         switch AVAudioApplication.shared.recordPermission {
@@ -110,6 +177,14 @@ struct OnboardingView: View {
         default:
             break
         }
+
+        location.refresh()
+
+        #if canImport(AlarmKit)
+        if #available(iOS 26.0, *) {
+            alarmsGranted = AlarmManager.shared.authorizationState == .authorized
+        }
+        #endif
     }
 
     private func requestMicrophonePermission() {
@@ -118,6 +193,17 @@ struct OnboardingView: View {
                 microphoneGranted = granted
             }
         }
+    }
+
+    private func requestAlarmPermission() {
+        #if canImport(AlarmKit)
+        if #available(iOS 26.0, *) {
+            Task {
+                let state = try? await AlarmManager.shared.requestAuthorization()
+                alarmsGranted = state == .authorized
+            }
+        }
+        #endif
     }
 }
 
@@ -152,6 +238,8 @@ struct PermissionCard: View {
                     Text(description)
                         .font(.caption)
                         .foregroundColor(.gray)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .multilineTextAlignment(.leading)
                 }
 
                 Spacer()
