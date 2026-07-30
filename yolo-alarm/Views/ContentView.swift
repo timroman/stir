@@ -2,6 +2,9 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var appState: AppState
+    #if DEBUG
+    @State private var debugShowDetails = ProcessInfo.processInfo.arguments.contains("-showDetails")
+    #endif
 
     var body: some View {
         ZStack {
@@ -21,6 +24,13 @@ struct ContentView: View {
             }
         }
         .animation(.easeInOut(duration: 1.0), value: appState.currentScreen)
+        #if DEBUG
+        .sheet(isPresented: $debugShowDetails) {
+            NavigationStack {
+                TechnicalDetailsView()
+            }
+        }
+        #endif
     }
 }
 
