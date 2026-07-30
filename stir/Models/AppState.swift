@@ -44,10 +44,25 @@ class AppState: ObservableObject {
     }
 
     #if DEBUG
-    // Test support: jump straight to a screen with a synthetic session, e.g.
-    //   -screen monitoring -upByMinutes 12
+    // Test support: jump straight to a screen with a synthetic session.
+    // Launch arguments (-screen monitoring -upByMinutes 12) work when the
+    // simulator delivers them; one-shot UserDefaults keys (debugScreen,
+    // debugUpByMinutes — cleared after applying) are the reliable path for
+    // scripted screenshots, since simctl arg delivery is flaky:
+    //   xcrun simctl spawn <dev> defaults write <bundle> debugScreen monitoring
     private func applyLaunchOverrides() {
-        let args = ProcessInfo.processInfo.arguments
+        var args = ProcessInfo.processInfo.arguments
+
+        let defaults = UserDefaults.standard
+        if let screen = defaults.string(forKey: "debugScreen") {
+            args += ["-screen", screen]
+            defaults.removeObject(forKey: "debugScreen")
+        }
+        if let minutes = defaults.string(forKey: "debugUpByMinutes") {
+            args += ["-upByMinutes", minutes]
+            defaults.removeObject(forKey: "debugUpByMinutes")
+        }
+
         if let index = args.firstIndex(of: "-upByMinutes"), index + 1 < args.count,
            let minutes = Double(args[index + 1]) {
             settings.wakeUpBy = Date().addingTimeInterval(minutes * 60)

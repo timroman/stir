@@ -66,6 +66,10 @@ targets:
         NSLocationWhenInUseUsageDescription: "stir uses your approximate location only to draw the real sun and moon in the night sky. It never leaves your device."
         NSAlarmKitUsageDescription: "stir schedules a backup system alarm at your 'up by' time so you never oversleep, even if the app is closed overnight."
         ITSAppUsesNonExemptEncryption: false
+        CFBundleURLTypes:
+          - CFBundleURLName: com.pureinference.stir
+            CFBundleURLSchemes:
+              - stir
     entitlements:
       path: stir/stir.entitlements
       properties:
