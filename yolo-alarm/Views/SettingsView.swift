@@ -277,36 +277,32 @@ struct SettingsView: View {
 
                 // About Section
                 Section {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("yolo apps")
-                            .font(.headline)
-                            .foregroundColor(.primary)
-
-                        Text("apps designed for focus, privacy, and what matters. no ads, no subscriptions, no data collection. tools to help you create, reflect, live healthy, and focus on what brings you joy.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-
-                        Link(destination: URL(string: "https://yoloapps.com")!) {
-                            HStack {
-                                Text("learn more")
-                                    .font(.caption)
-                                Image(systemName: "arrow.up.right")
-                                    .font(.caption2)
-                            }
-                            .foregroundColor(.blue)
-                        }
-
-                        Link(destination: URL(string: "https://timroman.github.io/yolo-alarm/")!) {
-                            HStack {
-                                Text("open source — see how it's built")
-                                    .font(.caption)
-                                Image(systemName: "arrow.up.right")
-                                    .font(.caption2)
-                            }
-                            .foregroundColor(.blue)
+                    Link(destination: URL(string: "https://timroman.github.io/yolo-alarm/")!) {
+                        HStack {
+                            Text("open source — see how it's built")
+                            Spacer()
+                            Image(systemName: "arrow.up.right")
+                                .font(.caption)
                         }
                     }
-                    .padding(.vertical, 4)
+
+                    Link(destination: URL(string: "https://timroman.github.io/yolo-alarm/#privacy")!) {
+                        HStack {
+                            Text("privacy policy")
+                            Spacer()
+                            Image(systemName: "arrow.up.right")
+                                .font(.caption)
+                        }
+                    }
+
+                    Link(destination: URL(string: "https://www.pureinference.com")!) {
+                        HStack {
+                            Text("a pure inference build")
+                            Spacer()
+                            Image(systemName: "arrow.up.right")
+                                .font(.caption)
+                        }
+                    }
                 } footer: {
                     Text("version \(appVersion)")
                 }
