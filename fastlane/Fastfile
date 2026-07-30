@@ -7,7 +7,8 @@
 default_platform(:ios)
 
 platform :ios do
-  before_all do
+  # Auth only for lanes that talk to Apple — the local build lane needs none
+  private_lane :asc_auth do
     app_store_connect_api_key(
       key_id: ENV.fetch("ASC_KEY_ID"),
       issuer_id: ENV.fetch("ASC_ISSUER_ID"),
@@ -27,12 +28,14 @@ platform :ios do
 
   desc "Upload a new build to TestFlight"
   lane :beta do
+    asc_auth
     build
     upload_to_testflight(skip_waiting_for_build_processing: true)
   end
 
   desc "Upload build + metadata to App Store Connect for review submission"
   lane :release do
+    asc_auth
     build
     upload_to_app_store(
       force: true,                 # skip the HTML report prompt (non-interactive)
@@ -43,6 +46,7 @@ platform :ios do
 
   desc "Push metadata (description, keywords, URLs) without a new build"
   lane :metadata do
+    asc_auth
     upload_to_app_store(
       force: true,
       skip_binary_upload: true,
