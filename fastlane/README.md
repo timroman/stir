@@ -23,6 +23,14 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Regenerate the Xcode project and build a signed release archive
 
+### ios create_app
+
+```sh
+[bundle exec] fastlane ios create_app
+```
+
+Create the App Store Connect app record (one-time). Fails loudly if the name is taken.
+
 ### ios beta
 
 ```sh

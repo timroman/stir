@@ -33,6 +33,11 @@ platform :ios do
     )
   end
 
+  # Note: the App Store Connect API cannot create app records (apps resource
+  # is read/update only) — the one-time app creation is done in the ASC web UI.
+  # Everything after that (builds, metadata, screenshots, TestFlight) works
+  # through the API key.
+
   desc "Upload a new build to TestFlight"
   lane :beta do
     asc_auth
