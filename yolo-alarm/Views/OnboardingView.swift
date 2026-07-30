@@ -4,6 +4,7 @@ import AVFoundation
 struct OnboardingView: View {
     @EnvironmentObject var appState: AppState
     @State private var microphoneGranted = false
+    @State private var showingDetails = false
 
     var body: some View {
         ZStack {
@@ -43,6 +44,16 @@ struct OnboardingView: View {
                     RoundedRectangle(cornerRadius: 16)
                         .fill(Color.white.opacity(0.05))
                 )
+
+                Button(action: { showingDetails = true }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "sparkles")
+                            .font(.caption)
+                        Text("how it works")
+                            .font(.subheadline)
+                    }
+                    .foregroundColor(.white.opacity(0.7))
+                }
 
                 PermissionCard(
                     icon: "mic.fill",
@@ -84,6 +95,12 @@ struct OnboardingView: View {
         }
         .onAppear {
             checkExistingPermissions()
+        }
+        .sheet(isPresented: $showingDetails) {
+            NavigationStack {
+                TechnicalDetailsView()
+            }
+            .presentationDragIndicator(.visible)
         }
     }
 

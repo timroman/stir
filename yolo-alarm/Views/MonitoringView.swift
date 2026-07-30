@@ -39,20 +39,9 @@ struct MonitoringView: View {
             VStack {
                 Spacer()
 
-                // Status info — kept low, out of the sky
+                // Only functional detail, kept low and out of the sky — no
+                // status labels; the face stays clean
                 VStack(spacing: 8) {
-                    Text(statusText)
-                        .font(.system(size: 12, weight: .semibold))
-                        .kerning(2)
-                        .textCase(.uppercase)
-                        .foregroundColor(statusColor)
-
-                    if phase == .fading {
-                        ProgressView(value: Double(whiteNoisePlayer.fadeProgress))
-                            .progressViewStyle(LinearProgressViewStyle(tint: .white.opacity(0.4)))
-                            .frame(width: 120)
-                    }
-
                     if audioMonitor.monitoringState.isCalibrating {
                         // Calibration progress
                         VStack(spacing: 4) {
@@ -154,42 +143,6 @@ struct MonitoringView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "h:mm a"
         return formatter.string(from: currentTime).lowercased()
-    }
-
-    private var statusText: String {
-        switch phase {
-        case .whiteNoise:
-            return "white noise"
-        case .fading:
-            return "fading out..."
-        case .quiet:
-            return "quiet"
-        case .complete:
-            return "white noise ended — good morning"
-        case .wakeWindow:
-            switch audioMonitor.monitoringState {
-            case .idle: return "waiting"
-            case .calibrating: return "calibrating..."
-            case .listening: return "listening"
-            }
-        }
-    }
-
-    private var statusColor: Color {
-        switch phase {
-        case .whiteNoise, .fading:
-            return NightSky.cream.opacity(0.7)
-        case .quiet:
-            return .white.opacity(0.45)
-        case .complete:
-            return NightSky.dawnAmber
-        case .wakeWindow:
-            switch audioMonitor.monitoringState {
-            case .idle: return .white.opacity(0.45)
-            case .calibrating: return NightSky.dawnAmber.opacity(0.8)
-            case .listening: return NightSky.dawnAmber
-            }
-        }
     }
 
     // Keep the display alive through the night — but only while docked, so a

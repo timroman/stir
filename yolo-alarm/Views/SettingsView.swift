@@ -266,6 +266,15 @@ struct SettingsView: View {
                     Text("haptics")
                 }
 
+                // Technical details
+                Section {
+                    NavigationLink("technical details") {
+                        TechnicalDetailsView()
+                    }
+                } footer: {
+                    Text("how the night, the listening, and the rings actually work")
+                }
+
                 // About Section
                 Section {
                     VStack(alignment: .leading, spacing: 12) {
