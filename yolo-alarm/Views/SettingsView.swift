@@ -295,6 +295,16 @@ struct SettingsView: View {
                             }
                             .foregroundColor(.blue)
                         }
+
+                        Link(destination: URL(string: "https://timroman.github.io/yolo-alarm/")!) {
+                            HStack {
+                                Text("open source — see how it's built")
+                                    .font(.caption)
+                                Image(systemName: "arrow.up.right")
+                                    .font(.caption2)
+                            }
+                            .foregroundColor(.blue)
+                        }
                     }
                     .padding(.vertical, 4)
                 } footer: {

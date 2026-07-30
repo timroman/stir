@@ -1,370 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>yolo alarm - Wake up ready to live</title>
-    <meta name="description" content="yolo alarm wakes you gently when your body is ready. No more groggy mornings.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>yolo alarm — sleep soundly, wake up ready to live</title>
+<meta name="description" content="One overnight session: white noise fades to silence, then yolo listens for you naturally stirring. The night screen is the real sky — the actual sun and moon on their daily rings. Open source, on-device, private.">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #e9e6df;
+    --muted: rgba(233, 230, 223, 0.55);
+    --faint: rgba(233, 230, 223, 0.28);
+    --cream: #f3ead6;
+    --amber: #d29a6a;
+    --line: rgba(233, 230, 223, 0.14);
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #000;
+    color: var(--ink);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 0 24px; }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-            color: #fff;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+  /* Hero: the night face */
+  .hero {
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(180deg, #000 0%, #000 55%, #030412 75%, #0a0d1f 100%);
+    position: relative;
+    overflow: hidden;
+    padding: 48px 24px;
+  }
+  .rings { width: min(420px, 86vw); height: auto; display: block; margin-bottom: 44px; }
+  h1 {
+    font-size: clamp(2.2rem, 7vw, 3.4rem);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: var(--cream);
+    margin-bottom: 14px;
+  }
+  .tagline { font-size: 1.05rem; color: var(--muted); max-width: 420px; }
+  .hero .links { margin-top: 40px; display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+  .btn {
+    display: inline-block;
+    padding: 12px 26px;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    text-decoration: none;
+    color: #0a0d1f;
+    background: var(--cream);
+  }
+  .btn.ghost {
+    color: var(--cream);
+    background: transparent;
+    border: 1px solid rgba(243, 234, 214, 0.4);
+  }
 
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
+  section { padding: 72px 0; border-top: 1px solid var(--line); }
+  .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 14px;
+  }
+  h2 { font-size: 1.45rem; font-weight: 500; margin-bottom: 16px; color: var(--cream); }
+  p { color: var(--muted); margin-bottom: 14px; max-width: 58ch; }
+  p strong { color: var(--ink); font-weight: 500; }
+  a { color: var(--cream); }
 
-        /* Hero */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 60px 24px;
-            position: relative;
-        }
+  footer { padding: 56px 0 72px; border-top: 1px solid var(--line); }
+  footer p { font-size: 0.85rem; color: var(--faint); }
+  footer a { color: var(--muted); }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 20%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .logo {
-            font-size: 1.25rem;
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            margin-bottom: 60px;
-            color: rgba(255,255,255,0.9);
-        }
-
-        h1 {
-            font-size: clamp(2.5rem, 8vw, 4.5rem);
-            font-weight: 700;
-            letter-spacing: -0.03em;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .tagline {
-            font-size: clamp(1.125rem, 3vw, 1.5rem);
-            color: rgba(255,255,255,0.6);
-            max-width: 500px;
-            line-height: 1.5;
-            margin-bottom: 48px;
-        }
-
-        .app-store-badge {
-            transition: transform 0.2s ease;
-        }
-
-        .app-store-badge:hover {
-            transform: scale(1.05);
-        }
-
-        .app-store-badge img {
-            height: 54px;
-        }
-
-        .phone-mockup {
-            margin-top: 60px;
-            position: relative;
-        }
-
-        .phone-mockup img {
-            max-width: 280px;
-            width: 100%;
-            border-radius: 36px;
-            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
-        }
-
-        /* Features */
-        .features {
-            padding: 120px 24px;
-        }
-
-        .features h2 {
-            text-align: center;
-            font-size: clamp(2rem, 5vw, 3rem);
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-bottom: 60px;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 32px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .feature {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 16px;
-            padding: 32px;
-            transition: background 0.2s ease;
-        }
-
-        .feature:hover {
-            background: rgba(255,255,255,0.05);
-        }
-
-        .feature-icon {
-            font-size: 2rem;
-            margin-bottom: 16px;
-        }
-
-        .feature h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .feature p {
-            color: rgba(255,255,255,0.5);
-            line-height: 1.6;
-        }
-
-        /* How it works */
-        .how-it-works {
-            padding: 120px 24px;
-            background: rgba(0,0,0,0.2);
-        }
-
-        .how-it-works h2 {
-            text-align: center;
-            font-size: clamp(2rem, 5vw, 3rem);
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-bottom: 60px;
-        }
-
-        .steps {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .step {
-            display: flex;
-            align-items: flex-start;
-            gap: 20px;
-        }
-
-        .step-number {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            flex-shrink: 0;
-        }
-
-        .step-content h3 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .step-content p {
-            color: rgba(255,255,255,0.5);
-            line-height: 1.5;
-        }
-
-        /* Privacy */
-        .privacy {
-            padding: 120px 24px;
-            text-align: center;
-        }
-
-        .privacy-icon {
-            font-size: 3rem;
-            margin-bottom: 24px;
-        }
-
-        .privacy h2 {
-            font-size: clamp(1.75rem, 4vw, 2.5rem);
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-bottom: 16px;
-        }
-
-        .privacy p {
-            color: rgba(255,255,255,0.5);
-            max-width: 500px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        /* CTA */
-        .cta {
-            padding: 120px 24px;
-            text-align: center;
-            background: rgba(0,0,0,0.2);
-        }
-
-        .cta h2 {
-            font-size: clamp(2rem, 5vw, 3rem);
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-bottom: 16px;
-        }
-
-        .cta p {
-            color: rgba(255,255,255,0.5);
-            margin-bottom: 32px;
-            font-size: 1.125rem;
-        }
-
-        /* Footer */
-        footer {
-            padding: 40px 24px;
-            text-align: center;
-            border-top: 1px solid rgba(255,255,255,0.06);
-        }
-
-        footer p {
-            color: rgba(255,255,255,0.4);
-            font-size: 0.875rem;
-        }
-
-        footer a {
-            color: rgba(255,255,255,0.6);
-            text-decoration: none;
-            margin: 0 12px;
-            transition: color 0.2s ease;
-        }
-
-        footer a:hover {
-            color: #fff;
-        }
-
-        .footer-links {
-            margin-bottom: 16px;
-        }
-    </style>
+  @media (prefers-reduced-motion: no-preference) {
+    .moon-dot { animation: drift 60s linear infinite; transform-origin: 210px 178px; }
+    @keyframes drift { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  }
+</style>
 </head>
 <body>
-    <section class="hero">
-        <div class="logo">yolo alarm</div>
-        <h1>Wake up ready to live</h1>
-        <p class="tagline">yolo wakes you gently when your body is ready. No more groggy mornings. Just you, starting your day right.</p>
-        <a href="https://apps.apple.com/app/yolo-alarm" class="app-store-badge">
-            <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store">
-        </a>
-    </section>
 
-    <section class="features">
-        <div class="container">
-            <h2>Wake up differently</h2>
-            <div class="features-grid">
-                <div class="feature">
-                    <div class="feature-icon">🌅</div>
-                    <h3>Wake Window</h3>
-                    <p>Set your earliest and latest wake times. yolo finds the perfect moment in between.</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🎯</div>
-                    <h3>Smart Detection</h3>
-                    <p>Adjustable sensitivity detects the subtle sounds of you naturally stirring awake.</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🔔</div>
-                    <h3>Gentle Alarm</h3>
-                    <p>Volume builds gradually over 60 seconds. Wake up peacefully, not startled.</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🎨</div>
-                    <h3>Make It Yours</h3>
-                    <p>Custom sounds, haptic patterns, and color themes. Your alarm, your way.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+<div class="hero">
+  <!-- The night face: sun and moon rings over one horizon -->
+  <svg class="rings" viewBox="0 0 420 300" role="img" aria-label="The app's night face: the sun's and moon's daily rings crossing a shared horizon">
+    <rect x="0" y="150" width="420" height="150" fill="rgba(255,255,255,0.03)"/>
+    <line x1="0" y1="150" x2="420" y2="150" stroke="rgba(233,230,223,0.25)" stroke-width="1"/>
+    <!-- sun ring: rides high -->
+    <circle cx="210" cy="122" r="118" fill="none" stroke="rgba(210,154,106,0.35)" stroke-width="1.5"/>
+    <!-- moon ring: rides low -->
+    <circle cx="210" cy="178" r="118" fill="none" stroke="rgba(233,230,223,0.22)" stroke-width="1.5"/>
+    <!-- crossings -->
+    <circle cx="95.5" cy="150" r="2.5" fill="rgba(210,154,106,0.5)"/>
+    <circle cx="324.5" cy="150" r="2.5" fill="rgba(210,154,106,0.5)"/>
+    <circle cx="103.6" cy="150" r="2.5" fill="rgba(233,230,223,0.4)"/>
+    <circle cx="316.4" cy="150" r="2.5" fill="rgba(233,230,223,0.4)"/>
+    <!-- sun, under the earth -->
+    <circle cx="210" cy="240" r="11" fill="#d29a6a" opacity="0.4"/>
+    <!-- moon, high in the sky, slowly drifting its ring -->
+    <g class="moon-dot">
+      <circle cx="210" cy="60" r="12" fill="#f3ead6"/>
+      <circle cx="210" cy="60" r="20" fill="none" stroke="rgba(243,234,214,0.18)" stroke-width="8"/>
+    </g>
+  </svg>
 
-    <section class="how-it-works">
-        <div class="container">
-            <h2>How it works</h2>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h3>Set your wake window</h3>
-                        <p>Choose your earliest and latest wake times, like 6:30 - 7:00 AM.</p>
-                    </div>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h3>Tap Start and sleep</h3>
-                        <p>yolo quietly listens for signs you're waking up naturally.</p>
-                    </div>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h3>Wake up refreshed</h3>
-                        <p>When you stir, yolo gently brings you into your day.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+  <h1>yolo alarm</h1>
+  <p class="tagline">sleep soundly, wake up ready to live. one overnight session — white noise into silence, then a gentle wake when your body is ready.</p>
+  <div class="links">
+    <a class="btn" href="https://apps.apple.com/app/yolo-alarm">App Store</a>
+    <a class="btn ghost" href="https://github.com/timroman/yolo-alarm">Source on GitHub</a>
+  </div>
+</div>
 
-    <section class="privacy">
-        <div class="container">
-            <div class="privacy-icon">🔒</div>
-            <h2>Private by design</h2>
-            <p>All audio processing happens on your device. Nothing is ever recorded, stored, or sent anywhere. Your sleep is your business.</p>
-        </div>
-    </section>
+<div class="wrap">
+  <section>
+    <div class="eyebrow">the night</div>
+    <h2>one time, one button</h2>
+    <p>Set when you need to be up by, and start the night. White noise carries you to sleep and holds through the small hours, then fades to silence. After a quiet gap, yolo listens — a 30-second statistical calibration of your room, then a trigger set a few standard deviations above its baseline, so distant traffic never wakes you but the rustle of you naturally stirring does. Miss the window, and the alarm sounds at your "up by" time no matter what.</p>
+  </section>
 
-    <section class="cta">
-        <div class="container">
-            <h2>You only live once</h2>
-            <p>Wake up like it matters.</p>
-            <a href="https://apps.apple.com/app/yolo-alarm" class="app-store-badge">
-                <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store">
-            </a>
-        </div>
-    </section>
+  <section>
+    <div class="eyebrow">the face</div>
+    <h2>no clock — a sky</h2>
+    <p>The night screen shows nothing that tells the time. The background is near-black until about ninety minutes before your wake, then warms through pre-dawn to a sunrise — one glance answers "is it time yet."</p>
+    <p>The two rings are the <strong>real sun and moon</strong>: each ring is that body's complete daily lap around you, and the share of a ring above the horizon line is exactly the share of the day it spends in the sky. The sun's ring sweeps high to low once a year with the seasons; the moon's makes the same sweep every 27 days, and a full moon always rides opposite the sun. The bodies sit at their true positions, computed on-device — when the moon touches the line on screen, it's rising or setting outside your window.</p>
+  </section>
 
-    <footer>
-        <div class="footer-links">
-            <a href="privacy.html">Privacy Policy</a>
-            <a href="https://github.com/timroman/yolo-alarm">GitHub</a>
-        </div>
-        <p>&copy; 2025 yolo alarm</p>
-    </footer>
+  <section>
+    <div class="eyebrow">the build</div>
+    <h2>developed in the open</h2>
+    <p>yolo alarm is open source — the code, the design decisions, and the spec that drove them live in <a href="https://github.com/timroman/yolo-alarm">the repository</a>. The commit history is the development story: the merge of a white-noise app and a smart alarm into one night, the death of every clock on the night screen, and the astronomy that replaced them.</p>
+    <p>Built with Swift and SwiftUI. On iOS 26 and later, a system AlarmKit alarm backstops every session, so you can't oversleep even if the app is closed overnight.</p>
+  </section>
+
+  <section>
+    <div class="eyebrow">privacy</div>
+    <h2>everything stays on your phone</h2>
+    <p>No accounts, no analytics, no servers. The microphone is evaluated only during your wake window and nothing is ever recorded; in no-alarm mode it's never activated at all. Your approximate location places the sun and moon and never leaves the device. <a href="privacy.html">Full privacy policy</a>.</p>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>© 2026 · <a href="https://github.com/timroman/yolo-alarm">github.com/timroman/yolo-alarm</a> · <a href="privacy.html">privacy</a></p>
+  </div>
+</footer>
+
 </body>
 </html>
