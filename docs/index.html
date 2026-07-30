@@ -80,10 +80,10 @@
   footer a { color: var(--muted); }
 
   @media (prefers-reduced-motion: no-preference) {
-    /* The sun laps in 60s; the moon takes 62s — the same ~3% lag that makes
-       the real moon rise ~50 minutes later each night */
-    .sun-dot { animation: drift 60s linear infinite; transform-origin: 210px 122px; }
-    .moon-dot { animation: drift 62s linear infinite; transform-origin: 210px 178px; }
+    /* The moon laps slower than the sun — same direction as reality (it rises
+       ~50 min later each night), exaggerated so the lag is visible at a glance */
+    .sun-dot { animation: drift 40s linear infinite; transform-origin: 210px 122px; }
+    .moon-dot { animation: drift 60s linear infinite; transform-origin: 210px 178px; }
     @keyframes drift { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   }
 </style>
