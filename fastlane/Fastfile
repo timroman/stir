@@ -19,10 +19,17 @@ platform :ios do
   desc "Regenerate the Xcode project and build a signed release archive"
   lane :build do
     sh("cd .. && xcodegen generate")
+    # First run for a new bundle ID needs Apple's provisioning service to
+    # register the App ID and mint an App Store profile; -allowProvisioningUpdates
+    # authorizes xcodebuild to do that using the ASC API key.
     build_app(
       project: "stir.xcodeproj",
       scheme: "stir",
-      export_method: "app-store"
+      export_method: "app-store",
+      xcargs: "-allowProvisioningUpdates " \
+              "-authenticationKeyID #{ENV.fetch('ASC_KEY_ID')} " \
+              "-authenticationKeyIssuerID #{ENV.fetch('ASC_ISSUER_ID')} " \
+              "-authenticationKeyPath #{File.expand_path(ENV.fetch('ASC_KEY_PATH'))}"
     )
   end
 
