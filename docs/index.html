@@ -80,7 +80,10 @@
   footer a { color: var(--muted); }
 
   @media (prefers-reduced-motion: no-preference) {
-    .moon-dot { animation: drift 60s linear infinite; transform-origin: 210px 178px; }
+    /* The sun laps in 60s; the moon takes 62s — the same ~3% lag that makes
+       the real moon rise ~50 minutes later each night */
+    .sun-dot { animation: drift 60s linear infinite; transform-origin: 210px 122px; }
+    .moon-dot { animation: drift 62s linear infinite; transform-origin: 210px 178px; }
     @keyframes drift { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   }
 </style>
@@ -101,8 +104,10 @@
     <circle cx="324.5" cy="150" r="2.5" fill="rgba(210,154,106,0.5)"/>
     <circle cx="103.6" cy="150" r="2.5" fill="rgba(233,230,223,0.4)"/>
     <circle cx="316.4" cy="150" r="2.5" fill="rgba(233,230,223,0.4)"/>
-    <!-- sun, under the earth -->
-    <circle cx="210" cy="240" r="11" fill="#d29a6a" opacity="0.4"/>
+    <!-- sun, starting under the earth, lapping its ring -->
+    <g class="sun-dot">
+      <circle cx="210" cy="240" r="11" fill="#d29a6a" opacity="0.55"/>
+    </g>
     <!-- moon, high in the sky, slowly drifting its ring -->
     <g class="moon-dot">
       <circle cx="210" cy="60" r="12" fill="#f3ead6"/>
@@ -137,6 +142,14 @@
     <h2>developed in the open</h2>
     <p>yolo alarm is open source — the code, the design decisions, and the spec that drove them live in <a href="https://github.com/timroman/yolo-alarm">the repository</a>. The commit history is the development story: the merge of a white-noise app and a smart alarm into one night, the death of every clock on the night screen, and the astronomy that replaced them.</p>
     <p>Built with Swift and SwiftUI. On iOS 26 and later, a system AlarmKit alarm backstops every session, so you can't oversleep even if the app is closed overnight.</p>
+  </section>
+
+  <section>
+    <div class="eyebrow">the story</div>
+    <h2>why I made this</h2>
+    <p>For months I went to bed running two alarm apps side by side. One played white noise and faded out before morning; the other listened for me stirring and woke me gently. Every night, the same ritual: set the first to end about thirty minutes before the second started listening. They were obviously one app that hadn't met itself yet.</p>
+    <p>So I merged them — and then kept pulling the thread. If the app only needs to answer "is it time to wake up," why show a clock at all? The screen became a sky that warms toward your morning. Then the moon crept in: I like stepping outside when it's rising, so the face shows the real moon on its real daily ring, with the horizon drawn where it actually is. The sun followed. Somewhere along the way an alarm clock turned into the night itself, sitting on my nightstand.</p>
+    <p>It's the alarm I wanted to wake up to. Now it's yours too.</p>
   </section>
 
   <section>
