@@ -192,6 +192,8 @@ enum AlarmSound: String, Codable, CaseIterable, Identifiable {
     // Gentle Tones
     case gentleChime = "gentle_chime"
     case softBells = "soft_bells"
+    case singingBowl = "singing_bowl"
+    case dawn = "dawn"
 
     // Nature Sounds
     case oceanWaves = "ocean_waves"
@@ -202,13 +204,15 @@ enum AlarmSound: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .gentleChime: return "gentle chime"
         case .softBells: return "soft bells"
+        case .singingBowl: return "singing bowl"
+        case .dawn: return "dawn"
         case .oceanWaves: return "ocean waves"
         }
     }
 
     var category: SoundCategory {
         switch self {
-        case .gentleChime, .softBells:
+        case .gentleChime, .softBells, .singingBowl, .dawn:
             return .gentle
         case .oceanWaves:
             return .nature
@@ -226,9 +230,12 @@ enum WhiteNoiseSound: String, Codable, CaseIterable, Identifiable {
     case whiteNoise = "white_noise"
     case pinkNoise = "pink_noise"
     case brownNoise = "brown_noise"
+    case fan = "fan"
 
     // Nature Sounds
     case oceanWaves = "ocean_waves"
+    case rain = "rain"
+    case wind = "wind"
 
     var id: String { rawValue }
 
@@ -237,15 +244,18 @@ enum WhiteNoiseSound: String, Codable, CaseIterable, Identifiable {
         case .whiteNoise: return "white noise"
         case .pinkNoise: return "pink noise"
         case .brownNoise: return "brown noise"
+        case .fan: return "fan"
         case .oceanWaves: return "ocean waves"
+        case .rain: return "rain"
+        case .wind: return "wind"
         }
     }
 
     var category: SoundCategory {
         switch self {
-        case .whiteNoise, .pinkNoise, .brownNoise:
+        case .whiteNoise, .pinkNoise, .brownNoise, .fan:
             return .noise
-        case .oceanWaves:
+        case .oceanWaves, .rain, .wind:
             return .nature
         }
     }

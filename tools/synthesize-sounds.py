@@ -49,3 +49,51 @@ for period, phase, amp in [(11.3, 0.0, 1.0), (17.7, 2.1, 0.7), (7.9, 4.0, 0.45)]
     swell += amp * np.clip(s, 0, None) ** 1.6        # waves break, then recede
 ocean = surf_base * (0.25 + swell / swell.max() * 0.75)
 write_wav("ocean_waves.wav", loopable(ocean))
+
+# --- extended set (2026-07-30): more sleep sounds + alarm tones ---
+
+# rain: dense random droplet impulses over a hiss bed
+drops = np.zeros(n)
+idx = rng.integers(0, n - 40, size=int(DUR * 900))
+for i in idx:
+    drops[i:i+40] += rng.standard_normal(40) * np.exp(-np.arange(40) / 8) * rng.uniform(0.2, 1.0)
+spec = np.fft.rfft(rng.standard_normal(n))
+hiss = np.fft.irfft(spec / (f ** 0.35), n)
+write_wav("rain.wav", loopable(hiss * 0.4 + drops))
+
+# wind: deep noise with slow gusts (band-limited amplitude wander)
+spec = np.fft.rfft(rng.standard_normal(n))
+bed = np.fft.irfft(spec / (f ** 1.1), n)
+gust_spec = np.fft.rfft(rng.standard_normal(n))
+mask = f < 0.35
+gust = np.fft.irfft(np.where(mask, gust_spec, 0), n)
+gust = (gust - gust.min()) / (gust.max() - gust.min())
+write_wav("wind.wav", loopable(bed * (0.3 + 0.7 * gust)))
+
+# fan: brown bed + faint 58 Hz motor hum + slight rotational wobble
+spec = np.fft.rfft(rng.standard_normal(n))
+bed = np.fft.irfft(spec / f, n)
+bed = bed / np.max(np.abs(bed))
+hum = 0.06 * np.sin(2 * np.pi * 58 * t) + 0.03 * np.sin(2 * np.pi * 116 * t)
+wobble = 1 + 0.05 * np.sin(2 * np.pi * 4.7 * t)
+write_wav("fan.wav", loopable(bed * wobble + hum))
+
+def tone(freqs_amps_decays, dur):
+    m = int(dur * SR)
+    tt = np.arange(m) / SR
+    out = np.zeros(m)
+    for fr, amp, dec in freqs_amps_decays:
+        out += amp * np.sin(2 * np.pi * fr * tt) * np.exp(-tt / dec)
+    return out * np.minimum(tt / 0.02, 1)   # click-free attack
+
+# singing bowl: inharmonic partials, long decay
+bowl = tone([(220, 1.0, 3.5), (516, 0.55, 2.6), (933, 0.30, 1.8), (1466, 0.15, 1.2)], 8)
+write_wav("singing_bowl.wav", bowl)
+
+# dawn: two soft rising notes, warm partials
+d1 = tone([(392, 1.0, 1.6), (784, 0.35, 1.1)], 2.2)         # G4
+d2 = tone([(523.25, 1.0, 2.4), (1046.5, 0.35, 1.4)], 3.4)   # C5
+dawn = np.zeros(int(5.2 * SR))
+dawn[:len(d1)] += d1
+dawn[int(1.4 * SR):int(1.4 * SR) + len(d2)] += d2
+write_wav("dawn.wav", dawn)
