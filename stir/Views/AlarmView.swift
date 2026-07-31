@@ -349,7 +349,7 @@ class AlarmPlayer: ObservableObject {
             url = customURL
             print("🔔 Playing custom sound: \(customSound.name)")
         } else {
-            url = Bundle.main.url(forResource: sound.rawValue, withExtension: "mp3")
+            url = bundledSoundURL(sound.rawValue)
         }
 
         guard let soundURL = url else {

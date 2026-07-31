@@ -352,7 +352,7 @@ struct SettingsView: View {
     private func previewSound(_ sound: AlarmSound) {
         stopPreview()
 
-        guard let url = Bundle.main.url(forResource: sound.rawValue, withExtension: "mp3") else {
+        guard let url = bundledSoundURL(sound.rawValue) else {
             print("Sound file not found: \(sound.rawValue).mp3")
             return
         }
@@ -363,7 +363,7 @@ struct SettingsView: View {
     private func previewWhiteNoise(_ sound: WhiteNoiseSound) {
         stopPreview()
 
-        guard let url = Bundle.main.url(forResource: sound.rawValue, withExtension: "mp3") else {
+        guard let url = bundledSoundURL(sound.rawValue) else {
             print("Sound file not found: \(sound.rawValue).mp3")
             return
         }

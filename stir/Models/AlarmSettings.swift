@@ -1,5 +1,12 @@
 import Foundation
 
+// Bundled sounds ship as synthesized .m4a (noise family, surf) or legacy .mp3
+// (short alarm tones); resolve either
+func bundledSoundURL(_ name: String) -> URL? {
+    Bundle.main.url(forResource: name, withExtension: "m4a")
+        ?? Bundle.main.url(forResource: name, withExtension: "mp3")
+}
+
 struct AlarmSettings: Codable {
     var wakeUpBy: Date           // The one nightly input: fallback alarm fires at this time
     var wakeWindowMinutes: Int   // Listening window length; windowStart = wakeUpBy - this (10-90)

@@ -26,7 +26,7 @@ class WhiteNoisePlayer: ObservableObject {
     private let fadeUpdateInterval: TimeInterval = 5.0  // Update volume every 5 seconds
 
     func play(sound: WhiteNoiseSound, volume: Float) {
-        guard let url = Bundle.main.url(forResource: sound.rawValue, withExtension: "mp3") else {
+        guard let url = bundledSoundURL(sound.rawValue) else {
             print("Sound file not found: \(sound.rawValue).mp3")
             return
         }
