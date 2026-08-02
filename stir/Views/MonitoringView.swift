@@ -221,7 +221,11 @@ struct MonitoringView: View {
         // started inside the quiet gap or wake window plays white noise
         // (3s fade-in), then fades out; calibration waits for silence.
         if settings.whiteNoiseEnabled {
-            if !hasStartedWhiteNoise {
+            // In alarm mode, wait for the mic engine's first buffer — proof the
+            // audio graph is live — so the fade-in is actually heard instead of
+            // ramping into a dead route
+            let audioReady = !settings.alarmEnabled || audioMonitor.isAudioLive
+            if !hasStartedWhiteNoise && audioReady {
                 hasStartedWhiteNoise = true
                 startWhiteNoise()
             }

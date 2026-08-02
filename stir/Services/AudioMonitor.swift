@@ -51,6 +51,10 @@ class AudioMonitor: ObservableObject {
     @Published var didTrigger: Bool = false
     @Published var monitoringState: MonitoringState = .idle
     @Published var calibrationProgress: Double = 0.0
+    // True once the first audio buffer arrives — ground truth that the audio
+    // graph is actually live (session activation + routing can take seconds
+    // on device, and anything played before then is silently swallowed)
+    @Published var isAudioLive: Bool = false
 
     // Sensitivity multiplier for standard deviation (2.0 = most sensitive, 5.0 = least sensitive)
     var sensitivityMultiplier: Float = 3.5  // Default medium
@@ -269,6 +273,8 @@ class AudioMonitor: ObservableObject {
         didTrigger = false
         monitoringState = .idle
         calibrationProgress = 0.0
+        isAudioLive = false
+        bufferCount = 0
 
         calibrationLock.lock()
         _calibrationSamples.removeAll()
@@ -296,6 +302,7 @@ class AudioMonitor: ObservableObject {
         bufferCount += 1
         if bufferCount == 1 {
             print("🎤 First audio buffer received!")
+            Task { @MainActor in self.isAudioLive = true }
         }
 
         guard let channelData = buffer.floatChannelData?[0] else {
