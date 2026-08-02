@@ -1,1 +1,1 @@
-alarm,sleep,white noise,gentle wake,smart alarm,moon,night,wake up,minimal,bedside
+white,noise,clock,smart,sunrise,bedside,night,moon,machine,asleep,calm,quiet,morning,insomnia
