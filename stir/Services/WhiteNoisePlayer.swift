@@ -67,7 +67,7 @@ class WhiteNoisePlayer: ObservableObject {
             fadeProgress = 0.0
 
             print("Started playing: \(name), fading in to volume \(volume), crossfade looping")
-            startFadeIn(duration: 4.0)
+            startFadeIn(duration: 3.0)
             scheduleCrossfade()
         } catch {
             print("Failed to play sound: \(error)")

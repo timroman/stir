@@ -217,24 +217,21 @@ struct MonitoringView: View {
         let fadeStart = appState.fadeStartTime
         let whiteNoiseEnd = appState.whiteNoiseEndTime
 
-        // White noise lifecycle
+        // White noise lifecycle. Enabled means you hear it — even a session
+        // started inside the quiet gap or wake window plays white noise
+        // (3s fade-in), then fades out; calibration waits for silence.
         if settings.whiteNoiseEnabled {
-            if !hasStartedWhiteNoise && now < whiteNoiseEnd {
-                // Also covers a late bedtime landing mid-fade: start, then the fade
-                // branch below compresses the remaining fade time
+            if !hasStartedWhiteNoise {
                 hasStartedWhiteNoise = true
                 startWhiteNoise()
             }
 
             if whiteNoisePlayer.isPlaying && !whiteNoisePlayer.isFadingOut && now >= fadeStart {
-                whiteNoisePlayer.startFadeOut(duration: whiteNoiseEnd.timeIntervalSince(now)) {
+                // Late starts get at least two gentle minutes before the fade completes
+                let remaining = max(whiteNoiseEnd.timeIntervalSince(now), 120)
+                whiteNoisePlayer.startFadeOut(duration: remaining) {
                     // Player stops itself; phase transition happens on the next tick
                 }
-            }
-
-            // Safety: never let white noise bleed past its end time
-            if whiteNoisePlayer.isPlaying && now >= whiteNoiseEnd {
-                whiteNoisePlayer.stopGently()
             }
         }
 
@@ -244,7 +241,9 @@ struct MonitoringView: View {
             let inWakeWindow = now >= windowStart && now <= settings.wakeUpBy
 
             // Start calibration when the wake window begins (audio engine already running)
-            if inWakeWindow && audioMonitor.monitoringState == .idle {
+            // Never calibrate over our own white noise — a late-start session
+            // waits for the fade to finish before learning the room
+            if inWakeWindow && audioMonitor.monitoringState == .idle && !whiteNoisePlayer.isPlaying {
                 audioMonitor.startCalibration()
             }
 
