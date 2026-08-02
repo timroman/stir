@@ -180,7 +180,10 @@ class WhiteNoisePlayer: ObservableObject {
 
                 currentStep += 1
                 let progress = Float(currentStep) / Float(steps)
-                self.currentVolume = self.targetVolume * progress
+                // Equal-power curve: linear amplitude sounds like silence
+                // followed by a harsh arrival; sine is audible almost
+                // immediately and lands softly
+                self.currentVolume = self.targetVolume * sin(progress * .pi / 2)
                 self.activePlayer?.volume = self.currentVolume
 
                 if currentStep >= steps {
@@ -218,8 +221,8 @@ class WhiteNoisePlayer: ObservableObject {
                 let progress = Float(min(elapsed / self.fadeDuration, 1.0))
                 self.fadeProgress = progress
 
-                // Calculate new volume (linear fade)
-                let newVolume = self.targetVolume * (1.0 - progress)
+                // Equal-power descent — lingers, then leaves without a cliff
+                let newVolume = self.targetVolume * cos(progress * .pi / 2)
                 self.currentVolume = max(0, newVolume)
 
                 // Apply to active player (crossfade handles both during transitions)
@@ -231,6 +234,36 @@ class WhiteNoisePlayer: ObservableObject {
                     self.fadeTimer = nil
                     self.stop()
                     onComplete()
+                }
+            }
+        }
+    }
+
+    private var isStoppingGently = false
+
+    // User-initiated stop: a short ramp down, never a cut
+    func stopGently(duration: TimeInterval = 0.6) {
+        guard !isStoppingGently else { return }
+        guard isPlaying, let player = activePlayer else {
+            stop()
+            return
+        }
+        isStoppingGently = true
+        fadeTimer?.invalidate()
+        fadeInTimer?.invalidate()
+        crossfadeTimer?.invalidate()
+
+        let startVolume = player.volume
+        let steps = 12
+        var currentStep = 0
+        Timer.scheduledTimer(withTimeInterval: duration / Double(steps), repeats: true) { [weak self] timer in
+            Task { @MainActor in
+                currentStep += 1
+                let progress = Float(currentStep) / Float(steps)
+                player.volume = startVolume * cos(progress * .pi / 2)
+                if currentStep >= steps {
+                    timer.invalidate()
+                    self?.stop()
                 }
             }
         }
@@ -253,6 +286,7 @@ class WhiteNoisePlayer: ObservableObject {
 
         isPlaying = false
         isFadingOut = false
+        isStoppingGently = false
         currentVolume = 0
         fadeProgress = 0
     }

@@ -234,7 +234,7 @@ struct MonitoringView: View {
 
             // Safety: never let white noise bleed past its end time
             if whiteNoisePlayer.isPlaying && now >= whiteNoiseEnd {
-                whiteNoisePlayer.stop()
+                whiteNoisePlayer.stopGently()
             }
         }
 
@@ -312,7 +312,7 @@ struct MonitoringView: View {
 
     private func endSession() {
         stopSessionTimer()
-        whiteNoisePlayer.stop()
+        whiteNoisePlayer.stopGently()
         audioMonitor.stop()
         motionMonitor.stop()
         StirLiveActivity.stop()
