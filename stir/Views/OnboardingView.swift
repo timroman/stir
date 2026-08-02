@@ -45,9 +45,8 @@ struct OnboardingView: View {
         ZStack {
             SkyBackground(colors: NightSky.colors(NightSky.dusk))
 
-            VStack(spacing: 40) {
-                Spacer()
-
+            ScrollView {
+            VStack(spacing: 32) {
                 // Wordmark
                 VStack(spacing: 10) {
                     Text("stir")
@@ -58,8 +57,7 @@ struct OnboardingView: View {
                         .font(.subheadline)
                         .foregroundColor(.gray)
                 }
-
-                Spacer()
+                .padding(.top, 72)
 
                 // How the night works
             VStack(spacing: 16) {
@@ -71,6 +69,11 @@ struct OnboardingView: View {
                         .font(.caption)
                         .foregroundColor(.gray)
                         .fixedSize(horizontal: false, vertical: true)
+                    Text("stir asks for these permissions so nothing interrupts your night — and everything they enable runs entirely on your phone. nothing is ever recorded, stored, or sent anywhere.")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.top, 4)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(16)
@@ -79,14 +82,26 @@ struct OnboardingView: View {
                         .fill(Color.white.opacity(0.05))
                 )
 
-                Button(action: { showingDetails = true }) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "sparkles")
-                            .font(.caption)
-                        Text("how it works")
-                            .font(.subheadline)
+                HStack(spacing: 24) {
+                    Button(action: { showingDetails = true }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "sparkles")
+                                .font(.caption)
+                            Text("how it works")
+                                .font(.subheadline)
+                        }
+                        .foregroundColor(.white.opacity(0.7))
                     }
-                    .foregroundColor(.white.opacity(0.7))
+
+                    Link(destination: URL(string: "https://timroman.github.io/stir/#privacy")!) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "lock.fill")
+                                .font(.caption)
+                            Text("full details")
+                                .font(.subheadline)
+                        }
+                        .foregroundColor(.white.opacity(0.7))
+                    }
                 }
 
                 // All permissions up front, each explained — so no prompt ever
@@ -125,8 +140,6 @@ struct OnboardingView: View {
             }
             .padding(.horizontal, 24)
 
-            Spacer()
-
             // Continue button
             if microphoneGranted {
                 Button(action: {
@@ -149,6 +162,7 @@ struct OnboardingView: View {
 
             Spacer()
                 .frame(height: 40)
+            }
             }
         }
         .onAppear {
