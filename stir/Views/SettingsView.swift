@@ -48,36 +48,50 @@ struct SettingsView: View {
 
                 // Night timeline Section
                 Section {
-                    Stepper(value: $appState.settings.wakeWindowMinutes, in: 10...90, step: 5) {
-                        HStack {
-                            Text("wake window")
-                            Spacer()
-                            Text("\(appState.settings.wakeWindowMinutes) min")
-                                .foregroundColor(.gray)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Stepper(value: $appState.settings.fadeOutMinutes, in: 5...60, step: 5) {
+                            HStack {
+                                Text("fade-out")
+                                Spacer()
+                                Text("\(appState.settings.fadeOutMinutes) min")
+                                    .foregroundColor(.gray)
+                            }
                         }
+                        Text("how long the white noise takes to fade to silence")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
 
-                    Stepper(value: $appState.settings.quietGapMinutes, in: 0...120, step: 5) {
-                        HStack {
-                            Text("quiet gap")
-                            Spacer()
-                            Text("\(appState.settings.quietGapMinutes) min")
-                                .foregroundColor(.gray)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Stepper(value: $appState.settings.quietGapMinutes, in: 0...120, step: 5) {
+                            HStack {
+                                Text("quiet gap")
+                                Spacer()
+                                Text("\(appState.settings.quietGapMinutes) min")
+                                    .foregroundColor(.gray)
+                            }
                         }
+                        Text("silence between the fade ending and listening starting — keeps the room quiet so stir can learn its baseline")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
-
-                    Stepper(value: $appState.settings.fadeOutMinutes, in: 5...60, step: 5) {
-                        HStack {
-                            Text("fade-out")
-                            Spacer()
-                            Text("\(appState.settings.fadeOutMinutes) min")
-                                .foregroundColor(.gray)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Stepper(value: $appState.settings.wakeWindowMinutes, in: 10...90, step: 5) {
+                            HStack {
+                                Text("wake window")
+                                Spacer()
+                                Text("\(appState.settings.wakeWindowMinutes) min")
+                                    .foregroundColor(.gray)
+                            }
                         }
+                        Text("how long stir listens for you stirring before your \"up by\" time — wake anywhere in this window")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                 } header: {
                     Text("night timeline")
                 } footer: {
-                    Text("listening starts a wake window before your \"up by\" time. white noise fades out over the fade-out duration, finishing a quiet gap before listening begins.")
+                    Text(timelineExample)
                 }
 
                 // Sensitivity Section
@@ -358,6 +372,21 @@ struct SettingsView: View {
         }
 
         playPreviewWithFade(url: url)
+    }
+
+    // Tonight's schedule with the current settings, so the steppers explain themselves
+    private var timelineExample: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        let upBy = formatter.string(from: appState.settings.wakeUpBy).lowercased()
+        let fadeStart = formatter.string(from: appState.fadeStartTime).lowercased()
+        let fadeEnd = formatter.string(from: appState.whiteNoiseEndTime).lowercased()
+        let windowStart = formatter.string(from: appState.windowStart).lowercased()
+
+        if !appState.settings.alarmEnabled {
+            return "tonight, with \"up by\" \(upBy): white noise fades from \(fadeStart) and ends at \(upBy) — the silence is your wake-up."
+        }
+        return "tonight, with \"up by\" \(upBy): white noise fades from \(fadeStart) to \(fadeEnd), the room stays quiet until \(windowStart), then stir listens from \(windowStart) and the alarm sounds at \(upBy) at the latest."
     }
 
     private func previewWhiteNoise(_ sound: WhiteNoiseSound) {

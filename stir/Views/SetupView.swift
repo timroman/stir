@@ -25,7 +25,7 @@ struct SetupView: View {
                 Spacer()
 
             // The one nightly input: when do you need to be up?
-            VStack(spacing: 14) {
+            VStack(spacing: 30) {
                 Text("up by")
                     .font(.system(size: 12, weight: .semibold))
                     .kerning(2.5)
