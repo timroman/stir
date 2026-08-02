@@ -18,9 +18,9 @@ struct TechnicalDetailsView: View {
             }
 
             Section {
-                Text("the background is your wake signal. it stays near-black through the night, then begins to warm about 90 minutes before your \"up by\" time — deep blue into pre-dawn, then a low amber glow in the final 20 minutes, and a full sunrise if you sleep past it. one glance answers \"is it time yet\" without a single number on screen.")
+                Text("the night screen stays black all night — nothing on it tells the time, glows brighter, or counts anything down. the only things on screen are the real sun and moon on their rings. if you wake and glance at it, there is nothing to read unless you want to read the sky itself.")
             } header: {
-                Text("the sky")
+                Text("the night screen")
             }
 
             Section {

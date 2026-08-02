@@ -24,14 +24,11 @@ struct MonitoringView: View {
 
     var body: some View {
         ZStack {
-            SkyBackground(colors: NightSky.colors(
-                now: currentTime,
-                upBy: appState.settings.wakeUpBy
-            ))
-            .animation(.easeInOut(duration: 2), value: currentTime)
+            // Black all night, no time-of-night signal in the light. The real
+            // sun and moon on their rings are the only things on screen — read
+            // them if you want, or let them be art.
+            SkyBackground(colors: NightSky.colors(NightSky.deepNight))
 
-            // The night face: real sun and moon riding their diurnal rings
-            // over a shared horizon. The warming gradient is the wake signal.
             SkyFace(moonPosition: moonTracker.position,
                     sunPosition: moonTracker.sunPosition)
                 .offset(burnInOffset)

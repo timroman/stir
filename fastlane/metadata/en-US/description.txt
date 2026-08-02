@@ -1,5 +1,5 @@
 stir covers your whole night with one session. Set the time you need to be up by, and start the night: white noise carries you to sleep and fades to silence before morning. Then stir listens — calibrated to your room — and wakes you gently when it hears you naturally stirring inside your wake window. Miss the window, and the alarm sounds at your "up by" time no matter what.
 
-The night screen shows nothing that tells the time. A near-black sky warms toward sunrise only when your morning is actually near, and the real sun and moon ride their daily rings at their true positions, computed on your device. When the moon touches the horizon line on screen, it is rising or setting outside your window.
+The night screen shows nothing that tells the time — a black sky where the real sun and moon ride their daily rings at their true positions, computed on your device. When the moon touches the horizon line on screen, it is rising or setting outside your window.
 
 Everything happens on your phone. No accounts, no analytics, no tracking. The microphone is only evaluated during your wake window and nothing is ever recorded. stir is open source.

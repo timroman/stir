@@ -191,7 +191,7 @@ struct MoonPhaseView: View {
 
 #Preview("Sky face") {
     ZStack {
-        SkyBackground(colors: NightSky.colors(NightSky.preDawn))
+        SkyBackground(colors: NightSky.colors(NightSky.deepNight))
         SkyFace(
             moonPosition: MoonTracker.MoonPosition(
                 altitude: 0.5, azimuth: -0.7, hourAngle: -0.9, horizonCos: 0.25
