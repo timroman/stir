@@ -13,8 +13,10 @@ struct AlarmView: View {
 
     var body: some View {
         ZStack {
-            // Full sunrise — the one bright screen in the app
-            SkyBackground(colors: NightSky.colors(NightSky.sunrise))
+            // Dawn synced to sound: black at first ring, warming to full gold
+            // as the volume ramps — light and loudness rise together
+            SkyBackground(colors: dawnColors)
+                .animation(.easeInOut(duration: 1.2), value: alarmPlayer.rampProgress)
 
             VStack(spacing: 40) {
                 Spacer()
@@ -89,6 +91,16 @@ struct AlarmView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "h:mm a"
         return formatter.string(from: currentTime).lowercased()
+    }
+
+    // Warmer than any sky the night screen ever had: deep gold morning.
+    // Interpolated from black by ramp progress.
+    private var dawnColors: [Color] {
+        let warm: [(Double, Double, Double)] = [
+            (0.16, 0.12, 0.24), (0.42, 0.24, 0.22), (0.80, 0.47, 0.26), (0.99, 0.76, 0.44)
+        ]
+        let t = alarmPlayer.rampProgress
+        return warm.map { Color(red: $0.0 * t, green: $0.1 * t, blue: $0.2 * t) }
     }
 }
 
@@ -315,6 +327,10 @@ class HapticManager: ObservableObject {
 
 @MainActor
 class AlarmPlayer: ObservableObject {
+    // 0 → 1 over the 60s volume ramp; the alarm screen's light tracks this,
+    // so brightness and loudness rise together
+    @Published var rampProgress: Double = 0
+
     private var playerA: AVAudioPlayer?
     private var playerB: AVAudioPlayer?
     private var activePlayer: AVAudioPlayer? // Currently playing at full volume
@@ -409,6 +425,7 @@ class AlarmPlayer: ObservableObject {
                 currentStep += 1
                 let progress = Float(currentStep) / Float(totalSteps)
                 self.currentVolume = self.targetVolume * progress
+                self.rampProgress = Double(progress)
 
                 // Apply to active player (crossfade will handle transitions)
                 if let active = self.activePlayer {
@@ -417,6 +434,7 @@ class AlarmPlayer: ObservableObject {
 
                 if currentStep >= totalSteps {
                     self.currentVolume = self.targetVolume
+                    self.rampProgress = 1
                     print("🔔 Volume ramp complete: \(Int(self.targetVolume * 2000))% of max")
                     timer.invalidate()
                     self.volumeRampTimer = nil

@@ -6,7 +6,7 @@ struct SetupView: View {
 
     var body: some View {
         ZStack {
-            SkyBackground(colors: NightSky.colors(NightSky.dusk))
+            SpaceBackground()
 
             VStack(spacing: 0) {
                 // Wordmark + the one question

@@ -12,6 +12,7 @@
 		1CECD3B6EEF2C04D67BA8C48 /* StirWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D967D9651F113BF861322057 /* StirWidgetsBundle.swift */; };
 		1DC4F08D90B1FA098B238C9B /* ocean_waves.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 700692067C1E213740D598E4 /* ocean_waves.m4a */; };
 		1EC0E4D1F404A3D35A7D3EA4 /* MoonTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729BE7AC31F3154804BA8103 /* MoonTracker.swift */; };
+		3244B16227C789FF01F8B43A /* SpaceBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD5422326A8AC076F0521A3 /* SpaceBackground.swift */; };
 		34094B5B13B9CE4EE4361C94 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C096FB9AF8CC1928E5E6D814 /* ContentView.swift */; };
 		346816F88DB0726F288F922B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E8E59A5489F47D0C5609FA /* SettingsView.swift */; };
 		4A72FB638F3EC79E02F42074 /* fan.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 8A5607025F6BBB641D36D497 /* fan.m4a */; };
@@ -81,6 +82,7 @@
 		215AA25344A9487DF7470C5A /* StirActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StirActivityAttributes.swift; sourceTree = "<group>"; };
 		219EC465F7D7DCA21637D4E0 /* SkyBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkyBackground.swift; sourceTree = "<group>"; };
 		2A195731ACB8F847E583CED6 /* white_noise.m4a */ = {isa = PBXFileReference; path = white_noise.m4a; sourceTree = "<group>"; };
+		2FD5422326A8AC076F0521A3 /* SpaceBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpaceBackground.swift; sourceTree = "<group>"; };
 		31E8E59A5489F47D0C5609FA /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		3319761B25C1F5A15016A2BA /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		3621C1610B2466A837426511 /* AlarmBackstop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmBackstop.swift; sourceTree = "<group>"; };
@@ -129,6 +131,7 @@
 			children = (
 				129BD251B689B48CAC132AAC /* NightArcFace.swift */,
 				219EC465F7D7DCA21637D4E0 /* SkyBackground.swift */,
+				2FD5422326A8AC076F0521A3 /* SpaceBackground.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -363,6 +366,7 @@
 				346816F88DB0726F288F922B /* SettingsView.swift in Sources */,
 				C6D51E60FE5A12A3449B418F /* SetupView.swift in Sources */,
 				FFE6492399AECB4B851D5F57 /* SkyBackground.swift in Sources */,
+				3244B16227C789FF01F8B43A /* SpaceBackground.swift in Sources */,
 				90407EF71A837592C1778647 /* StirActivityAttributes.swift in Sources */,
 				8E05EB85F46DDEF023BD88D5 /* StirApp.swift in Sources */,
 				9035EC9A9EF010110E1EC5CF /* StirLiveActivity.swift in Sources */,

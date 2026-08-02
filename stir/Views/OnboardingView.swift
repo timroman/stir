@@ -43,7 +43,7 @@ struct OnboardingView: View {
 
     var body: some View {
         ZStack {
-            SkyBackground(colors: NightSky.colors(NightSky.dusk))
+            SpaceBackground()
 
             ScrollView {
             VStack(spacing: 32) {
