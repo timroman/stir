@@ -51,8 +51,21 @@ platform :ios do
     build
     upload_to_app_store(
       force: true,                 # skip the HTML report prompt (non-interactive)
+      overwrite_screenshots: true, # deliver keeps existing ASC screenshots otherwise
       precheck_include_in_app_purchases: false,
       submit_for_review: false     # Tim presses the final submit button
+    )
+  end
+
+  desc "Replace the App Store screenshots only"
+  lane :screenshots do
+    asc_auth
+    upload_to_app_store(
+      force: true,
+      skip_binary_upload: true,
+      skip_metadata: true,
+      overwrite_screenshots: true,
+      precheck_include_in_app_purchases: false
     )
   end
 

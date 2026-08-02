@@ -39,6 +39,14 @@ Upload a new build to TestFlight
 
 Upload build + metadata to App Store Connect for review submission
 
+### ios screenshots
+
+```sh
+[bundle exec] fastlane ios screenshots
+```
+
+Replace the App Store screenshots only
+
 ### ios metadata
 
 ```sh
