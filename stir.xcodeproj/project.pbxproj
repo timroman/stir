@@ -12,7 +12,6 @@
 		1CECD3B6EEF2C04D67BA8C48 /* StirWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D967D9651F113BF861322057 /* StirWidgetsBundle.swift */; };
 		1DC4F08D90B1FA098B238C9B /* ocean_waves.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 700692067C1E213740D598E4 /* ocean_waves.m4a */; };
 		1EC0E4D1F404A3D35A7D3EA4 /* MoonTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729BE7AC31F3154804BA8103 /* MoonTracker.swift */; };
-		2C635B5D6DBBC64BEFEBE7D4 /* rain.m4a in Resources */ = {isa = PBXBuildFile; fileRef = A40D556A5E79D26FF702E99B /* rain.m4a */; };
 		34094B5B13B9CE4EE4361C94 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C096FB9AF8CC1928E5E6D814 /* ContentView.swift */; };
 		346816F88DB0726F288F922B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E8E59A5489F47D0C5609FA /* SettingsView.swift */; };
 		4A72FB638F3EC79E02F42074 /* fan.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 8A5607025F6BBB641D36D497 /* fan.m4a */; };
@@ -97,7 +96,6 @@
 		8A5607025F6BBB641D36D497 /* fan.m4a */ = {isa = PBXFileReference; path = fan.m4a; sourceTree = "<group>"; };
 		8E440957EC87E3CD97F463E8 /* pink_noise.m4a */ = {isa = PBXFileReference; path = pink_noise.m4a; sourceTree = "<group>"; };
 		92CE2A370C6733D8946E2B62 /* TechnicalDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnicalDetailsView.swift; sourceTree = "<group>"; };
-		A40D556A5E79D26FF702E99B /* rain.m4a */ = {isa = PBXFileReference; path = rain.m4a; sourceTree = "<group>"; };
 		ACA11DE98D22F3DAA607833D /* WhiteNoisePlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteNoisePlayer.swift; sourceTree = "<group>"; };
 		AEFC8AF87B6E2ECC24F4F346 /* stir.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = stir.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B91E7E22556C9596A1B5132B /* MonitoringView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitoringView.swift; sourceTree = "<group>"; };
@@ -195,7 +193,6 @@
 				03587498C88B0E56E5EDF7FE /* gentle_chime.mp3 */,
 				700692067C1E213740D598E4 /* ocean_waves.m4a */,
 				8E440957EC87E3CD97F463E8 /* pink_noise.m4a */,
-				A40D556A5E79D26FF702E99B /* rain.m4a */,
 				C2156F32F69842404E2CCE95 /* singing_bowl.m4a */,
 				F6E554669BCF3C3AD855F0DD /* soft_bells.mp3 */,
 				2A195731ACB8F847E583CED6 /* white_noise.m4a */,
@@ -327,7 +324,6 @@
 				7878A5F394A1701332787793 /* gentle_chime.mp3 in Resources */,
 				1DC4F08D90B1FA098B238C9B /* ocean_waves.m4a in Resources */,
 				92F71D0E19F0E648EE0C49A4 /* pink_noise.m4a in Resources */,
-				2C635B5D6DBBC64BEFEBE7D4 /* rain.m4a in Resources */,
 				105A817182AF421D5EFB0C31 /* singing_bowl.m4a in Resources */,
 				6A2530B36AFB7962F93F5CE4 /* soft_bells.mp3 in Resources */,
 				E6A32E05A09E778639FECB77 /* white_noise.m4a in Resources */,

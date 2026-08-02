@@ -52,7 +52,7 @@ write_wav("ocean_waves.wav", loopable(ocean))
 
 # --- extended set (2026-07-30): more sleep sounds + alarm tones ---
 
-# rain: dense random droplet impulses over a hiss bed
+# rain: dense random droplet impulses over a hiss bed (not shipped — cut in review)
 drops = np.zeros(n)
 idx = rng.integers(0, n - 40, size=int(DUR * 900))
 for i in idx:

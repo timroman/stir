@@ -234,7 +234,6 @@ enum WhiteNoiseSound: String, Codable, CaseIterable, Identifiable {
 
     // Nature Sounds
     case oceanWaves = "ocean_waves"
-    case rain = "rain"
     case wind = "wind"
 
     var id: String { rawValue }
@@ -246,7 +245,6 @@ enum WhiteNoiseSound: String, Codable, CaseIterable, Identifiable {
         case .brownNoise: return "brown noise"
         case .fan: return "fan"
         case .oceanWaves: return "ocean waves"
-        case .rain: return "rain"
         case .wind: return "wind"
         }
     }
@@ -255,7 +253,7 @@ enum WhiteNoiseSound: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .whiteNoise, .pinkNoise, .brownNoise, .fan:
             return .noise
-        case .oceanWaves, .rain, .wind:
+        case .oceanWaves, .wind:
             return .nature
         }
     }
