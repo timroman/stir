@@ -67,7 +67,15 @@ class WhiteNoisePlayer: ObservableObject {
             fadeProgress = 0.0
 
             print("Started playing: \(name), fading in to volume \(volume), crossfade looping")
-            startFadeIn(duration: 3.0)
+            // Let the audio route finish coming alive (session activation and
+            // speaker rerouting eat the first beat on device), then ramp with
+            // the player's native fade — it runs inside the audio engine, so
+            // it can't race the route the way a wall-clock timer can
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                guard let self, self.isPlaying, !self.isFadingOut else { return }
+                self.activePlayer?.setVolume(self.targetVolume, fadeDuration: 3.0)
+                self.currentVolume = self.targetVolume
+            }
             scheduleCrossfade()
         } catch {
             print("Failed to play sound: \(error)")
@@ -153,44 +161,6 @@ class WhiteNoisePlayer: ObservableObject {
                     incoming.volume = effectiveVolume
                     self.activePlayer = incoming
                     self.scheduleCrossfade() // Schedule next crossfade
-                }
-            }
-        }
-    }
-
-    private func startFadeIn(duration: TimeInterval) {
-        fadeInTimer?.invalidate()
-        let steps = 40
-        let stepInterval = duration / Double(steps)
-        var currentStep = 0
-
-        fadeInTimer = Timer.scheduledTimer(withTimeInterval: stepInterval, repeats: true) { [weak self] timer in
-            Task { @MainActor in
-                guard let self else {
-                    timer.invalidate()
-                    return
-                }
-                // A fade-out can begin mid-fade-in (very late session start);
-                // it owns the volume from then on
-                guard self.isPlaying, !self.isFadingOut else {
-                    timer.invalidate()
-                    self.fadeInTimer = nil
-                    return
-                }
-
-                currentStep += 1
-                let progress = Float(currentStep) / Float(steps)
-                // Equal-power curve: linear amplitude sounds like silence
-                // followed by a harsh arrival; sine is audible almost
-                // immediately and lands softly
-                self.currentVolume = self.targetVolume * sin(progress * .pi / 2)
-                self.activePlayer?.volume = self.currentVolume
-
-                if currentStep >= steps {
-                    timer.invalidate()
-                    self.fadeInTimer = nil
-                    self.currentVolume = self.targetVolume
-                    self.activePlayer?.volume = self.targetVolume
                 }
             }
         }
