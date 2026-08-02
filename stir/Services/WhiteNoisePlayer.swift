@@ -21,6 +21,8 @@ class WhiteNoisePlayer: ObservableObject {
     private var crossfadeTimer: Timer?
     private var targetVolume: Float = 1.0
     private var fadeStartTime: Date?
+    private var playbackStartedAt: Date?
+    private var pendingFadeOut = false
     private var fadeDuration: TimeInterval = 600  // 10 minutes default
     private let crossfadeDuration: TimeInterval = 1.5  // seconds for crossfade
 
@@ -65,6 +67,7 @@ class WhiteNoisePlayer: ObservableObject {
             isPlaying = true
             isFadingOut = false
             fadeProgress = 0.0
+            playbackStartedAt = Date()
 
             print("Started playing: \(name), fading in to volume \(volume), crossfade looping")
             // Let the audio route finish coming alive (session activation and
@@ -167,6 +170,27 @@ class WhiteNoisePlayer: ObservableObject {
     }
 
     func startFadeOut(duration: TimeInterval, onComplete: @escaping () -> Void) {
+        guard isPlaying, activePlayer != nil, !isFadingOut, !pendingFadeOut else { return }
+
+        // A fade-out requested while the fade-in is still blooming (session
+        // started inside the fade window) waits for it — starting both at once
+        // left the volume at zero until the fade-out's first 5s tick slammed
+        // it to near-full
+        let fadeInWindow: TimeInterval = 4.0
+        let sinceStart = playbackStartedAt.map { Date().timeIntervalSince($0) } ?? .infinity
+        if sinceStart < fadeInWindow {
+            pendingFadeOut = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + (fadeInWindow - sinceStart)) { [weak self] in
+                guard let self, self.isPlaying else { return }
+                self.pendingFadeOut = false
+                self.beginFadeOut(duration: duration, onComplete: onComplete)
+            }
+            return
+        }
+        beginFadeOut(duration: duration, onComplete: onComplete)
+    }
+
+    private func beginFadeOut(duration: TimeInterval, onComplete: @escaping () -> Void) {
         guard isPlaying, activePlayer != nil else { return }
 
         fadeDuration = max(duration, 1.0)
@@ -257,6 +281,8 @@ class WhiteNoisePlayer: ObservableObject {
         isPlaying = false
         isFadingOut = false
         isStoppingGently = false
+        pendingFadeOut = false
+        playbackStartedAt = nil
         currentVolume = 0
         fadeProgress = 0
     }
