@@ -47,6 +47,14 @@ Upload build + metadata to App Store Connect for review submission
 
 Replace the App Store screenshots only
 
+### ios privacy
+
+```sh
+[bundle exec] fastlane ios privacy
+```
+
+Declare the app privacy nutrition label (data not collected)
+
 ### ios metadata
 
 ```sh
