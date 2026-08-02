@@ -17,6 +17,7 @@ class WhiteNoisePlayer: ObservableObject {
     private var activePlayer: AVAudioPlayer?
     private var soundURL: URL?
     private var fadeTimer: Timer?
+    private var fadeInTimer: Timer?
     private var crossfadeTimer: Timer?
     private var targetVolume: Float = 1.0
     private var fadeStartTime: Date?
@@ -53,18 +54,20 @@ class WhiteNoisePlayer: ObservableObject {
             playerA?.prepareToPlay()
             playerB?.prepareToPlay()
 
-            // Start player A
-            playerA?.volume = volume
+            // Start player A silent and bloom in — a hard start is jarring
+            // at bedtime
+            playerA?.volume = 0
             playerA?.play()
             activePlayer = playerA
 
             targetVolume = volume
-            currentVolume = volume
+            currentVolume = 0
             isPlaying = true
             isFadingOut = false
             fadeProgress = 0.0
 
-            print("Started playing: \(name) at volume \(volume) with crossfade looping")
+            print("Started playing: \(name), fading in to volume \(volume), crossfade looping")
+            startFadeIn(duration: 4.0)
             scheduleCrossfade()
         } catch {
             print("Failed to play sound: \(error)")
@@ -155,6 +158,41 @@ class WhiteNoisePlayer: ObservableObject {
         }
     }
 
+    private func startFadeIn(duration: TimeInterval) {
+        fadeInTimer?.invalidate()
+        let steps = 40
+        let stepInterval = duration / Double(steps)
+        var currentStep = 0
+
+        fadeInTimer = Timer.scheduledTimer(withTimeInterval: stepInterval, repeats: true) { [weak self] timer in
+            Task { @MainActor in
+                guard let self else {
+                    timer.invalidate()
+                    return
+                }
+                // A fade-out can begin mid-fade-in (very late session start);
+                // it owns the volume from then on
+                guard self.isPlaying, !self.isFadingOut else {
+                    timer.invalidate()
+                    self.fadeInTimer = nil
+                    return
+                }
+
+                currentStep += 1
+                let progress = Float(currentStep) / Float(steps)
+                self.currentVolume = self.targetVolume * progress
+                self.activePlayer?.volume = self.currentVolume
+
+                if currentStep >= steps {
+                    timer.invalidate()
+                    self.fadeInTimer = nil
+                    self.currentVolume = self.targetVolume
+                    self.activePlayer?.volume = self.targetVolume
+                }
+            }
+        }
+    }
+
     func startFadeOut(duration: TimeInterval, onComplete: @escaping () -> Void) {
         guard isPlaying, activePlayer != nil else { return }
 
@@ -201,6 +239,8 @@ class WhiteNoisePlayer: ObservableObject {
     func stop() {
         fadeTimer?.invalidate()
         fadeTimer = nil
+        fadeInTimer?.invalidate()
+        fadeInTimer = nil
         crossfadeTimer?.invalidate()
         crossfadeTimer = nil
 
