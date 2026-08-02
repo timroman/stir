@@ -53,7 +53,7 @@ struct OnboardingView: View {
                         .font(.system(size: 52, weight: .light))
                         .kerning(1.5)
                         .foregroundColor(NightSky.cream)
-                    Text("wakes you when you do")
+                    Text("the world's most gentle alarm")
                         .font(.subheadline)
                         .foregroundColor(.gray)
                 }

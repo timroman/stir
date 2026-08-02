@@ -17,7 +17,7 @@ struct SetupView: View {
                         .font(.system(size: 44, weight: .light))
                         .kerning(1.5)
                         .foregroundColor(NightSky.cream)
-                    Text("wakes you when you do")
+                    Text("the world's most gentle alarm")
                         .font(.subheadline)
                         .foregroundColor(.white.opacity(0.55))
                 }
