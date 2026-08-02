@@ -8,38 +8,28 @@ struct SetupView: View {
         ZStack {
             SkyBackground(colors: NightSky.colors(NightSky.dusk))
 
-            VStack(spacing: 40) {
-                Spacer()
-
-                // Wordmark
-                VStack(spacing: 10) {
+            VStack(spacing: 0) {
+                // Wordmark + the one question
+                VStack(spacing: 12) {
                     Text("stir")
                         .font(.system(size: 44, weight: .light))
                         .kerning(1.5)
                         .foregroundColor(NightSky.cream)
-                    Text("the world's most gentle alarm")
+                    Text("when do you want to be up by?")
                         .font(.subheadline)
                         .foregroundColor(.white.opacity(0.55))
                 }
+                .padding(.top, 72)
 
                 Spacer()
-
-            // The one nightly input: when do you need to be up?
-            VStack(spacing: 52) {
-                Text("up by")
-                    .font(.system(size: 12, weight: .semibold))
-                    .kerning(2.5)
-                    .textCase(.uppercase)
-                    .foregroundColor(.white.opacity(0.55))
 
                 DatePicker("", selection: $appState.settings.wakeUpBy, displayedComponents: .hourAndMinute)
                     .labelsHidden()
                     .colorScheme(.dark)
                     .datePickerStyle(.wheel)
                     .frame(height: 130)
-            }
 
-            Spacer()
+                Spacer()
 
             // Start button
             Button(action: {
@@ -57,6 +47,7 @@ struct SetupView: View {
                     .cornerRadius(999)
             }
             .padding(.horizontal, 40)
+            .padding(.bottom, 12)
 
             // Settings button
             Button(action: {
