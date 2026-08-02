@@ -88,11 +88,15 @@ private enum TimelinePreset: String, CaseIterable, Identifiable {
 
 struct NightSettingsView: View {
     @EnvironmentObject var appState: AppState
+    // "custom" changes no values, so it must be sticky state — a purely
+    // derived selection would snap back to whichever preset the values match
+    @State private var forcedCustom = false
 
     private var preset: TimelinePreset {
-        TimelinePreset.match(fade: appState.settings.fadeOutMinutes,
-                             gap: appState.settings.quietGapMinutes,
-                             window: appState.settings.wakeWindowMinutes)
+        if forcedCustom { return .custom }
+        return TimelinePreset.match(fade: appState.settings.fadeOutMinutes,
+                                    gap: appState.settings.quietGapMinutes,
+                                    window: appState.settings.wakeWindowMinutes)
     }
 
     var body: some View {
@@ -122,8 +126,11 @@ struct NightSettingsView: View {
                         switch newValue {
                         case .gentle: values = TimelinePreset.gentleValues
                         case .quick: values = TimelinePreset.quickValues
-                        case .custom: return   // custom is whatever you make it below
+                        case .custom:
+                            forcedCustom = true
+                            return   // custom keeps current values; steppers appear below
                         }
+                        forcedCustom = false
                         appState.settings.fadeOutMinutes = values.0
                         appState.settings.quietGapMinutes = values.1
                         appState.settings.wakeWindowMinutes = values.2
