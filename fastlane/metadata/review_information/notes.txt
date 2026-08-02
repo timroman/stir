@@ -1,6 +1,6 @@
 stir is an overnight alarm. To test without waiting a night:
 1. Complete onboarding (grant microphone; location and backup alarm optional).
 2. On the setup screen, set "up by" 3-4 minutes ahead and tap "start the night".
-3. White noise may be skipped automatically for a session this short; the app calibrates to room sound for 30 seconds, then listens. Make a sustained noise (e.g. speak near the phone) to trigger the gentle wake, or wait for the "up by" time - the alarm fires regardless.
-4. The night screen intentionally shows no clock; the background warms as the wake time approaches. The two rings are the real sun and moon computed from location.
+3. White noise fades in over ~3 seconds and plays while the session runs. The night screen intentionally shows no clock and stays black - the two rings on it are the real sun and moon computed from location.
+4. The app calibrates to room sound for 30 seconds once the white noise has faded, then listens. Make a sustained noise (e.g. speak near the phone) to trigger the gentle wake, or wait for the "up by" time - the alarm fires regardless, with light and volume rising together.
 All processing is on-device. The microphone is only evaluated during the wake window and nothing is recorded. On iOS 26+, an AlarmKit backup alarm is scheduled 2 minutes after "up by" and cancelled when the user stops the session.
