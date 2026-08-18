@@ -259,7 +259,10 @@ struct PermissionCard: View {
                 Spacer()
 
                 if !isGranted && isActive {
-                    Text("allow")
+                    // Neutral verb, not "allow" — App Review 5.1.1(iv) treats a
+                    // custom "allow" ahead of the system prompt as steering the
+                    // decision
+                    Text("continue")
                         .font(.subheadline.bold())
                         .foregroundColor(.black)
                         .padding(.horizontal, 16)
