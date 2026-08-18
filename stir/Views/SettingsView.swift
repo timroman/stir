@@ -115,6 +115,10 @@ struct NightSettingsView: View {
             } footer: {
                 if !appState.settings.alarmEnabled {
                     Text("alarm off: white noise fades to silence at your \"up by\" time — when you don't hear it, it's time. the microphone is never used.")
+                } else if !appState.settings.whiteNoiseEnabled {
+                    // The toggle above is on but greyed out, which reads as
+                    // "unavailable" without this line
+                    Text("with white noise off, the gentle alarm stays on — a night needs at least one of the two.")
                 }
             }
 
