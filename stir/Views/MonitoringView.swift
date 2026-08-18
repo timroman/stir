@@ -96,6 +96,11 @@ struct MonitoringView: View {
         }
         .animation(.easeInOut(duration: 0.6), value: audioMonitor.monitoringState)
         .animation(.easeInOut(duration: 0.6), value: phase)
+        // Nothing but sky. The status bar clock is the one piece of time the
+        // night screen can't otherwise suppress, and it's the hardest thing to
+        // read at 3am anyway — the sun and moon carry the hour instead.
+        .statusBarHidden(true)
+        .persistentSystemOverlays(.hidden)
         .task {
             await startSessionAsync()
         }
