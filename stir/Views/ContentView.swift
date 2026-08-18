@@ -24,6 +24,21 @@ struct ContentView: View {
             }
         }
         .animation(.easeInOut(duration: 1.0), value: appState.currentScreen)
+        // One owner for the display sleep timer. Screens must not each set it
+        // in onAppear/onDisappear: SwiftUI runs the incoming view's onAppear
+        // before the outgoing view's onDisappear, so the screen being left
+        // always wins — which is how a ringing alarm ended up handed back to
+        // the system timer and fell through to the lock screen.
+        .onAppear {
+            UIDevice.current.isBatteryMonitoringEnabled = true
+            updateIdleTimer()
+        }
+        .onChange(of: appState.currentScreen) { _, _ in
+            updateIdleTimer()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIDevice.batteryStateDidChangeNotification)) { _ in
+            updateIdleTimer()
+        }
         #if DEBUG
         .sheet(isPresented: $debugShowDetails) {
             NavigationStack {
@@ -50,6 +65,23 @@ struct ContentView: View {
             }
         }
         #endif
+    }
+
+    // The alarm holds the display no matter what — it is the one moment the
+    // screen must survive. The night screen holds it only while charging, so a
+    // phone left off the charger doesn't drain until morning.
+    private func updateIdleTimer() {
+        let keepAwake: Bool
+        switch appState.currentScreen {
+        case .alarm:
+            keepAwake = true
+        case .monitoring:
+            let state = UIDevice.current.batteryState
+            keepAwake = (state == .charging || state == .full)
+        case .setup, .onboarding:
+            keepAwake = false
+        }
+        UIApplication.shared.isIdleTimerDisabled = keepAwake
     }
 }
 

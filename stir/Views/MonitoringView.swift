@@ -99,9 +99,6 @@ struct MonitoringView: View {
         .task {
             await startSessionAsync()
         }
-        .onReceive(NotificationCenter.default.publisher(for: UIDevice.batteryStateDidChangeNotification)) { _ in
-            updateIdleTimer()
-        }
         .onReceive(audioMonitor.$monitoringState) { state in
             switch state {
             case .idle:
@@ -131,22 +128,7 @@ struct MonitoringView: View {
             whiteNoisePlayer.stop()
             audioMonitor.stop()
             motionMonitor.stop()
-            UIApplication.shared.isIdleTimerDisabled = false
-            UIDevice.current.isBatteryMonitoringEnabled = false
         }
-    }
-
-    private var timeString: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm a"
-        return formatter.string(from: currentTime).lowercased()
-    }
-
-    // Keep the display alive through the night — but only while docked, so a
-    // forgotten un-docked phone doesn't drain overnight
-    private func updateIdleTimer() {
-        let state = UIDevice.current.batteryState
-        UIApplication.shared.isIdleTimerDisabled = (state == .charging || state == .full)
     }
 
     // A slow pixel drift so the moon never burns into an OLED panel
@@ -160,8 +142,6 @@ struct MonitoringView: View {
         guard !hasStarted else { return }
         hasStarted = true
 
-        UIDevice.current.isBatteryMonitoringEnabled = true
-        updateIdleTimer()
         moonTracker.start()
 
         if appState.settings.alarmEnabled {
