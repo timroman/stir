@@ -343,9 +343,12 @@ class AlarmPlayer: ObservableObject {
     private let crossfadeDuration: TimeInterval = 1.5 // seconds for crossfade
 
     func play(sound: AlarmSound, customSoundId: UUID?, volume: Float) {
-        // Scale down the volume significantly - AVAudioPlayer is very loud
-        // User's 0-100% maps to 0-0.05 actual volume (5% max)
-        targetVolume = volume * 0.05
+        // The slider maps straight through, exactly like the white noise it has
+        // to wake you from. Gentleness is the 60-second ramp from silence
+        // below, not a ceiling: the old 5% cap left the alarm ~17x quieter than
+        // the sleep sound playing minutes earlier, on already-quiet assets
+        // (gentle_chime is -21 dB mean), so its peak never arrived.
+        targetVolume = volume
 
         // Configure audio session for playback
         do {
@@ -435,7 +438,7 @@ class AlarmPlayer: ObservableObject {
                 if currentStep >= totalSteps {
                     self.currentVolume = self.targetVolume
                     self.rampProgress = 1
-                    print("🔔 Volume ramp complete: \(Int(self.targetVolume * 2000))% of max")
+                    print("🔔 Volume ramp complete: \(Int(self.targetVolume * 100))% of max")
                     timer.invalidate()
                     self.volumeRampTimer = nil
                 }
