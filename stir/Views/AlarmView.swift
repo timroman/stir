@@ -515,9 +515,11 @@ class AlarmPlayer: ObservableObject {
                 // Use current volume level (which may still be ramping up)
                 let effectiveVolume = self.currentVolume > 0 ? self.currentVolume : self.targetVolume
 
-                // Fade out outgoing, fade in incoming
-                outgoingPlayer?.volume = effectiveVolume * (1.0 - progress)
-                incoming.volume = effectiveVolume * progress
+                // Equal power, not linear: the outgoing tail and incoming
+                // attack are uncorrelated and sum as power, so a linear blend
+                // dips ~3 dB every time the tone repeats
+                outgoingPlayer?.volume = effectiveVolume * cos(progress * .pi / 2)
+                incoming.volume = effectiveVolume * sin(progress * .pi / 2)
 
                 if currentStep >= steps {
                     timer.invalidate()
