@@ -33,7 +33,7 @@ class WhiteNoisePlayer: ObservableObject {
             print("Sound file not found: \(sound.rawValue).mp3")
             return
         }
-        playURL(url, name: sound.displayName, volume: volume)
+        playURL(url, name: sound.displayName, volume: volume, seamless: true)
     }
 
     func playCustomSound(_ customSound: CustomSound, volume: Float) {
@@ -41,20 +41,31 @@ class WhiteNoisePlayer: ObservableObject {
             print("Custom sound file not found: \(customSound.name)")
             return
         }
-        playURL(url, name: customSound.name, volume: volume)
+        playURL(url, name: customSound.name, volume: volume, seamless: false)
     }
 
-    private func playURL(_ url: URL, name: String, volume: Float) {
+    // `seamless` means the file is known to butt-join end-to-start. The bundled
+    // beds are built that way by tools/synthesize-sounds.py, so AVAudioPlayer's
+    // own repeat is gapless and exact — and crossfading them would blend the tail
+    // against a head that already contains that same tail, correlated content
+    // summing to a bump. It also retires a 100 ms poll that otherwise runs all
+    // night. Imported sounds carry no such guarantee, so they keep the crossfade.
+    private func playURL(_ url: URL, name: String, volume: Float, seamless: Bool) {
         stop()
 
         self.soundURL = url
 
         do {
-            // Initialize both players with the same sound
             playerA = try AVAudioPlayer(contentsOf: url)
-            playerB = try AVAudioPlayer(contentsOf: url)
             playerA?.prepareToPlay()
-            playerB?.prepareToPlay()
+
+            if seamless {
+                playerA?.numberOfLoops = -1
+            } else {
+                // Second deck only exists to crossfade an imported sound
+                playerB = try AVAudioPlayer(contentsOf: url)
+                playerB?.prepareToPlay()
+            }
 
             // Start player A silent and bloom in — a hard start is jarring
             // at bedtime
@@ -69,7 +80,7 @@ class WhiteNoisePlayer: ObservableObject {
             fadeProgress = 0.0
             playbackStartedAt = Date()
 
-            print("Started playing: \(name), fading in to volume \(volume), crossfade looping")
+            print("Started playing: \(name), fading in to volume \(volume), \(seamless ? "gapless repeat" : "crossfade looping")")
             // Let the audio route finish coming alive (session activation and
             // speaker rerouting eat the first beat on device), then ramp with
             // the player's native fade — it runs inside the audio engine, so
@@ -79,7 +90,7 @@ class WhiteNoisePlayer: ObservableObject {
                 self.activePlayer?.setVolume(self.targetVolume, fadeDuration: 3.0)
                 self.currentVolume = self.targetVolume
             }
-            scheduleCrossfade()
+            if !seamless { scheduleCrossfade() }
         } catch {
             print("Failed to play sound: \(error)")
         }
@@ -154,9 +165,10 @@ class WhiteNoisePlayer: ObservableObject {
                 // Use current volume level (which may be fading out)
                 let effectiveVolume = self.currentVolume
 
-                // Fade out outgoing, fade in incoming
-                outgoingPlayer?.volume = effectiveVolume * (1.0 - progress)
-                incoming.volume = effectiveVolume * progress
+                // Equal power, not linear: two points in an uncorrelated
+                // signal sum as power, so a linear blend dips 3 dB at the seam
+                outgoingPlayer?.volume = effectiveVolume * cos(progress * .pi / 2)
+                incoming.volume = effectiveVolume * sin(progress * .pi / 2)
 
                 if currentStep >= steps {
                     timer.invalidate()
