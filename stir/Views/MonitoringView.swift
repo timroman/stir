@@ -1,5 +1,6 @@
 import SwiftUI
 import AVFoundation
+import os
 
 // The phases of a night session, derived each tick from the clock — never stored
 enum SessionPhase: Equatable {
@@ -116,13 +117,13 @@ struct MonitoringView: View {
         }
         .onReceive(audioMonitor.$didTrigger) { triggered in
             if triggered {
-                print("🚨 Audio trigger received, stopping monitors and switching to alarm")
+                Logger.session.notice("🚨 Audio trigger received, stopping monitors and switching to alarm")
                 triggerAlarm()
             }
         }
         .onReceive(motionMonitor.$didTrigger) { triggered in
             if triggered {
-                print("🚨 Motion trigger received, stopping monitors and switching to alarm")
+                Logger.session.notice("🚨 Motion trigger received, stopping monitors and switching to alarm")
                 triggerAlarm()
             }
         }
@@ -168,7 +169,7 @@ struct MonitoringView: View {
                 try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
                 try session.setActive(true)
             } catch {
-                print("❌ Failed to configure playback session: \(error)")
+                Logger.session.error("❌ Failed to configure playback session: \(String(describing: error), privacy: .public)")
             }
         }
 
@@ -185,7 +186,7 @@ struct MonitoringView: View {
                 tick()
             }
         }
-        print("⏰ Session timer started")
+        Logger.session.notice("⏰ Session timer started")
     }
 
     private func stopSessionTimer() {

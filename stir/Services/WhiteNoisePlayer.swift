@@ -1,5 +1,6 @@
 @preconcurrency import AVFoundation
 import Combine
+import os
 
 // Plays looping white noise with crossfade and a timed fade-out.
 // Does NOT own the AVAudioSession: during a session the shared .playAndRecord
@@ -30,7 +31,7 @@ class WhiteNoisePlayer: ObservableObject {
 
     func play(sound: WhiteNoiseSound, volume: Float) {
         guard let url = bundledSoundURL(sound.rawValue) else {
-            print("Sound file not found: \(sound.rawValue).mp3")
+            Logger.audio.notice("Sound file not found: \(String(describing: sound.rawValue), privacy: .public).mp3")
             return
         }
         playURL(url, name: sound.displayName, volume: volume, seamless: true)
@@ -38,7 +39,7 @@ class WhiteNoisePlayer: ObservableObject {
 
     func playCustomSound(_ customSound: CustomSound, volume: Float) {
         guard let url = customSound.fileURL else {
-            print("Custom sound file not found: \(customSound.name)")
+            Logger.audio.notice("Custom sound file not found: \(String(describing: customSound.name), privacy: .public)")
             return
         }
         playURL(url, name: customSound.name, volume: volume, seamless: false)
@@ -80,7 +81,7 @@ class WhiteNoisePlayer: ObservableObject {
             fadeProgress = 0.0
             playbackStartedAt = Date()
 
-            print("Started playing: \(name), fading in to volume \(volume), \(seamless ? "gapless repeat" : "crossfade looping")")
+            Logger.audio.notice("Started playing: \(String(describing: name), privacy: .public), fading in to volume \(String(describing: volume), privacy: .public), \(String(describing: seamless ? "gapless repeat" : "crossfade looping"), privacy: .public)")
             // Let the audio route finish coming alive (session activation and
             // speaker rerouting eat the first beat on device), then ramp with
             // the player's native fade — it runs inside the audio engine, so
@@ -92,7 +93,7 @@ class WhiteNoisePlayer: ObservableObject {
             }
             if !seamless { scheduleCrossfade() }
         } catch {
-            print("Failed to play sound: \(error)")
+            Logger.audio.error("Failed to play sound: \(String(describing: error), privacy: .public)")
         }
     }
 
@@ -209,7 +210,7 @@ class WhiteNoisePlayer: ObservableObject {
         fadeStartTime = Date()
         isFadingOut = true
 
-        print("Starting fade-out over \(Int(fadeDuration / 60)) minutes")
+        Logger.audio.notice("Starting fade-out over \(String(describing: Int(self.fadeDuration / 60)), privacy: .public) minutes")
 
         fadeTimer = Timer.scheduledTimer(withTimeInterval: fadeUpdateInterval, repeats: true) { [weak self] timer in
             Task { @MainActor in

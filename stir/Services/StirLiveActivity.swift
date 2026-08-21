@@ -1,6 +1,7 @@
 import ActivityKit
 import Foundation
 import SwiftUI
+import os
 
 enum StirLiveActivity {
     private static var currentActivity: Activity<StirActivityAttributes>?
@@ -9,7 +10,7 @@ enum StirLiveActivity {
 
     static func start(wakeWindow: String) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else {
-            print("Live Activities not enabled")
+            Logger.session.notice("Live Activities not enabled")
             return
         }
 
@@ -35,9 +36,9 @@ enum StirLiveActivity {
                 pushType: nil
             )
             currentActivity = activity
-            print("Started Live Activity: \(activity.id)")
+            Logger.session.notice("Started Live Activity: \(String(describing: activity.id), privacy: .public)")
         } catch {
-            print("Failed to start Live Activity: \(error)")
+            Logger.session.error("Failed to start Live Activity: \(String(describing: error), privacy: .public)")
         }
     }
 
@@ -59,7 +60,7 @@ enum StirLiveActivity {
             await activity.update(
                 ActivityContent(state: state, staleDate: nil)
             )
-            print("Live Activity status: \(status)")
+            Logger.session.notice("Live Activity status: \(String(describing: status), privacy: .public)")
         }
     }
 
@@ -100,7 +101,7 @@ enum StirLiveActivity {
             await currentActivity?.update(
                 ActivityContent(state: state, staleDate: nil)
             )
-            print("Live Activity updated to alarm state")
+            Logger.session.notice("Live Activity updated to alarm state")
         }
     }
 
@@ -122,7 +123,7 @@ enum StirLiveActivity {
                 dismissalPolicy: .immediate
             )
             currentActivity = nil
-            print("Live Activity stopped")
+            Logger.session.notice("Live Activity stopped")
         }
     }
 }

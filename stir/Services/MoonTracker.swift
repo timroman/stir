@@ -1,6 +1,7 @@
 import Foundation
 import CoreLocation
 import Combine
+import os
 
 // The real moon: altitude and azimuth right now, from the observer's location.
 // Low-precision Meeus series (the suncalc formulation, ~1° accuracy) — entirely
@@ -156,6 +157,6 @@ extension MoonTracker: CLLocationManagerDelegate {
     }
 
     nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("🌙 Location fix failed: \(error.localizedDescription)")
+        Logger.session.error("🌙 Location fix failed: \(String(describing: error.localizedDescription), privacy: .public)")
     }
 }

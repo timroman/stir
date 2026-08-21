@@ -1,5 +1,6 @@
 import SwiftUI
 import AVFoundation
+import os
 
 struct SetupView: View {
     @EnvironmentObject var appState: AppState
@@ -105,7 +106,7 @@ struct SetupView: View {
             try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
             try session.setActive(true)
         } catch {
-            print("⚠️ Could not read system volume: \(error)")
+            Logger.session.error("⚠️ Could not read system volume: \(String(describing: error), privacy: .public)")
             return nil
         }
         return session.outputVolume

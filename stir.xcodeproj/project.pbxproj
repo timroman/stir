@@ -31,6 +31,7 @@
 		99AD63ECFBFADA2FB18BA31D /* AlarmBackstop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3621C1610B2466A837426511 /* AlarmBackstop.swift */; };
 		A40697DB09197D46B4A1D820 /* TechnicalDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92CE2A370C6733D8946E2B62 /* TechnicalDetailsView.swift */; };
 		AD93BA919195EEE1E8C3FAB2 /* NightArcFace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 129BD251B689B48CAC132AAC /* NightArcFace.swift */; };
+		AED52E8138D86B8281E70B54 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92497362A23FDEB89BC160D0 /* Log.swift */; };
 		C6D51E60FE5A12A3449B418F /* SetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDBE9CD3509B6BB7BF2CDD44 /* SetupView.swift */; };
 		CE6911908594E31752200207 /* brown_noise.m4a in Resources */ = {isa = PBXBuildFile; fileRef = E57D2C7E4F7F1220A0B4E450 /* brown_noise.m4a */; };
 		D2BF15BF890F10FE38F1B07D /* dawn.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 1068AC4BFC908362EEF26E79 /* dawn.m4a */; };
@@ -97,6 +98,7 @@
 		853556B5111816A761906A57 /* StirLiveActivityWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StirLiveActivityWidget.swift; sourceTree = "<group>"; };
 		8A5607025F6BBB641D36D497 /* fan.m4a */ = {isa = PBXFileReference; path = fan.m4a; sourceTree = "<group>"; };
 		8E440957EC87E3CD97F463E8 /* pink_noise.m4a */ = {isa = PBXFileReference; path = pink_noise.m4a; sourceTree = "<group>"; };
+		92497362A23FDEB89BC160D0 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		92CE2A370C6733D8946E2B62 /* TechnicalDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnicalDetailsView.swift; sourceTree = "<group>"; };
 		ACA11DE98D22F3DAA607833D /* WhiteNoisePlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteNoisePlayer.swift; sourceTree = "<group>"; };
 		AEFC8AF87B6E2ECC24F4F346 /* stir.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = stir.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -118,6 +120,7 @@
 				3621C1610B2466A837426511 /* AlarmBackstop.swift */,
 				0DA05CC505629D8A8D20C6E0 /* AudioMonitor.swift */,
 				4118C77059DF41F2AEAD8B28 /* CustomSoundManager.swift */,
+				92497362A23FDEB89BC160D0 /* Log.swift */,
 				729BE7AC31F3154804BA8103 /* MoonTracker.swift */,
 				3F4F559E78A903A55E4D4BBB /* MotionMonitor.swift */,
 				013A3DB4AA7DE7AC2CB9AB58 /* StirLiveActivity.swift */,
@@ -296,7 +299,6 @@
 				};
 			};
 			buildConfigurationList = 61721F7956A25866686C65DD /* Build configuration list for PBXProject "stir" */;
-			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -306,6 +308,7 @@
 			mainGroup = 57E92CA17EE6E663B3888FCE;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
+			productRefGroup = A6C2AB7759C42395113BA2DC /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -358,6 +361,7 @@
 				EB0358F235F25624ABEF7C05 /* AudioMonitor.swift in Sources */,
 				34094B5B13B9CE4EE4361C94 /* ContentView.swift in Sources */,
 				D894633ABBE270C557DF59E0 /* CustomSoundManager.swift in Sources */,
+				AED52E8138D86B8281E70B54 /* Log.swift in Sources */,
 				E91C552CD2DA8D221DD1DFC7 /* MonitoringView.swift in Sources */,
 				1EC0E4D1F404A3D35A7D3EA4 /* MoonTracker.swift in Sources */,
 				74977CE7F28C965C76C737F3 /* MotionMonitor.swift in Sources */,

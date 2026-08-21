@@ -1,6 +1,7 @@
 import SwiftUI
 @preconcurrency import AVFoundation
 import CoreHaptics
+import os
 
 struct AlarmView: View {
     @EnvironmentObject var appState: AppState
@@ -119,7 +120,7 @@ class HapticManager: ObservableObject {
 
     func start(type: HapticType, targetIntensity: Float) {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else {
-            print("📳 Haptics not supported on this device")
+            Logger.haptics.notice("📳 Haptics not supported on this device")
             return
         }
 
@@ -138,7 +139,7 @@ class HapticManager: ObservableObject {
             hapticEngine?.playsHapticsOnly = true
 
             hapticEngine?.stoppedHandler = { [weak self] reason in
-                print("📳 Haptic engine stopped: \(reason.rawValue)")
+                Logger.haptics.notice("📳 Haptic engine stopped: \(String(describing: reason.rawValue), privacy: .public)")
                 Task { @MainActor in
                     guard let self = self, self.isRunning else { return }
                     try? self.hapticEngine?.start()
@@ -147,7 +148,7 @@ class HapticManager: ObservableObject {
             }
 
             hapticEngine?.resetHandler = { [weak self] in
-                print("📳 Haptic engine reset")
+                Logger.haptics.notice("📳 Haptic engine reset")
                 Task { @MainActor in
                     guard let self = self, self.isRunning else { return }
                     try? self.hapticEngine?.start()
@@ -156,7 +157,7 @@ class HapticManager: ObservableObject {
             }
 
             try hapticEngine?.start()
-            print("📳 Haptic engine started")
+            Logger.haptics.notice("📳 Haptic engine started")
 
             // Test haptic to verify device supports it
             let testEvent = CHHapticEvent(
@@ -170,7 +171,7 @@ class HapticManager: ObservableObject {
             let testPattern = try CHHapticPattern(events: [testEvent], parameters: [])
             let testPlayer = try hapticEngine?.makePlayer(with: testPattern)
             try testPlayer?.start(atTime: CHHapticTimeImmediate)
-            print("📳 Test haptic fired")
+            Logger.haptics.notice("📳 Test haptic fired")
 
             // Play first pattern
             playPattern()
@@ -185,15 +186,15 @@ class HapticManager: ObservableObject {
             // Start intensity ramp
             startIntensityRamp()
 
-            print("📳 Haptic feedback started: \(type.displayName), ramping to intensity \(targetIntensity)")
+            Logger.haptics.notice("📳 Haptic feedback started: \(String(describing: type.displayName), privacy: .public), ramping to intensity \(String(describing: targetIntensity), privacy: .public)")
         } catch {
-            print("📳 Haptic error: \(error)")
+            Logger.haptics.error("📳 Haptic error: \(String(describing: error), privacy: .public)")
         }
     }
 
     private func playPattern() {
         guard isRunning, let engine = hapticEngine else {
-            print("📳 playPattern skipped: isRunning=\(isRunning), engine=\(String(describing: hapticEngine))")
+            Logger.haptics.notice("📳 playPattern skipped: isRunning=\(String(describing: self.isRunning), privacy: .public), engine=\(String(describing: String(describing: self.hapticEngine)), privacy: .public)")
             return
         }
 
@@ -202,9 +203,9 @@ class HapticManager: ObservableObject {
             let pattern = try CHHapticPattern(events: events, parameters: [])
             hapticPlayer = try engine.makePlayer(with: pattern)
             try hapticPlayer?.start(atTime: CHHapticTimeImmediate)
-            print("📳 Pattern playing with intensity: \(currentIntensity)")
+            Logger.haptics.notice("📳 Pattern playing with intensity: \(String(describing: self.currentIntensity), privacy: .public)")
         } catch {
-            print("📳 Failed to play haptic pattern: \(error)")
+            Logger.haptics.error("📳 Failed to play haptic pattern: \(String(describing: error), privacy: .public)")
         }
     }
 
@@ -228,7 +229,7 @@ class HapticManager: ObservableObject {
 
                 if currentStep >= totalSteps {
                     self.currentIntensity = self.targetIntensity
-                    print("📳 Haptic intensity ramp complete: \(self.targetIntensity)")
+                    Logger.haptics.notice("📳 Haptic intensity ramp complete: \(String(describing: self.targetIntensity), privacy: .public)")
                     timer.invalidate()
                     self.intensityRampTimer = nil
                 }
@@ -321,7 +322,7 @@ class HapticManager: ObservableObject {
 
         hapticEngine?.stop()
         hapticEngine = nil
-        print("📳 Haptics stopped")
+        Logger.haptics.notice("📳 Haptics stopped")
     }
 }
 
@@ -355,9 +356,9 @@ class AlarmPlayer: ObservableObject {
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
             try session.setActive(true)
-            print("🔊 Audio session configured for alarm playback")
+            Logger.alarm.notice("🔊 Audio session configured for alarm playback")
         } catch {
-            print("⚠️ Failed to configure audio session: \(error)")
+            Logger.alarm.error("⚠️ Failed to configure audio session: \(String(describing: error), privacy: .public)")
         }
 
         // Determine which sound URL to use
@@ -366,13 +367,13 @@ class AlarmPlayer: ObservableObject {
            let customSound = CustomSoundManager.shared.customSounds.first(where: { $0.id == customId }),
            let customURL = customSound.fileURL {
             url = customURL
-            print("🔔 Playing custom sound: \(customSound.name)")
+            Logger.alarm.notice("🔔 Playing custom sound: \(String(describing: customSound.name), privacy: .public)")
         } else {
             url = bundledSoundURL(sound.rawValue)
         }
 
         guard let soundURL = url else {
-            print("Sound file not found: \(sound.rawValue)")
+            Logger.alarm.notice("Sound file not found: \(String(describing: sound.rawValue), privacy: .public)")
             playFallbackSound()
             return
         }
@@ -391,23 +392,23 @@ class AlarmPlayer: ObservableObject {
             playerA?.play()
             activePlayer = playerA
 
-            print("🔔 Alarm started with crossfade looping, ramping volume over \(rampDuration) seconds")
+            Logger.alarm.notice("🔔 Alarm started with crossfade looping, ramping volume over \(String(describing: self.rampDuration), privacy: .public) seconds")
             startVolumeRamp()
             scheduleCrossfade()
 
             // Diagnostics: leave evidence in the device log for overnight failures
             let session = AVAudioSession.sharedInstance()
-            print("🔔 Post-play state — playing: \(playerA?.isPlaying ?? false), systemVolume: \(session.outputVolume), route: \(session.currentRoute.outputs.map(\.portName).joined(separator: ","))")
+            Logger.alarm.notice("🔔 Post-play state — playing: \(String(describing: self.playerA?.isPlaying ?? false), privacy: .public), systemVolume: \(String(describing: session.outputVolume), privacy: .public), route: \(String(describing: session.currentRoute.outputs.map(\.portName).joined(separator: ",")), privacy: .public)")
 
             // Watchdog: if playback died within 5s (e.g. session stolen), restart it
             DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
                 guard let self, let active = self.activePlayer, !active.isPlaying else { return }
-                print("⚠️ Alarm playback died after start — reactivating session and restarting")
+                Logger.alarm.error("⚠️ Alarm playback died after start — reactivating session and restarting")
                 try? AVAudioSession.sharedInstance().setActive(true)
                 active.play()
             }
         } catch {
-            print("Failed to play alarm: \(error)")
+            Logger.alarm.error("Failed to play alarm: \(String(describing: error), privacy: .public)")
             playFallbackSound()
         }
     }
@@ -438,7 +439,7 @@ class AlarmPlayer: ObservableObject {
                 if currentStep >= totalSteps {
                     self.currentVolume = self.targetVolume
                     self.rampProgress = 1
-                    print("🔔 Volume ramp complete: \(Int(self.targetVolume * 100))% of max")
+                    Logger.alarm.notice("🔔 Volume ramp complete: \(String(describing: Int(self.targetVolume * 100)), privacy: .public)% of max")
                     timer.invalidate()
                     self.volumeRampTimer = nil
                 }
@@ -542,14 +543,14 @@ class AlarmPlayer: ObservableObject {
         playerA = nil
         playerB = nil
         activePlayer = nil
-        print("🔔 Alarm stopped")
+        Logger.alarm.notice("🔔 Alarm stopped")
 
         // Deactivate audio session
         do {
             try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
-            print("🔊 Audio session deactivated")
+            Logger.alarm.notice("🔊 Audio session deactivated")
         } catch {
-            print("⚠️ Failed to deactivate audio session: \(error)")
+            Logger.alarm.error("⚠️ Failed to deactivate audio session: \(String(describing: error), privacy: .public)")
         }
     }
 

@@ -1,6 +1,7 @@
 import Foundation
 import CoreMotion
 import Combine
+import os
 
 @MainActor
 class MotionMonitor: ObservableObject {
@@ -17,7 +18,7 @@ class MotionMonitor: ObservableObject {
 
     func start() {
         guard motionManager.isDeviceMotionAvailable else {
-            print("📱 Device motion not available")
+            Logger.monitor.notice("📱 Device motion not available")
             return
         }
 
@@ -34,7 +35,7 @@ class MotionMonitor: ObservableObject {
             }
         }
 
-        print("📱 Motion monitoring started")
+        Logger.monitor.notice("📱 Motion monitoring started")
     }
 
     private func processMotion(_ motion: CMDeviceMotion?, error: Error?) {
@@ -44,7 +45,7 @@ class MotionMonitor: ObservableObject {
         if !isCalibrated {
             referenceAttitude = motion.attitude.copy() as? CMAttitude
             isCalibrated = true
-            print("📱 Motion calibrated at attitude: pitch=\(String(format: "%.2f", motion.attitude.pitch)), roll=\(String(format: "%.2f", motion.attitude.roll))")
+            Logger.monitor.notice("📱 Motion calibrated at attitude: pitch=\(String(describing: String(format: "%.2f", motion.attitude.pitch)), privacy: .public), roll=\(String(describing: String(format: "%.2f", motion.attitude.roll)), privacy: .public)")
             return
         }
 
@@ -62,7 +63,7 @@ class MotionMonitor: ObservableObject {
         let maxRotation = max(pitchChange, max(rollChange, yawChange))
 
         if maxRotation > rotationThreshold {
-            print("📱 Motion detected! Rotation: \(String(format: "%.2f", maxRotation)) rad (threshold: \(rotationThreshold))")
+            Logger.monitor.notice("📱 Motion detected! Rotation: \(String(describing: String(format: "%.2f", maxRotation)), privacy: .public) rad (threshold: \(String(describing: self.rotationThreshold), privacy: .public))")
             didTrigger = true
             stop()
         }
@@ -73,6 +74,6 @@ class MotionMonitor: ObservableObject {
         isMonitoring = false
         referenceAttitude = nil
         isCalibrated = false
-        print("📱 Motion monitoring stopped")
+        Logger.monitor.notice("📱 Motion monitoring stopped")
     }
 }

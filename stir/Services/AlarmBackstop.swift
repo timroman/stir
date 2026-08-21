@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 #if canImport(AlarmKit)
 import AlarmKit
+import os
 #endif
 
 // Guaranteed can't-oversleep net behind the gentle in-app alarm. On iOS 26+
@@ -30,11 +31,11 @@ enum AlarmBackstop {
                     case .notDetermined:
                         let state = try await manager.requestAuthorization()
                         guard state == .authorized else {
-                            print("⏰ Backstop not authorized")
+                            Logger.alarm.notice("⏰ Backstop not authorized")
                             return
                         }
                     case .denied:
-                        print("⏰ Backstop authorization denied")
+                        Logger.alarm.error("⏰ Backstop authorization denied")
                         return
                     case .authorized:
                         break
@@ -64,9 +65,9 @@ enum AlarmBackstop {
 
                     _ = try await manager.schedule(id: id, configuration: configuration)
                     UserDefaults.standard.set(id.uuidString, forKey: alarmIdKey)
-                    print("⏰ Backstop scheduled for \(upBy.addingTimeInterval(graceSeconds))")
+                    Logger.alarm.notice("⏰ Backstop scheduled for \(String(describing: upBy.addingTimeInterval(graceSeconds)), privacy: .public)")
                 } catch {
-                    print("⏰ Backstop scheduling failed: \(error)")
+                    Logger.alarm.error("⏰ Backstop scheduling failed: \(String(describing: error), privacy: .public)")
                 }
             }
         }
@@ -88,9 +89,9 @@ enum AlarmBackstop {
               let id = UUID(uuidString: idString) else { return }
         do {
             try AlarmManager.shared.cancel(id: id)
-            print("⏰ Backstop cancelled")
+            Logger.alarm.notice("⏰ Backstop cancelled")
         } catch {
-            print("⏰ Backstop cancel failed (may have already fired): \(error)")
+            Logger.alarm.error("⏰ Backstop cancel failed (may have already fired): \(String(describing: error), privacy: .public)")
         }
         UserDefaults.standard.removeObject(forKey: alarmIdKey)
     }

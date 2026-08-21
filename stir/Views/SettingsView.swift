@@ -1,6 +1,7 @@
 import SwiftUI
 import AVFoundation
 import UniformTypeIdentifiers
+import os
 
 // Five calm rows; every knob lives one tap deeper
 struct SettingsView: View {
@@ -351,7 +352,7 @@ struct SoundsSettingsView: View {
                 stopPreview()
             }
         } catch {
-            print("Failed to preview sound: \(error)")
+            Logger.sounds.error("Failed to preview sound: \(String(describing: error), privacy: .public)")
         }
     }
 

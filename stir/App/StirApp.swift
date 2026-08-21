@@ -1,13 +1,14 @@
 import SwiftUI
 import AVFoundation
+import os
 
 @main
 struct StirApp: App {
     @StateObject private var appState = AppState()
 
     init() {
-        print("🚀 stir app initializing...")
-        print("🚀 stir app ready")
+        Logger.session.notice("🚀 stir app initializing...")
+        Logger.session.notice("🚀 stir app ready")
     }
 
     var body: some Scene {
@@ -16,7 +17,7 @@ struct StirApp: App {
                 .environmentObject(appState)
                 .preferredColorScheme(.dark)
                 .onAppear {
-                    print("🚀 ContentView appeared")
+                    Logger.session.notice("🚀 ContentView appeared")
                 }
         }
     }
