@@ -32,6 +32,7 @@
 		A40697DB09197D46B4A1D820 /* TechnicalDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92CE2A370C6733D8946E2B62 /* TechnicalDetailsView.swift */; };
 		AD93BA919195EEE1E8C3FAB2 /* NightArcFace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 129BD251B689B48CAC132AAC /* NightArcFace.swift */; };
 		AED52E8138D86B8281E70B54 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92497362A23FDEB89BC160D0 /* Log.swift */; };
+		C1D175BC7E5D8A2EAFBD58B5 /* SessionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC433593AE06BB9802072BFA /* SessionRecord.swift */; };
 		C6D51E60FE5A12A3449B418F /* SetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDBE9CD3509B6BB7BF2CDD44 /* SetupView.swift */; };
 		CE6911908594E31752200207 /* brown_noise.m4a in Resources */ = {isa = PBXBuildFile; fileRef = E57D2C7E4F7F1220A0B4E450 /* brown_noise.m4a */; };
 		D2BF15BF890F10FE38F1B07D /* dawn.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 1068AC4BFC908362EEF26E79 /* dawn.m4a */; };
@@ -109,6 +110,7 @@
 		CCB7677DAB034D6E2618FC61 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CDBE9CD3509B6BB7BF2CDD44 /* SetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupView.swift; sourceTree = "<group>"; };
 		D967D9651F113BF861322057 /* StirWidgetsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StirWidgetsBundle.swift; sourceTree = "<group>"; };
+		DC433593AE06BB9802072BFA /* SessionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionRecord.swift; sourceTree = "<group>"; };
 		E57D2C7E4F7F1220A0B4E450 /* brown_noise.m4a */ = {isa = PBXFileReference; path = brown_noise.m4a; sourceTree = "<group>"; };
 		F6E554669BCF3C3AD855F0DD /* soft_bells.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = soft_bells.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -226,6 +228,7 @@
 			children = (
 				04B3E00A25A378A0362F269D /* AlarmSettings.swift */,
 				3319761B25C1F5A15016A2BA /* AppState.swift */,
+				DC433593AE06BB9802072BFA /* SessionRecord.swift */,
 				215AA25344A9487DF7470C5A /* StirActivityAttributes.swift */,
 			);
 			path = Models;
@@ -367,6 +370,7 @@
 				74977CE7F28C965C76C737F3 /* MotionMonitor.swift in Sources */,
 				AD93BA919195EEE1E8C3FAB2 /* NightArcFace.swift in Sources */,
 				970D17B50020B2BFEB7E12C4 /* OnboardingView.swift in Sources */,
+				C1D175BC7E5D8A2EAFBD58B5 /* SessionRecord.swift in Sources */,
 				346816F88DB0726F288F922B /* SettingsView.swift in Sources */,
 				C6D51E60FE5A12A3449B418F /* SetupView.swift in Sources */,
 				FFE6492399AECB4B851D5F57 /* SkyBackground.swift in Sources */,

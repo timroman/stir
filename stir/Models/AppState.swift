@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import os
 
 enum AppScreen {
     case onboarding
@@ -22,6 +23,10 @@ class AppState: ObservableObject {
 
     private let settingsKey = "alarmSettings"
     private let onboardingKey = "hasCompletedOnboarding"
+
+    // Live for the length of one session, then folded into a SessionRecord
+    private var sessionStartedAt: Date?
+    private var alarmFiredAt: Date?
 
     init() {
         self.hasCompletedOnboarding = UserDefaults.standard.bool(forKey: onboardingKey)
@@ -78,8 +83,7 @@ class AppState: ObservableObject {
             switch args[index + 1] {
             case "setup": currentScreen = .setup
             case "monitoring":
-                currentScreen = .monitoring
-                isMonitoring = true
+                startMonitoring()
             case "alarm": currentScreen = .alarm
             default: break
             }
@@ -136,22 +140,44 @@ class AppState: ObservableObject {
     }
 
     func startMonitoring() {
+        sessionStartedAt = Date()
+        alarmFiredAt = nil
         currentScreen = .monitoring
         isMonitoring = true
+        Logger.session.notice("night started, up by \(self.timeString(self.settings.wakeUpBy), privacy: .public)")
     }
 
     func stopMonitoring() {
+        recordSessionEnd(.stopped)
         isMonitoring = false
         currentScreen = .setup
     }
 
     func triggerAlarm() {
+        if alarmFiredAt == nil { alarmFiredAt = Date() }
         currentScreen = .alarm
+        Logger.session.notice("alarm fired")
     }
 
     func dismissAlarm() {
+        recordSessionEnd(.alarmDismissed)
         isMonitoring = false
         currentScreen = .setup
+    }
+
+    // Written on every exit from a session so the next morning has something to
+    // read, on the phone and in the unified log
+    private func recordSessionEnd(_ ending: SessionRecord.Ending) {
+        guard let startedAt = sessionStartedAt else { return }
+        let record = SessionRecord(startedAt: startedAt,
+                                   upBy: settings.wakeUpBy,
+                                   alarmFiredAt: alarmFiredAt,
+                                   endedAt: Date(),
+                                   ending: ending)
+        record.save()
+        Logger.session.notice("night ended after \(record.lengthText, privacy: .public) — \(ending.rawValue, privacy: .public), alarm \(record.alarmText, privacy: .public)")
+        sessionStartedAt = nil
+        alarmFiredAt = nil
     }
 
     func completeOnboarding() {

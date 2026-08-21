@@ -67,8 +67,7 @@ struct ContentView: View {
             switch url.lastPathComponent {
             case "setup": appState.currentScreen = .setup
             case "monitoring":
-                appState.currentScreen = .monitoring
-                appState.isMonitoring = true
+                appState.startMonitoring()
             case "alarm": appState.currentScreen = .alarm
             case "details": debugShowDetails = true
             default: break

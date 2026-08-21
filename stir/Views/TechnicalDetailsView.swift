@@ -5,6 +5,21 @@ import SwiftUI
 struct TechnicalDetailsView: View {
     var body: some View {
         List {
+            // Only appears once a night has actually run; the answer to "what
+            // happened last night?" without needing a Mac attached
+            if let last = SessionRecord.last {
+                Section {
+                    LabeledContent("started", value: last.startedText)
+                    LabeledContent("alarm", value: last.alarmText)
+                    LabeledContent("ended", value: last.endedText)
+                    LabeledContent("how", value: last.ending.label)
+                } header: {
+                    Text("last night")
+                } footer: {
+                    Text("the session ran \(last.lengthText).")
+                }
+            }
+
             Section {
                 Text("set the one time that matters — when you need to be up by. white noise plays while you fall asleep and through the night, then fades to silence. after a quiet gap, stir starts listening. when it hears or feels you naturally stirring inside your wake window, it wakes you gently. if the window closes without a stir, the alarm sounds at your \"up by\" time no matter what.")
             } header: {
