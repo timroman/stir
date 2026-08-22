@@ -22,6 +22,12 @@ struct MonitoringView: View {
     @State private var phase: SessionPhase = .whiteNoise
     @State private var hasStartedWhiteNoise = false
     @StateObject private var moonTracker = MoonTracker()
+    // A brushed screen at 3am used to end the night — and cancel the backstop —
+    // on one tap. Confirmation is a second tap on the same control rather than
+    // a system dialog: an action sheet would flood a dark room with light, which
+    // is the worst possible answer to a touch you didn't mean to make.
+    @State private var confirmingEnd = false
+    @State private var confirmTask: Task<Void, Never>?
 
     var body: some View {
         ZStack {
@@ -78,21 +84,17 @@ struct MonitoringView: View {
                 .padding(.bottom, 28)
 
                 // Stop button - subtle; reads "done" once a no-alarm session completes
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        endSession()
-                        appState.stopMonitoring()
-                    }
-                }) {
+                Button(action: armOrEnd) {
                     VStack(spacing: 8) {
                         Image(systemName: "chevron.up")
                             .font(.caption)
-                        Text(phase == .complete ? "done" : "stop")
+                        Text(stopLabel)
                             .font(.subheadline)
                     }
-                    .foregroundColor(.white.opacity(0.3))
+                    .foregroundColor(.white.opacity(confirmingEnd ? 0.55 : 0.3))
                 }
                 .padding(.bottom, 40)
+                .animation(.easeInOut(duration: 0.25), value: confirmingEnd)
             }
         }
         .animation(.easeInOut(duration: 0.6), value: audioMonitor.monitoringState)
@@ -128,12 +130,42 @@ struct MonitoringView: View {
             }
         }
         .onDisappear {
+            confirmTask?.cancel()
             // Clean up monitors but leave the Live Activity alone — when the alarm
             // fires this view disappears while the activity must stay in alarm state
             stopSessionTimer()
             whiteNoisePlayer.stop()
             audioMonitor.stop()
             motionMonitor.stop()
+        }
+    }
+
+    private var stopLabel: String {
+        if phase == .complete { return "done" }
+        return confirmingEnd ? "tap again to end" : "stop"
+    }
+
+    // First tap arms, second ends. A completed no-alarm night has nothing left
+    // to lose, so it ends on the first tap.
+    private func armOrEnd() {
+        guard phase != .complete, !confirmingEnd else {
+            endNight()
+            return
+        }
+        confirmingEnd = true
+        confirmTask?.cancel()
+        confirmTask = Task {
+            try? await Task.sleep(nanoseconds: 5_000_000_000)
+            guard !Task.isCancelled else { return }
+            confirmingEnd = false
+        }
+    }
+
+    private func endNight() {
+        confirmTask?.cancel()
+        withAnimation(.easeInOut(duration: 0.3)) {
+            endSession()
+            appState.stopMonitoring()
         }
     }
 
