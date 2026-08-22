@@ -40,6 +40,12 @@ struct AlarmView: View {
                 // Dismiss button
                 Button(action: {
                     withAnimation(.easeInOut(duration: 0.3)) {
+                        // Haptics first: the engine is attached to the app's
+                        // audio session, so stopping the player deactivates the
+                        // session out from under it, its stoppedHandler sees a
+                        // still-running manager and restarts — one last buzz
+                        // about a second after you asked it to stop.
+                        hapticManager.stop()
                         alarmPlayer.stop()
                         StirLiveActivity.stop()
                         AlarmBackstop.cancelBackstop()
