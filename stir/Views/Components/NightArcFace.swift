@@ -193,12 +193,8 @@ struct MoonPhaseView: View {
     ZStack {
         SkyBackground(colors: NightSky.colors(NightSky.deepNight))
         SkyFace(
-            moonPosition: MoonTracker.MoonPosition(
-                altitude: 0.5, azimuth: -0.7, hourAngle: -0.9, horizonCos: 0.25
-            ),
-            sunPosition: MoonTracker.MoonPosition(
-                altitude: -0.6, azimuth: 2.4, hourAngle: 2.6, horizonCos: -0.23
-            )
+            moonPosition: MoonTracker.MoonPosition(hourAngle: -0.9, horizonCos: 0.25),
+            sunPosition: MoonTracker.MoonPosition(hourAngle: 2.6, horizonCos: -0.23)
         )
     }
 }
