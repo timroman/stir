@@ -28,3 +28,6 @@ AppStore/
 fastlane/.env
 *.ipa
 *.dSYM.zip
+
+# fastlane run artifacts
+fastlane/report.xml
