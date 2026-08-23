@@ -37,7 +37,7 @@ Upload a new build to TestFlight
 [bundle exec] fastlane ios release
 ```
 
-Upload build + metadata to App Store Connect for review submission
+Upload build + metadata to App Store Connect (screenshots untouched)
 
 ### ios screenshots
 
