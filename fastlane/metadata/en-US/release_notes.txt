@@ -1,1 +1,5 @@
-first release of stir.
+brown noise, fan and wind now play properly. they were pitched so low that most phones could not reproduce them at all.
+
+the stop control on the night screen is now a hold rather than a tap, with a much larger target — it was possible to tap it and have nothing happen.
+
+white noise loops without the small dip it used to have at the seam.

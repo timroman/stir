@@ -11,6 +11,8 @@ BACKGROUND AUDIO (UIBackgroundModes: audio) - PLEASE TEST THIS STEP:
 
 Removing the audio background mode would stop the white noise the moment the screen locks and prevent the alarm from sounding at all - the app has no function without it.
 
+This background mode was reviewed and approved for build 4 (submission 82cf20e0-1265-4ee3-9c15-f3735168454c), where a screen recording of the backgrounded session was provided.
+
 WAKE-UP:
 
 6. Once the white noise finishes fading, stir calibrates to room sound for 30 seconds, then listens. Make a sustained noise (speak near the device) to trigger the gentle wake, or simply wait for the "up by" time - the alarm fires regardless, with light and volume rising together over 60 seconds.
