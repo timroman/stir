@@ -8,8 +8,28 @@ import numpy as np, wave, sys, os
 SR = 44100
 OUT = sys.argv[1]
 
+def highpass(x, cutoff=45.0, order=4):
+    # Remove sub-audible content before normalizing.
+    #
+    # The beds are 1/f^k spectra built over a 302-second window, so rfftfreq's
+    # lowest bins sit at ~0.003 Hz and the 1/f gain there runs into the
+    # hundreds. None of that is audible, and a phone speaker cannot move air
+    # below ~40 Hz at all — but peak normalization still scaled the whole file
+    # by those peaks, leaving the audible band 45 dB down. brown noise, fan and
+    # wind shipped effectively silent on a phone: measured energy above 500 Hz
+    # was -61, -60 and -65 dB against white noise's -19.
+    #
+    # The FFT treats the signal as periodic, which is exactly how it is played,
+    # so this filter wraps around the loop seam instead of disturbing it.
+    n = len(x)
+    spec = np.fft.rfft(x)
+    f = np.fft.rfftfreq(n, 1 / SR)
+    gain = 1.0 / np.sqrt(1.0 + (cutoff / np.maximum(f, 1e-9)) ** (2 * order))
+    return np.fft.irfft(spec * gain, n)
+
 def write_wav(name, data):
     # normalize to -3 dBFS, 16-bit stereo
+    data = highpass(data)
     data = data / np.max(np.abs(data)) * 0.7
     pcm = (data * 32767).astype(np.int16)
     stereo = np.column_stack([pcm, pcm]).ravel()
@@ -89,7 +109,10 @@ write_wav("wind.wav", loopable(bed * (0.3 + 0.7 * gust)))
 spec = np.fft.rfft(rng.standard_normal(n))
 bed = np.fft.irfft(spec / f, n)
 bed = bed / np.max(np.abs(bed))
-hum = 0.06 * np.sin(2 * np.pi * 58 * t) + 0.03 * np.sin(2 * np.pi * 116 * t)
+# Motor hum sits under the air, not over it: at 0.06 these two tones became
+# the file's peak once the sub-bass was filtered out, so normalization scaled
+# everything by a 58 Hz tone no phone can reproduce and the fan went silent.
+hum = 0.012 * np.sin(2 * np.pi * 58 * t) + 0.006 * np.sin(2 * np.pi * 116 * t)
 wobble = 1 + 0.05 * np.sin(2 * np.pi * 4.7 * t)
 write_wav("fan.wav", loopable(bed * wobble + hum))
 
