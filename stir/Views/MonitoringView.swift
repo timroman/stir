@@ -22,12 +22,14 @@ struct MonitoringView: View {
     @State private var phase: SessionPhase = .whiteNoise
     @State private var hasStartedWhiteNoise = false
     @StateObject private var moonTracker = MoonTracker()
-    // A brushed screen at 3am used to end the night — and cancel the backstop —
-    // on one tap. Confirmation is a second tap on the same control rather than
-    // a system dialog: an action sheet would flood a dark room with light, which
-    // is the worst possible answer to a touch you didn't mean to make.
-    @State private var confirmingEnd = false
-    @State private var confirmTask: Task<Void, Never>?
+    // A brushed screen at 3am must not end the night — that also cancels the
+    // backstop, leaving nothing to wake you. A hold is immune to a brush and,
+    // unlike the two-tap confirm it replaces, states its own gesture: nothing
+    // is hidden behind a state change you have to notice after acting, and
+    // there is no timing window to fall outside of.
+    private let holdDuration: TimeInterval = 1.2
+    @State private var isHolding = false
+    @State private var holdProgress: CGFloat = 0
 
     var body: some View {
         ZStack {
@@ -83,25 +85,45 @@ struct MonitoringView: View {
                 }
                 .padding(.bottom, 28)
 
-                // Stop button - subtle; reads "done" once a no-alarm session completes
-                Button(action: armOrEnd) {
-                    VStack(spacing: 8) {
-                        Image(systemName: "chevron.up")
-                            .font(.caption)
-                        Text(stopLabel)
-                            .font(.subheadline)
+                // Subtle by design; reads "done" once a no-alarm session completes
+                VStack(spacing: 8) {
+                    Image(systemName: "chevron.up")
+                        .font(.caption)
+                    Text(stopLabel)
+                        .font(.subheadline)
+                }
+                .foregroundColor(.white.opacity(isHolding ? 0.7 : 0.3))
+                // The glyphs alone were a 30x33pt target — under Apple's 44pt
+                // minimum, so a tap aimed in the dark could miss entirely and
+                // look like a dead button. The added area is transparent.
+                .frame(minWidth: 120, minHeight: 60)
+                .contentShape(Rectangle())
+                // The only light the gesture adds: a hairline filling as you hold
+                .overlay(alignment: .bottom) {
+                    Capsule()
+                        .fill(Color.white.opacity(0.45))
+                        .frame(width: 120 * holdProgress, height: 1.5)
+                        .opacity(isHolding ? 1 : 0)
+                }
+                .onTapGesture {
+                    // A finished no-alarm night has nothing left to lose
+                    if phase == .complete { endNight() }
+                }
+                .onLongPressGesture(minimumDuration: holdDuration, maximumDistance: 60) {
+                    endNight()
+                } onPressingChanged: { pressing in
+                    isHolding = pressing
+                    withAnimation(.linear(duration: pressing ? holdDuration : 0.2)) {
+                        holdProgress = pressing ? 1 : 0
                     }
-                    .foregroundColor(.white.opacity(confirmingEnd ? 0.55 : 0.3))
-                    // The glyphs alone were a 30x33pt target — under Apple's
-                    // 44pt minimum, so a tap aimed in the dark could miss
-                    // entirely and look like a dead button. The added area is
-                    // transparent; nothing about the screen changes.
-                    .frame(minWidth: 120, minHeight: 60)
-                    .contentShape(Rectangle())
                 }
                 .padding(.bottom, 40)
+                .accessibilityElement(children: .combine)
+                .accessibilityAddTraits(.isButton)
                 .accessibilityIdentifier("night.stop")
-                .animation(.easeInOut(duration: 0.25), value: confirmingEnd)
+                // VoiceOver activates with a double-tap, which never becomes a
+                // long press — give assistive tech a direct way to end the night
+                .accessibilityAction { endNight() }
             }
         }
         .animation(.easeInOut(duration: 0.6), value: audioMonitor.monitoringState)
@@ -137,7 +159,6 @@ struct MonitoringView: View {
             }
         }
         .onDisappear {
-            confirmTask?.cancel()
             // Clean up monitors but leave the Live Activity alone — when the alarm
             // fires this view disappears while the activity must stay in alarm state
             stopSessionTimer()
@@ -148,28 +169,10 @@ struct MonitoringView: View {
     }
 
     private var stopLabel: String {
-        if phase == .complete { return "done" }
-        return confirmingEnd ? "tap again to end" : "stop"
-    }
-
-    // First tap arms, second ends. A completed no-alarm night has nothing left
-    // to lose, so it ends on the first tap.
-    private func armOrEnd() {
-        guard phase != .complete, !confirmingEnd else {
-            endNight()
-            return
-        }
-        confirmingEnd = true
-        confirmTask?.cancel()
-        confirmTask = Task {
-            try? await Task.sleep(nanoseconds: 5_000_000_000)
-            guard !Task.isCancelled else { return }
-            confirmingEnd = false
-        }
+        phase == .complete ? "done" : "hold to end"
     }
 
     private func endNight() {
-        confirmTask?.cancel()
         withAnimation(.easeInOut(duration: 0.3)) {
             endSession()
             appState.stopMonitoring()
