@@ -92,8 +92,15 @@ struct MonitoringView: View {
                             .font(.subheadline)
                     }
                     .foregroundColor(.white.opacity(confirmingEnd ? 0.55 : 0.3))
+                    // The glyphs alone were a 30x33pt target — under Apple's
+                    // 44pt minimum, so a tap aimed in the dark could miss
+                    // entirely and look like a dead button. The added area is
+                    // transparent; nothing about the screen changes.
+                    .frame(minWidth: 120, minHeight: 60)
+                    .contentShape(Rectangle())
                 }
                 .padding(.bottom, 40)
+                .accessibilityIdentifier("night.stop")
                 .animation(.easeInOut(duration: 0.25), value: confirmingEnd)
             }
         }
