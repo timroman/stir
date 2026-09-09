@@ -63,7 +63,7 @@ targets:
           - audio
         NSMicrophoneUsageDescription: "stir needs microphone access to detect when you start moving around during your wake window. the mic session stays ready overnight while white noise plays, but nothing is evaluated or recorded before your wake window begins."
         NSSupportsLiveActivities: true
-        NSLocationWhenInUseUsageDescription: "stir uses your approximate location only to draw the real sun and moon in the night sky. It never leaves your device."
+        NSLocationWhenInUseUsageDescription: "stir uses your approximate location only to draw the real sun and moon in the night sky. it never leaves your device."
         NSAlarmKitUsageDescription: "stir schedules a backup system alarm at your 'up by' time so you never oversleep, even if the app is closed overnight."
         ITSAppUsesNonExemptEncryption: false
         CFBundleURLTypes:
