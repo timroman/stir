@@ -53,7 +53,7 @@ stir uses your microphone solely to detect movement sounds during your wake wind
 
 - [Website](https://timroman.github.io/stir/)
 - [Privacy Policy](https://timroman.github.io/stir/privacy.html)
-- [App Store](https://apps.apple.com/app/stir)
+- [App Store](https://apps.apple.com/us/app/stir-sleep-sounds-wake-up/id6796480325)
 
 ## License
 
