@@ -12,6 +12,10 @@ schemes:
       targets:
         stir: all
         stir-widgets: all
+        stir-uitests: [test]
+    test:
+      targets:
+        - stir-uitests
     run:
       executable: stir
     profile:
@@ -72,6 +76,21 @@ targets:
         com.apple.security.app-sandbox: true
     dependencies:
       - target: stir-widgets
+
+  # Drives the real UI on a simulator. Exists because "the stop button doesn't
+  # work" is not something screenshots or logs can settle — it needs taps.
+  stir-uitests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: stir-uitests
+    dependencies:
+      - target: stir
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.pureinference.stir.uitests
+        TEST_TARGET_NAME: stir
+        GENERATE_INFOPLIST_FILE: YES
 
   stir-widgets:
     type: app-extension

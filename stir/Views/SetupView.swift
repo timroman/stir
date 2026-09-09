@@ -53,6 +53,7 @@ struct SetupView: View {
             }
             .padding(.horizontal, 40)
             .padding(.bottom, 12)
+            .accessibilityIdentifier("setup.start")
 
             // Settings button
             Button(action: {
