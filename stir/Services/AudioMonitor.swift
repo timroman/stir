@@ -1,5 +1,6 @@
 import AVFoundation
 import Combine
+import os
 
 enum MonitoringState: Equatable {
     case idle
@@ -86,26 +87,26 @@ class AudioMonitor: ObservableObject {
 
     func start() {
         guard !isRunning else {
-            print("🎤 Already running, skipping start")
+            Logger.monitor.notice("🎤 Already running, skipping start")
             return
         }
 
         // Check microphone permission first
         switch AVAudioApplication.shared.recordPermission {
         case .granted:
-            print("🎤 Microphone permission granted")
+            Logger.monitor.notice("🎤 Microphone permission granted")
         case .denied:
-            print("❌ Microphone permission denied")
+            Logger.monitor.error("❌ Microphone permission denied")
             return
         case .undetermined:
-            print("🎤 Requesting microphone permission...")
+            Logger.monitor.notice("🎤 Requesting microphone permission...")
             AVAudioApplication.requestRecordPermission { granted in
                 if granted {
                     Task { @MainActor in
                         self.configureAndStartAudio()
                     }
                 } else {
-                    print("❌ Microphone permission denied by user")
+                    Logger.monitor.error("❌ Microphone permission denied by user")
                 }
             }
             return
@@ -123,17 +124,17 @@ class AudioMonitor: ObservableObject {
         do {
             // Set category first (doesn't require active session)
             try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .mixWithOthers])
-            print("🔊 Audio session category set")
+            Logger.monitor.notice("🔊 Audio session category set")
         } catch {
-            print("❌ Failed to set audio category: \(error)")
+            Logger.monitor.error("❌ Failed to set audio category: \(String(describing: error), privacy: .public)")
             return
         }
 
         do {
             try session.setActive(true)
-            print("🔊 Audio session activated for monitoring")
+            Logger.monitor.notice("🔊 Audio session activated for monitoring")
         } catch {
-            print("❌ Audio session activation failed: \(error.localizedDescription)")
+            Logger.monitor.error("❌ Audio session activation failed: \(String(describing: error.localizedDescription), privacy: .public)")
             // Retry after a delay
             Task { @MainActor in
                 try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
@@ -155,12 +156,12 @@ class AudioMonitor: ObservableObject {
     }
 
     private func retryActivation() {
-        print("🎤 Retrying audio session activation...")
+        Logger.monitor.notice("🎤 Retrying audio session activation...")
         let session = AVAudioSession.sharedInstance()
 
         do {
             try session.setActive(true)
-            print("🔊 Audio session activated on retry")
+            Logger.monitor.notice("🔊 Audio session activated on retry")
 
             NotificationCenter.default.addObserver(
                 self,
@@ -171,7 +172,7 @@ class AudioMonitor: ObservableObject {
 
             startAudioEngine()
         } catch {
-            print("❌ Audio session retry failed: \(error.localizedDescription)")
+            Logger.monitor.error("❌ Audio session retry failed: \(String(describing: error.localizedDescription), privacy: .public)")
             // Try again
             Task { @MainActor in
                 try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
@@ -181,21 +182,21 @@ class AudioMonitor: ObservableObject {
     }
 
     private func startAudioEngine() {
-        print("🎤 Creating audio engine...")
+        Logger.monitor.notice("🎤 Creating audio engine...")
         audioEngine = AVAudioEngine()
         guard let audioEngine = audioEngine else {
-            print("❌ Failed to create audio engine")
+            Logger.monitor.error("❌ Failed to create audio engine")
             return
         }
 
         let inputNode = audioEngine.inputNode
         let format = inputNode.outputFormat(forBus: 0)
-        print("🎤 Input format: \(format)")
+        Logger.monitor.notice("🎤 Input format: \(String(describing: format), privacy: .public)")
 
         // Validate format before installing tap
         guard format.sampleRate > 0 && format.channelCount > 0 else {
-            print("❌ Invalid audio format (sampleRate: \(format.sampleRate), channels: \(format.channelCount))")
-            print("🎤 Will retry in 1 second...")
+            Logger.monitor.error("❌ Invalid audio format (sampleRate: \(String(describing: format.sampleRate), privacy: .public), channels: \(String(describing: format.channelCount), privacy: .public))")
+            Logger.monitor.notice("🎤 Will retry in 1 second...")
             self.audioEngine = nil
             Task { @MainActor in
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
@@ -208,15 +209,15 @@ class AudioMonitor: ObservableObject {
         inputNode.installTap(onBus: 0, bufferSize: 1024, format: format) { [weak self] buffer, _ in
             self?.processAudioBuffer(buffer)
         }
-        print("🎤 Tap installed")
+        Logger.monitor.notice("🎤 Tap installed")
 
         do {
             try audioEngine.start()
             isRunning = true
             consecutiveTriggerCount = 0
-            print("🎤 Audio engine started successfully!")
+            Logger.monitor.notice("🎤 Audio engine started successfully!")
         } catch {
-            print("❌ Failed to start audio engine: \(error)")
+            Logger.monitor.error("❌ Failed to start audio engine: \(String(describing: error), privacy: .public)")
         }
     }
 
@@ -229,15 +230,15 @@ class AudioMonitor: ObservableObject {
 
         switch type {
         case .began:
-            print("🎤 Audio interrupted")
+            Logger.monitor.notice("🎤 Audio interrupted")
         case .ended:
-            print("🎤 Audio interruption ended, restarting...")
+            Logger.monitor.notice("🎤 Audio interruption ended, restarting...")
             do {
                 try AVAudioSession.sharedInstance().setActive(true)
                 try audioEngine?.start()
-                print("🎤 Audio engine restarted after interruption")
+                Logger.monitor.notice("🎤 Audio engine restarted after interruption")
             } catch {
-                print("❌ Failed to restart after interruption: \(error)")
+                Logger.monitor.error("❌ Failed to restart after interruption: \(String(describing: error), privacy: .public)")
             }
         @unknown default:
             break
@@ -257,7 +258,7 @@ class AudioMonitor: ObservableObject {
 
         calibrationProgress = 0.0
         monitoringState = .calibrating(startTime: Date())
-        print("🎤 Starting 30-second calibration (statistical analysis)...")
+        Logger.monitor.notice("🎤 Starting 30-second calibration (statistical analysis)...")
     }
 
     func stop() {
@@ -289,10 +290,10 @@ class AudioMonitor: ObservableObject {
         // Deactivate audio session - don't fail if it errors
         do {
             try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
-            print("🔊 Audio session deactivated")
+            Logger.monitor.notice("🔊 Audio session deactivated")
         } catch {
             // This can fail if other audio is playing, that's okay
-            print("⚠️ Audio session deactivation note: \(error.localizedDescription)")
+            Logger.monitor.error("⚠️ Audio session deactivation note: \(String(describing: error.localizedDescription), privacy: .public)")
         }
     }
 
@@ -301,12 +302,12 @@ class AudioMonitor: ObservableObject {
     private func processAudioBuffer(_ buffer: AVAudioPCMBuffer) {
         bufferCount += 1
         if bufferCount == 1 {
-            print("🎤 First audio buffer received!")
+            Logger.monitor.notice("🎤 First audio buffer received!")
             Task { @MainActor in self.isAudioLive = true }
         }
 
         guard let channelData = buffer.floatChannelData?[0] else {
-            print("❌ No channel data in buffer")
+            Logger.monitor.error("❌ No channel data in buffer")
             return
         }
 
@@ -411,11 +412,11 @@ class AudioMonitor: ObservableObject {
                 calibrationLock.unlock()
 
                 result.newState = .listening(baseline: mean, stdDev: stdDev, threshold: calculatedThreshold)
-                print("🎤 Calibration complete (statistical analysis)")
-                print("   Baseline: \(String(format: "%.1f", mean)) dB")
-                print("   Std Dev: \(String(format: "%.1f", rawStdDev)) dB (using \(String(format: "%.1f", stdDev)) dB with floor)")
-                print("   Multiplier: \(String(format: "%.1f", sensitivityMultiplier))×")
-                print("   Threshold: \(String(format: "%.1f", calculatedThreshold)) dB")
+                Logger.monitor.notice("🎤 Calibration complete (statistical analysis)")
+                Logger.monitor.notice("   Baseline: \(String(describing: String(format: "%.1f", mean)), privacy: .public) dB")
+                Logger.monitor.notice("   Std Dev: \(String(describing: String(format: "%.1f", rawStdDev)), privacy: .public) dB (using \(String(describing: String(format: "%.1f", stdDev)), privacy: .public) dB with floor)")
+                Logger.monitor.notice("   Multiplier: \(String(describing: String(format: "%.1f", self.sensitivityMultiplier)), privacy: .public)×")
+                Logger.monitor.notice("   Threshold: \(String(describing: String(format: "%.1f", calculatedThreshold)), privacy: .public) dB")
 
                 // Update Live Activity immediately from background thread
                 StirLiveActivity.updateStatus("listening...")
@@ -433,7 +434,7 @@ class AudioMonitor: ObservableObject {
             if level > currentThreshold {
                 consecutiveTriggerCount += 1
                 if consecutiveTriggerCount >= requiredConsecutiveTriggers {
-                    print("🎤 Triggered! Level: \(String(format: "%.1f", level)) dB exceeded threshold: \(String(format: "%.1f", currentThreshold)) dB")
+                    Logger.monitor.notice("🎤 Triggered! Level: \(String(describing: String(format: "%.1f", level)), privacy: .public) dB exceeded threshold: \(String(describing: String(format: "%.1f", currentThreshold)), privacy: .public) dB")
                     result.shouldTrigger = true
                 }
             } else {

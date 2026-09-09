@@ -1,6 +1,23 @@
-stir is an overnight alarm. To test without waiting a night:
-1. Complete onboarding (grant microphone; location and backup alarm optional).
+stir is an overnight alarm that runs one continuous audio session from bedtime to wake-up. A full night takes 3-4 minutes to reproduce:
+
+1. Complete onboarding (grant microphone; location and backup alarm are optional).
 2. On the setup screen, set "up by" 3-4 minutes ahead and tap "start the night".
-3. White noise fades in over ~3 seconds and plays while the session runs. The night screen intentionally shows no clock and stays black - the two rings on it are the real sun and moon computed from location.
-4. The app calibrates to room sound for 30 seconds once the white noise has faded, then listens. Make a sustained noise (e.g. speak near the phone) to trigger the gentle wake, or wait for the "up by" time - the alarm fires regardless, with light and volume rising together.
-All processing is on-device. The microphone is only evaluated during the wake window and nothing is recorded. On iOS 26+, an AlarmKit backup alarm is scheduled 2 minutes after "up by" and cancelled when the user stops the session.
+3. White noise fades in over ~3 seconds and plays continuously for the whole session.
+
+BACKGROUND AUDIO (UIBackgroundModes: audio) - PLEASE TEST THIS STEP:
+
+4. With white noise playing, press Home to leave stir, or lock the device. The white noise KEEPS PLAYING. This is the persistent audio feature: stir plays white noise for the entire night with the app backgrounded and the screen off, which is the whole reason someone starts a session before falling asleep. Return to stir and the same session is still running.
+5. Also in the background: when the gentle alarm is on, stir keeps a .playAndRecord session live all night so it can listen for you stirring during the wake window, and the alarm itself fires and plays audio from the background at your "up by" time. Both require the audio background mode.
+
+Removing the audio background mode would stop the white noise the moment the screen locks and prevent the alarm from sounding at all - the app has no function without it.
+
+WAKE-UP:
+
+6. Once the white noise finishes fading, stir calibrates to room sound for 30 seconds, then listens. Make a sustained noise (speak near the device) to trigger the gentle wake, or simply wait for the "up by" time - the alarm fires regardless, with light and volume rising together over 60 seconds.
+
+NOTES ON THE DESIGN:
+
+- The night screen intentionally shows no clock and stays black. The two rings on it are the real sun and moon, computed from location.
+- All processing is on-device. The microphone is only evaluated during the wake window; nothing is recorded, stored, or transmitted.
+- On iOS 26+, an AlarmKit backup alarm is scheduled 2 minutes after "up by" and is cancelled when the user stops the session or dismisses the alarm.
+- stir is built for iPhone. On iPad it runs in iPhone compatibility mode.

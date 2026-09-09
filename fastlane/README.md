@@ -37,7 +37,7 @@ Upload a new build to TestFlight
 [bundle exec] fastlane ios release
 ```
 
-Upload build + metadata to App Store Connect for review submission
+Upload build + metadata to App Store Connect (screenshots untouched)
 
 ### ios screenshots
 
@@ -46,14 +46,6 @@ Upload build + metadata to App Store Connect for review submission
 ```
 
 Replace the App Store screenshots only
-
-### ios privacy
-
-```sh
-[bundle exec] fastlane ios privacy
-```
-
-Declare the app privacy nutrition label (data not collected)
 
 ### ios metadata
 

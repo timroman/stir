@@ -1,17 +1,20 @@
 import Foundation
 import CoreLocation
 import Combine
+import os
 
-// The real moon: altitude and azimuth right now, from the observer's location.
-// Low-precision Meeus series (the suncalc formulation, ~1° accuracy) — entirely
-// on-device, no network. Location is a one-shot coarse fix, cached so the moon
-// still renders offline or before the first fix of the night.
+// Where the moon and sun sit on their diurnal circles right now, from the
+// observer's location. Low-precision Meeus series (the suncalc formulation,
+// ~1° accuracy) — entirely on-device, no network. Location is a one-shot coarse
+// fix, cached so the moon still renders offline or before the first fix.
 @MainActor
 final class MoonTracker: NSObject, ObservableObject {
+    // Only what the face actually draws: position along the ring and where the
+    // horizon cuts it. Altitude and azimuth were computed here for both bodies
+    // every tick all night and read by nothing — the face derives above/below
+    // from the drawn point's own geometry.
     struct MoonPosition {
-        let altitude: Double  // radians, 0 = on the horizon
-        let azimuth: Double   // radians, measured from south, west positive
-        let hourAngle: Double // radians, 0 = culmination (highest point), west positive
+        let hourAngle: Double  // radians, 0 = culmination (highest point), west positive
         let horizonCos: Double // cos of the rise/set hour angle: where the horizon cuts the diurnal circle
     }
 
@@ -92,8 +95,6 @@ final class MoonTracker: NSObject, ObservableObject {
         let siderealTime = rad * (280.16 + 360.9856235 * d) - lw
         let h = siderealTime - ra
 
-        let altitude = asin(sin(phi) * sin(dec) + cos(phi) * cos(dec) * cos(h))
-        let azimuth = atan2(sin(h), cos(h) * sin(phi) - tan(dec) * cos(phi))
 
         // Wrap the hour angle to (-π, π]: 0 at culmination, ±π at the low point
         let wrapped = atan2(sin(h), cos(h))
@@ -101,8 +102,7 @@ final class MoonTracker: NSObject, ObservableObject {
         // mean the moon is circumpolar (never sets / never rises) tonight.
         let horizonCos = min(max(-tan(phi) * tan(dec), -1), 1)
 
-        return MoonPosition(altitude: altitude, azimuth: azimuth,
-                            hourAngle: wrapped, horizonCos: horizonCos)
+        return MoonPosition(hourAngle: wrapped, horizonCos: horizonCos)
     }
 
     // The sun, same formulation (suncalc's low-precision series)
@@ -123,13 +123,10 @@ final class MoonTracker: NSObject, ObservableObject {
         let siderealTime = rad * (280.16 + 360.9856235 * d) - lw
         let h = siderealTime - ra
 
-        let altitude = asin(sin(phi) * sin(dec) + cos(phi) * cos(dec) * cos(h))
-        let azimuth = atan2(sin(h), cos(h) * sin(phi) - tan(dec) * cos(phi))
         let wrapped = atan2(sin(h), cos(h))
         let horizonCos = min(max(-tan(phi) * tan(dec), -1), 1)
 
-        return MoonPosition(altitude: altitude, azimuth: azimuth,
-                            hourAngle: wrapped, horizonCos: horizonCos)
+        return MoonPosition(hourAngle: wrapped, horizonCos: horizonCos)
     }
 }
 
@@ -156,6 +153,6 @@ extension MoonTracker: CLLocationManagerDelegate {
     }
 
     nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("🌙 Location fix failed: \(error.localizedDescription)")
+        Logger.session.error("🌙 Location fix failed: \(String(describing: error.localizedDescription), privacy: .public)")
     }
 }

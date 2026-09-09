@@ -1,5 +1,6 @@
 import SwiftUI
 import AVFoundation
+import os
 
 // The phases of a night session, derived each tick from the clock — never stored
 enum SessionPhase: Equatable {
@@ -21,6 +22,14 @@ struct MonitoringView: View {
     @State private var phase: SessionPhase = .whiteNoise
     @State private var hasStartedWhiteNoise = false
     @StateObject private var moonTracker = MoonTracker()
+    // A brushed screen at 3am must not end the night — that also cancels the
+    // backstop, leaving nothing to wake you. A hold is immune to a brush and,
+    // unlike the two-tap confirm it replaces, states its own gesture: nothing
+    // is hidden behind a state change you have to notice after acting, and
+    // there is no timing window to fall outside of.
+    private let holdDuration: TimeInterval = 1.2
+    @State private var isHolding = false
+    @State private var holdProgress: CGFloat = 0
 
     var body: some View {
         ZStack {
@@ -76,31 +85,56 @@ struct MonitoringView: View {
                 }
                 .padding(.bottom, 28)
 
-                // Stop button - subtle; reads "done" once a no-alarm session completes
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        endSession()
-                        appState.stopMonitoring()
+                // Subtle by design; reads "done" once a no-alarm session completes
+                VStack(spacing: 8) {
+                    Image(systemName: "chevron.up")
+                        .font(.caption)
+                    Text(stopLabel)
+                        .font(.subheadline)
+                }
+                .foregroundColor(.white.opacity(isHolding ? 0.7 : 0.3))
+                // The glyphs alone were a 30x33pt target — under Apple's 44pt
+                // minimum, so a tap aimed in the dark could miss entirely and
+                // look like a dead button. The added area is transparent.
+                .frame(minWidth: 120, minHeight: 60)
+                .contentShape(Rectangle())
+                // The only light the gesture adds: a hairline filling as you hold
+                .overlay(alignment: .bottom) {
+                    Capsule()
+                        .fill(Color.white.opacity(0.45))
+                        .frame(width: 120 * holdProgress, height: 1.5)
+                        .opacity(isHolding ? 1 : 0)
+                }
+                .onTapGesture {
+                    // A finished no-alarm night has nothing left to lose
+                    if phase == .complete { endNight() }
+                }
+                .onLongPressGesture(minimumDuration: holdDuration, maximumDistance: 60) {
+                    endNight()
+                } onPressingChanged: { pressing in
+                    isHolding = pressing
+                    withAnimation(.linear(duration: pressing ? holdDuration : 0.2)) {
+                        holdProgress = pressing ? 1 : 0
                     }
-                }) {
-                    VStack(spacing: 8) {
-                        Image(systemName: "chevron.up")
-                            .font(.caption)
-                        Text(phase == .complete ? "done" : "stop")
-                            .font(.subheadline)
-                    }
-                    .foregroundColor(.white.opacity(0.3))
                 }
                 .padding(.bottom, 40)
+                .accessibilityElement(children: .combine)
+                .accessibilityAddTraits(.isButton)
+                .accessibilityIdentifier("night.stop")
+                // VoiceOver activates with a double-tap, which never becomes a
+                // long press — give assistive tech a direct way to end the night
+                .accessibilityAction { endNight() }
             }
         }
         .animation(.easeInOut(duration: 0.6), value: audioMonitor.monitoringState)
         .animation(.easeInOut(duration: 0.6), value: phase)
+        // Nothing but sky. The status bar clock is the one piece of time the
+        // night screen can't otherwise suppress, and it's the hardest thing to
+        // read at 3am anyway — the sun and moon carry the hour instead.
+        .statusBarHidden(true)
+        .persistentSystemOverlays(.hidden)
         .task {
             await startSessionAsync()
-        }
-        .onReceive(NotificationCenter.default.publisher(for: UIDevice.batteryStateDidChangeNotification)) { _ in
-            updateIdleTimer()
         }
         .onReceive(audioMonitor.$monitoringState) { state in
             switch state {
@@ -114,13 +148,13 @@ struct MonitoringView: View {
         }
         .onReceive(audioMonitor.$didTrigger) { triggered in
             if triggered {
-                print("🚨 Audio trigger received, stopping monitors and switching to alarm")
+                Logger.session.notice("🚨 Audio trigger received, stopping monitors and switching to alarm")
                 triggerAlarm()
             }
         }
         .onReceive(motionMonitor.$didTrigger) { triggered in
             if triggered {
-                print("🚨 Motion trigger received, stopping monitors and switching to alarm")
+                Logger.session.notice("🚨 Motion trigger received, stopping monitors and switching to alarm")
                 triggerAlarm()
             }
         }
@@ -131,22 +165,18 @@ struct MonitoringView: View {
             whiteNoisePlayer.stop()
             audioMonitor.stop()
             motionMonitor.stop()
-            UIApplication.shared.isIdleTimerDisabled = false
-            UIDevice.current.isBatteryMonitoringEnabled = false
         }
     }
 
-    private var timeString: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm a"
-        return formatter.string(from: currentTime).lowercased()
+    private var stopLabel: String {
+        phase == .complete ? "done" : "hold to end"
     }
 
-    // Keep the display alive through the night — but only while docked, so a
-    // forgotten un-docked phone doesn't drain overnight
-    private func updateIdleTimer() {
-        let state = UIDevice.current.batteryState
-        UIApplication.shared.isIdleTimerDisabled = (state == .charging || state == .full)
+    private func endNight() {
+        withAnimation(.easeInOut(duration: 0.3)) {
+            endSession()
+            appState.stopMonitoring()
+        }
     }
 
     // A slow pixel drift so the moon never burns into an OLED panel
@@ -160,8 +190,6 @@ struct MonitoringView: View {
         guard !hasStarted else { return }
         hasStarted = true
 
-        UIDevice.current.isBatteryMonitoringEnabled = true
-        updateIdleTimer()
         moonTracker.start()
 
         if appState.settings.alarmEnabled {
@@ -183,7 +211,7 @@ struct MonitoringView: View {
                 try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
                 try session.setActive(true)
             } catch {
-                print("❌ Failed to configure playback session: \(error)")
+                Logger.session.error("❌ Failed to configure playback session: \(String(describing: error), privacy: .public)")
             }
         }
 
@@ -200,7 +228,7 @@ struct MonitoringView: View {
                 tick()
             }
         }
-        print("⏰ Session timer started")
+        Logger.session.notice("⏰ Session timer started")
     }
 
     private func stopSessionTimer() {

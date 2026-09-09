@@ -1,5 +1,6 @@
 import Foundation
 import UniformTypeIdentifiers
+import os
 
 struct CustomSound: Codable, Identifiable, Equatable {
     let id: UUID
@@ -81,7 +82,7 @@ class CustomSoundManager: ObservableObject {
         customSounds.append(sound)
         saveSounds()
 
-        print("Imported custom sound: \(sound.name)")
+        Logger.sounds.notice("Imported custom sound: \(String(describing: sound.name), privacy: .public)")
         return sound
     }
 
@@ -91,7 +92,7 @@ class CustomSoundManager: ObservableObject {
         }
         customSounds.removeAll { $0.id == sound.id }
         saveSounds()
-        print("Deleted custom sound: \(sound.name)")
+        Logger.sounds.notice("Deleted custom sound: \(String(describing: sound.name), privacy: .public)")
     }
 
     func renameSound(_ sound: CustomSound, to newName: String) {

@@ -1,38 +1,37 @@
 # stir
 
-**Sleep soundly, wake up ready to live.**
+**sleep soundly, wake up ready to live.**
 
-stir covers your whole night. White noise helps you fall and stay asleep, fades to silence before your wake window, then stir listens for the subtle sounds of you naturally stirring and wakes you at the perfect moment — never later than your "up by" time.
+stir covers your whole night. white noise helps you fall and stay asleep, fades to silence before your wake window, then stir listens for the subtle sounds of you naturally stirring and wakes you at the perfect moment — never later than your "up by" time.
 
-## Features
+## features
 
-- **One Nightly Input** - Just set the time you want to be up by
-- **White Noise** - White, pink, or brown noise and nature sounds all night, with crossfade looping
-- **Gradual Fade** - White noise fades out smoothly, ending a quiet gap before listening begins
-- **Smart Detection** - Adjustable sensitivity detects subtle movements or only louder sounds
-- **Gentle Alarm** - Volume builds gradually over 60 seconds
-- **No-Alarm Mode** - The gentlest wake: when the white noise is gone, it's time
-- **Multiple Sounds** - Gentle chimes, soft bells, ocean waves, or import your own
-- **Haptic Patterns** - Heartbeat, pulse, escalating, or steady vibrations
-- **Color Themes** - Ocean, Sunset, Forest, Lavender, Midnight, Coral
-- **Live Activity** - See your night's status on your lock screen
-- **Private by Design** - All processing on-device, nothing recorded or sent anywhere
+- **one nightly input** - just set the time you want to be up by
+- **white noise** - white, pink, or brown noise and nature sounds all night, looping gaplessly
+- **gradual fade** - white noise fades out smoothly, ending a quiet gap before listening begins
+- **smart detection** - adjustable sensitivity detects subtle movements or only louder sounds
+- **gentle alarm** - volume builds gradually over 60 seconds
+- **no-alarm mode** - the gentlest wake: when the white noise is gone, it's time
+- **multiple sounds** - gentle chimes, soft bells, ocean waves, or import your own
+- **haptic patterns** - heartbeat, pulse, escalating, or steady vibrations
+- **Live Activity** - see your night's status on your lock screen
+- **private by design** - all processing on-device, nothing recorded or sent anywhere
 
-## How It Works
+## how it works
 
-1. Set the time you want to be up by (e.g., 7:00 AM)
-2. Tap Start and drift off to white noise
-3. The white noise fades out before your wake window opens
-4. When stir detects you stirring, it gently wakes you — or the alarm fires at your "up by" time
-5. Start your day feeling ready
+1. set the time you want to be up by (e.g., 7:00 am)
+2. tap start and drift off to white noise
+3. the white noise fades out before your wake window opens
+4. when stir detects you stirring, it gently wakes you — or the alarm fires at your "up by" time
+5. start your day feeling ready
 
-## Requirements
+## requirements
 
 - iOS 17.0+
 - Xcode 15.0+
 - [XcodeGen](https://github.com/yonaskolb/XcodeGen)
 
-## Building
+## building
 
 ```bash
 # Install XcodeGen if needed
@@ -45,16 +44,16 @@ xcodegen generate
 open stir.xcodeproj
 ```
 
-## Privacy
+## privacy
 
-stir uses your microphone solely to detect movement sounds during your wake window. Audio is processed on your device in real-time. Nothing is ever recorded, stored, or sent anywhere.
+stir uses your microphone solely to detect movement sounds during your wake window. audio is processed on your device in real-time. nothing is ever recorded, stored, or sent anywhere.
 
-## Links
+## links
 
-- [Website](https://timroman.github.io/stir/)
-- [Privacy Policy](https://timroman.github.io/stir/privacy.html)
-- [App Store](https://apps.apple.com/app/stir)
+- [website](https://timroman.github.io/stir/)
+- [privacy policy](https://timroman.github.io/stir/privacy.html)
+- [App Store](https://apps.apple.com/us/app/stir-sleep-sounds-wake-up/id6796480325)
 
-## License
+## license
 
 MIT licensed — see LICENSE. © 2026 Pure Inference Ventures, LLC.

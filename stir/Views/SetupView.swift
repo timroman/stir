@@ -1,8 +1,16 @@
 import SwiftUI
+import AVFoundation
+import os
 
 struct SetupView: View {
     @EnvironmentObject var appState: AppState
     @State private var showingSettings = false
+    @State private var showingLowVolume = false
+    @State private var systemVolumePercent = 0
+
+    // Below this, a gentle alarm ramping up from silence has no chance of
+    // being heard. Media volume is the one thing stir can read but not set.
+    private let lowVolumeThreshold: Float = 0.3
 
     var body: some View {
         ZStack {
@@ -33,10 +41,7 @@ struct SetupView: View {
 
             // Start button
             Button(action: {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    appState.recalculateWakeUpBy()
-                    appState.startMonitoring()
-                }
+                startNight(force: false)
             }) {
                 Text("start the night")
                     .font(.headline)
@@ -48,6 +53,7 @@ struct SetupView: View {
             }
             .padding(.horizontal, 40)
             .padding(.bottom, 12)
+            .accessibilityIdentifier("setup.start")
 
             // Settings button
             Button(action: {
@@ -69,6 +75,42 @@ struct SetupView: View {
             SettingsView()
                 .presentationDragIndicator(.visible)
         }
+        .alert("your volume is low", isPresented: $showingLowVolume) {
+            Button("start anyway") { startNight(force: true) }
+            Button("not yet", role: .cancel) { }
+        } message: {
+            Text("your phone is at \(systemVolumePercent)% — the alarm may not be loud enough to wake you. raise it with the volume buttons, then start again.")
+        }
+    }
+
+    // The last moment you're awake and holding the phone is the only moment a
+    // low media volume can still be fixed. Checked here rather than at "up by",
+    // when you're asleep and nothing can be done about it.
+    private func startNight(force: Bool) {
+        if !force, appState.settings.alarmEnabled, let volume = currentSystemVolume(),
+           volume < lowVolumeThreshold {
+            systemVolumePercent = Int((volume * 100).rounded())
+            showingLowVolume = true
+            return
+        }
+        withAnimation(.easeInOut(duration: 0.3)) {
+            appState.recalculateWakeUpBy()
+            appState.startMonitoring()
+        }
+    }
+
+    // outputVolume only reports meaningfully on an active session, so activate
+    // one first — .mixWithOthers so this never interrupts whatever is playing
+    private func currentSystemVolume() -> Float? {
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try session.setActive(true)
+        } catch {
+            Logger.session.error("⚠️ Could not read system volume: \(String(describing: error), privacy: .public)")
+            return nil
+        }
+        return session.outputVolume
     }
 }
 

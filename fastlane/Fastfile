@@ -45,18 +45,30 @@ platform :ios do
     upload_to_testflight(skip_waiting_for_build_processing: true)
   end
 
-  desc "Upload build + metadata to App Store Connect for review submission"
+  desc "Upload build + metadata to App Store Connect (screenshots untouched)"
   lane :release do
     asc_auth
     build
     upload_to_app_store(
       force: true,                 # skip the HTML report prompt (non-interactive)
-      overwrite_screenshots: true, # deliver keeps existing ASC screenshots otherwise
+      # Screenshots are deliberately left alone. deliver verifies an upload
+      # before App Store Connect has finished indexing the assets, concludes it
+      # failed, and retries — but the retry deletes only the screenshots that
+      # were still incomplete and re-uploads all of them, so every screenshot
+      # that had already completed gains a duplicate. Pushing a build would
+      # otherwise re-duplicate a set that was cleaned up by hand.
+      # Use the `screenshots` lane for screenshots, then prune in App Store
+      # Connect until this is fixed upstream.
+      skip_screenshots: true,
       precheck_include_in_app_purchases: false,
       submit_for_review: false     # Tim presses the final submit button
     )
   end
 
+  # Known issue: deliver's post-upload verification races App Store Connect's
+  # asset indexing and retries, leaving a duplicate of every screenshot that had
+  # already completed. Check the set in App Store Connect after running this and
+  # delete the extras by hand.
   desc "Replace the App Store screenshots only"
   lane :screenshots do
     asc_auth

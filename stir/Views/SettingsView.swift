@@ -1,6 +1,7 @@
 import SwiftUI
 import AVFoundation
 import UniformTypeIdentifiers
+import os
 
 // Five calm rows; every knob lives one tap deeper
 struct SettingsView: View {
@@ -115,6 +116,10 @@ struct NightSettingsView: View {
             } footer: {
                 if !appState.settings.alarmEnabled {
                     Text("alarm off: white noise fades to silence at your \"up by\" time — when you don't hear it, it's time. the microphone is never used.")
+                } else if !appState.settings.whiteNoiseEnabled {
+                    // The toggle above is on but greyed out, which reads as
+                    // "unavailable" without this line
+                    Text("with white noise off, the gentle alarm stays on — a night needs at least one of the two.")
                 }
             }
 
@@ -217,13 +222,13 @@ struct SoundsSettingsView: View {
                                       appState.settings.whiteNoiseSound = sound
                                       appState.settings.whiteNoiseCustomSoundId = nil
                                   },
-                                  onPreview: { previewBundled(sound.rawValue) })
+                                  onPreview: { previewBundled(sound.rawValue, volume: appState.settings.whiteNoiseVolume) })
                 }
                 ForEach(soundManager.customSounds) { sound in
                     selectableRow(sound.name,
                                   isSelected: appState.settings.whiteNoiseCustomSoundId == sound.id,
                                   onSelect: { appState.settings.whiteNoiseCustomSoundId = sound.id },
-                                  onPreview: { previewCustom(sound) })
+                                  onPreview: { previewCustom(sound, volume: appState.settings.whiteNoiseVolume) })
                 }
             } header: {
                 Text("sleep sound")
@@ -242,16 +247,18 @@ struct SoundsSettingsView: View {
                                       appState.settings.selectedSound = sound
                                       appState.settings.customSoundId = nil
                                   },
-                                  onPreview: { previewBundled(sound.rawValue) })
+                                  onPreview: { previewBundled(sound.rawValue, volume: appState.settings.volume) })
                 }
                 ForEach(soundManager.customSounds) { sound in
                     selectableRow(sound.name,
                                   isSelected: appState.settings.customSoundId == sound.id,
                                   onSelect: { appState.settings.customSoundId = sound.id },
-                                  onPreview: { previewCustom(sound) })
+                                  onPreview: { previewCustom(sound, volume: appState.settings.volume) })
                 }
             } header: {
                 Text("alarm sound")
+            } footer: {
+                Text("preview plays at the volume the alarm will use, through your phone's current volume — if it sounds quiet now, it will be quiet then.")
             }
 
             Section {
@@ -318,30 +325,34 @@ struct SoundsSettingsView: View {
         }
     }
 
-    private func previewBundled(_ name: String) {
+    private func previewBundled(_ name: String, volume: Float) {
         stopPreview()
         guard let url = bundledSoundURL(name) else { return }
-        playPreview(url: url)
+        playPreview(url: url, volume: volume)
     }
 
-    private func previewCustom(_ sound: CustomSound) {
+    private func previewCustom(_ sound: CustomSound, volume: Float) {
         stopPreview()
         guard let url = sound.fileURL else { return }
-        playPreview(url: url)
+        playPreview(url: url, volume: volume)
     }
 
-    private func playPreview(url: URL) {
+    // An honest preview: the slider's real value through the same .playback
+    // session the night uses, so what you hear now is what will play then —
+    // at whatever the phone's volume happens to be right now. A fixed 0.6
+    // preview made every sound seem fine and taught the slider nothing.
+    private func playPreview(url: URL, volume: Float) {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
             try AVAudioSession.sharedInstance().setActive(true)
             previewPlayer = try AVAudioPlayer(contentsOf: url)
-            previewPlayer?.volume = 0.6
+            previewPlayer?.volume = volume
             previewPlayer?.play()
             DispatchQueue.main.asyncAfter(deadline: .now() + 8.0) { [self] in
                 stopPreview()
             }
         } catch {
-            print("Failed to preview sound: \(error)")
+            Logger.sounds.error("Failed to preview sound: \(String(describing: error), privacy: .public)")
         }
     }
 
