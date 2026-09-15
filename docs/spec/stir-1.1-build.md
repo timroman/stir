@@ -18,7 +18,7 @@ every constant and rule in phases 2 to 4 is in stir.md decisions 60–74 and in 
 
 - one branch and one pull request per phase, off `main`. nothing goes to `main` directly.
 - tests are the gate. a phase merges with its unit and UI tests green on an iPhone 15 simulator, and after any device check the phase names.
-- boot the simulator and wait for it before testing: `xcrun simctl bootstatus <udid> -b`. a unit test host launched while the simulator is still booting logs "test daemon not ready" and fails as "the test runner hung before establishing connection" — a slow full build hides it, and a fast incremental one exposes it.
+- build once, then test without building: `xcodebuild build-for-testing`, then `xcodebuild test-without-building`, against a booted simulator (`xcrun simctl bootstatus <udid> -b`). a one-step `xcodebuild test` intermittently launches the unit test host before Xcode's test daemon is ready — the host logs "test daemon not ready", and the run fails as "the test runner hung before establishing connection" with no test having run. waiting for boot alone did not prevent it; the split did, on every run since.
 - one decision per commit: `scope: decision — reason`.
 - the owner merges, and the owner submits to App Review.
 - a phase that finds the spec wrong stops and says so. the spec changes before the code does.
