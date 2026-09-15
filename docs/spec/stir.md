@@ -308,6 +308,14 @@ at low, sound has to stay above the threshold for about two seconds rather than 
 **59. the listening settings say what counts.**
 the note under motion detection says anyone moving the phone sets it off, and that a phone on your side of the bed, on the nightstand, avoids most of it. distance does real work, because the threshold is set against the room's own baseline.
 
+each sensitivity also says roughly what it is tuned for, in a note under the picker that changes with the choice. the axis is how much of the room's sound comes and goes, not how loud it is: steady sound — a fan, an air conditioner — is measured into the baseline during calibration, and what sets stir off by mistake is sound that arrives and leaves.
+
+- **high** — alone, in a quiet or steady room. the threshold sits about 7 dB above the baseline, near enough to hear a person roll over or move the covers. on 22 august 2026 the owner's room calibrated at −53.2 dB, high set the threshold at −45.8, and stir woke him at −42.7, rolling over.
+- **medium** — some sound that comes and goes: occasional traffic, a partner who sleeps still. about 10.5 dB above the baseline.
+- **low** — a lot of it: a shared bed, pets, children nearby. about 14 dB above the baseline, and the sound has to last about two seconds (decision 58).
+
+those figures hold in the stillest room stir can calibrate, where the variation is at its 3 dB floor; a room that varies more gets a proportionally higher threshold at every setting. the descriptions are rough, and so far only high has a real night behind it.
+
 ---
 
 ## part nine — what this does not build
