@@ -33,9 +33,9 @@ stir had no build process written down. this is the one it has been using, recor
 - the three `CustomSoundError` messages in `CustomSoundManager.swift`, lowercased.
 - the comment in `NightArcFace.swift` corrected: the sun's position is solar time. the technical details copy corrected to match stir.md principle 1 — the owner's words to approve.
 - `PRIVACY.md` brought in line with the privacy section on the site, and lowercased.
-- shared rooms (stir.md part eight): at low sensitivity, sound must stay above the threshold for about two seconds, measured in elapsed time rather than a count of readings, because iOS chooses the buffer size (decision 58). the motion detection note in settings says anyone moving the phone sets it off, and where to put the phone; and the note under the sensitivity picker changes with the choice to say what each setting is tuned for — both in the owner's words to approve (decision 59).
+- shared rooms (stir.md part eight): the motion detection note in settings says anyone moving the phone sets it off, and where to put the phone; and the note under the sensitivity picker changes with the choice to say what each setting is tuned for — both in the owner's words to approve (decision 59).
 
-**done when** `stir-tests` runs in `xcodebuild test`; no user-facing string in `stir/` or `stir-widgets/` is capitalized apart from proper nouns; a unit test shows that at low sensitivity a one-second sound above the threshold does not set off the alarm and a three-second one does, with medium and high unchanged; and a UI test shows each sensitivity choice with its own note.
+**done when** `stir-tests` runs in `xcodebuild test`; no user-facing string in `stir/` or `stir-widgets/` is capitalized apart from proper nouns; and a UI test shows each sensitivity choice with its own note.
 
 ---
 
@@ -187,7 +187,7 @@ one per rule above, and:
 
 ## effort
 
-held loosely; estimates here have run high. phase 0: two hours, with the sustained-sound change and its test. phase 1: about two hours, mostly the clean-run tests. phase 2: two to three hours, mostly the tests. phase 3: two hours. phase 4: two hours, after the guideline. phase 5: two hours and a session on a device. about a day and a half.
+held loosely; estimates here have run high. phase 0: about an hour. phase 1: about two hours, mostly the clean-run tests. phase 2: two to three hours, mostly the tests. phase 3: two hours. phase 4: two hours, after the guideline. phase 5: two hours and a session on a device. about a day and a half.
 
 ---
 

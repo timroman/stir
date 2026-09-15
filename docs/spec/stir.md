@@ -302,8 +302,8 @@ a partner getting up or a child at the door sets stir off the same way you would
 **57. stir hears the room, not a person.**
 it does not try to tell people apart. doing that would mean learning voices or breathing, which needs a model and stored audio, and stir has neither (decisions 12 and 13). so the alarm is gentle whoever sets it off — it still rises from silence over a minute — and history names what set it off, never who.
 
-**58. low sensitivity also asks sound to last longer.**
-at low, sound has to stay above the threshold for about two seconds rather than a fraction of one, so a cough or a door no longer counts and sustained stirring still does. the cost is a missed gentle wake, which falls back to "up by". medium and high are unchanged.
+**58. withdrawn the same day: low sensitivity was to ask sound to last about two seconds.**
+the owner's objection was right. two seconds of sound is activity nobody sleeps through, so it would have filtered out the brief stirring — a roll, the covers — that stir exists to catch, along with the coughs and doors it was aimed at. how long a sound lasts cannot tell you from somebody else. low already makes the only honest trade there is: a higher threshold, which catches less and is set off less.
 
 **59. the listening settings say what counts.**
 the note under motion detection says anyone moving the phone sets it off, and that a phone on your side of the bed, on the nightstand, avoids most of it. distance does real work, because the threshold is set against the room's own baseline.
@@ -312,7 +312,7 @@ each sensitivity also says roughly what it is tuned for, in a note under the pic
 
 - **high** — alone, in a quiet or steady room. the threshold sits about 7 dB above the baseline, near enough to hear a person roll over or move the covers. on 22 august 2026 the owner's room calibrated at −53.2 dB, high set the threshold at −45.8, and stir woke him at −42.7, rolling over.
 - **medium** — some sound that comes and goes: occasional traffic, a partner who sleeps still. about 10.5 dB above the baseline.
-- **low** — a lot of it: a shared bed, pets, children nearby. about 14 dB above the baseline, and the sound has to last about two seconds (decision 58).
+- **low** — a lot of it: a shared bed, pets, children nearby. about 14 dB above the baseline.
 
 those figures hold in the stillest room stir can calibrate, where the variation is at its 3 dB floor; a room that varies more gets a proportionally higher threshold at every setting. the descriptions are rough, and so far only high has a real night behind it.
 
