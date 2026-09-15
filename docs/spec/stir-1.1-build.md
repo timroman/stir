@@ -1,6 +1,6 @@
 # stir 1.1 — build
 
-**status:** proposed, 15 september 2026. builds parts four, six and seven of [`stir.md`](stir.md), and the corrections in its open 9. suggestions (part five) are 1.2, with their own build spec once there is a month of real history to set their thresholds. new sounds come after 1.1 and start as a product decision, not a build.
+**status:** proposed, 15 september 2026. builds parts four, six, seven and eight of [`stir.md`](stir.md), and the corrections in its open 9. suggestions (part five) are 1.2, with their own build spec once there is a month of real history to set their thresholds. new sounds come after 1.1 and start as a product decision, not a build.
 
 **decisions this assumes.** the owner said build on 15 september with the recommended defaults — confirm on review:
 
@@ -33,8 +33,9 @@ stir had no build process written down. this is the one it has been using, recor
 - the three `CustomSoundError` messages in `CustomSoundManager.swift`, lowercased.
 - the comment in `NightArcFace.swift` corrected: the sun's position is solar time. the technical details copy corrected to match stir.md principle 1 — the owner's words to approve.
 - `PRIVACY.md` brought in line with the privacy section on the site, and lowercased.
+- shared rooms (stir.md part eight): at low sensitivity, sound must stay above the threshold for about two seconds, measured in elapsed time rather than a count of readings, because iOS chooses the buffer size (decision 58). the motion detection note in settings says anyone moving the phone sets it off, and where to put the phone — the owner's words to approve (decision 59).
 
-**done when** `stir-tests` runs in `xcodebuild test`, and no user-facing string in `stir/` or `stir-widgets/` is capitalized apart from proper nouns.
+**done when** `stir-tests` runs in `xcodebuild test`; no user-facing string in `stir/` or `stir-widgets/` is capitalized apart from proper nouns; and a unit test shows that at low sensitivity a one-second sound above the threshold does not set off the alarm and a three-second one does, with medium and high unchanged.
 
 ---
 
@@ -53,7 +54,7 @@ the record is what history, Health and 1.2's suggestions all read, and what user
 | `upBy` | `Date` | the promise that night |
 | `windowStart` | `Date?` | the wake window as it was that night; `nil` on a no-alarm night. stored because settings change, and stir.md decision 37 needs the window that applied |
 | `alarmFiredAt` | `Date?` | |
-| `wokeBy` | `WakeReason` | `sound`, `motion`, `upBy`, `none` |
+| `triggeredBy` | `AlarmTrigger` | `sound`, `motion`, `upBy`, `none` — what set off the alarm, never who (stir.md decision 57) |
 | `ending` | `NightEnding` | `stopped`, `alarmDismissed`, `completed` |
 | `alarmVolume` | `Float?` | media volume when the alarm started (decision 31) |
 | `startedLocalMinute` | `Int` | minutes after local midnight when the night started |
@@ -77,7 +78,7 @@ when a finished no-alarm night is dismissed, `MonitoringView.endNight()` calls `
 
 ### tests (unit)
 
-- each wake reason reaches the record.
+- each trigger reaches the record.
 - a finished no-alarm night records `completed`, with `windowStart` `nil`.
 - a night that never ends writes nothing.
 - a night ended by hand before its wake window writes no `NightRecord`, and still updates `lastSessionRecord`.
@@ -96,7 +97,7 @@ pure functions over `[NightRecord]`, with no UI, so every judgment stir makes ab
 over the most recent 14 records — nights, not days (decision 34):
 
 - **lights out** and **up**: the median, and the range from the 10th to the 90th percentile, rounded to 5 minutes. with 14 nights that range sets aside the single earliest and latest night, which is what "most nights" means and what keeps one late night from rewriting the week (decision 36).
-- **how you woke**: a count by `wokeBy`, and for sound and motion, how many minutes after `windowStart` it happened.
+- **what set off the alarm**: a count by `triggeredBy`, and for sound and motion, how many minutes after `windowStart` it happened.
 - **alarm ring**: `endedAt − alarmFiredAt`, on `alarmDismissed` nights.
 - **up before stir**: `stopped` inside the window before any alarm, which the list says in those words.
 - **too few nights**: under 3 records, no sentences at all — only the list. a spread of two nights describes nothing.
@@ -114,7 +115,7 @@ one per rule above, and:
 - a night on each side of a daylight-saving change keeps its local times.
 - 14 records spread across 30 days summarize as 14 consecutive nights.
 - one 2am start among thirteen near 10:45pm leaves the range unmoved.
-- a no-alarm night counts toward lights out and up, and not toward how you woke.
+- a no-alarm night counts toward lights out and up, and not toward what set off the alarm.
 
 ---
 
@@ -186,7 +187,7 @@ one per rule above, and:
 
 ## effort
 
-held loosely; estimates here have run high. phase 0: an hour. phase 1: about two hours, mostly the clean-run tests. phase 2: two to three hours, mostly the tests. phase 3: two hours. phase 4: two hours, after the guideline. phase 5: two hours and a session on a device. about a day and a half.
+held loosely; estimates here have run high. phase 0: two hours, with the sustained-sound change and its test. phase 1: about two hours, mostly the clean-run tests. phase 2: two to three hours, mostly the tests. phase 3: two hours. phase 4: two hours, after the guideline. phase 5: two hours and a session on a device. about a day and a half.
 
 ---
 

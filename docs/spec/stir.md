@@ -1,6 +1,6 @@
 # stir
 
-**status:** proposed, 15 september 2026. parts one through three describe stir 1.0.1 as it shipped. parts four through seven propose new work, and none of it is built.
+**status:** proposed, 15 september 2026. parts one through three describe stir 1.0.1 as it shipped. parts four through eight propose new work, and none of it is built.
 **supersedes:** [`combined-app-spec.md`](../combined-app-spec.md), approved 28 july 2026, which specified merging white noise into the alarm. it stays as the record of that decision.
 
 ---
@@ -193,7 +193,7 @@ consistency rather than duration is the choice principles 3 and 5 already force,
 **31. history keeps one record per clean run.**
 a clean run is a night that reached its end the way stir is designed to end one:
 
-- the alarm sounded and was stopped, whatever woke you
+- the alarm sounded and was stopped, whatever set it off
 - a no-alarm night reached silence
 - it was ended by hand inside its wake window, before the alarm — you were up before stir
 
@@ -201,7 +201,7 @@ and that started long enough before "up by" to be a night rather than a test or 
 
 the record extends the one in decision 26 with two fields:
 
-- **what woke you:** sound, motion, the "up by" alarm, or nothing (ended by hand, or a no-alarm night)
+- **what set off the alarm:** sound, motion, the "up by" time, or nothing (ended by hand, or a no-alarm night)
 - **the phone's media volume when the alarm started**
 
 **32. the line is drawn at the record, not in a policy.**
@@ -217,7 +217,7 @@ every figure reads "across your last 14 nights", counting only clean runs, even 
 
 - **lights out:** when your nights started, as the time most of them began and how widely they varied
 - **up:** when your nights ended, in the same form
-- **how you woke:** how many nights stir caught you stirring and how early in the window, and how many fell back to the "up by" alarm
+- **what set off the alarm:** how many nights it was sound, motion, or the "up by" time, and for sound and motion how early in the window. stir cannot tell whose sound or movement it was, so history says what set the alarm off and never who (decision 57)
 - **how long the alarm rang** before you stopped it
 
 written as sentences — "most nights you started between 10:30 and 11:05" — above a plain list of recent nights.
@@ -247,7 +247,7 @@ a suggestion says what stir saw, what it would change, and changes nothing until
 **42. a suggestion is offered only when the change is safe whatever caused what stir saw.**
 stir cannot tell you stirring from a dog. so it never proposes a change that is right for one explanation and harmful for another.
 
-- **a longer wake window**, when stir caught you stirring on few of your last 14 nights. whether the window was too short, the sensitivity too low, or you simply did not stir, a longer window gives stir more chances and moves "up by" nowhere.
+- **a longer wake window**, when sound or motion set off the alarm on few of your last 14 nights. whether the window was too short, the sensitivity too low, or nothing stirred, a longer window gives stir more chances and moves "up by" nowhere.
 - **turning the phone's volume up**, when media volume was under 30% on most of your last 10 alarms. on 22 august 2026 the owner's alarm started at 25%.
 - **never raising sensitivity.** it would catch more stirring and more dogs, and a false wake at 5am is worse than a gentle one at 6:45.
 - **never lowering sensitivity** because of early wakes, for the same reason in reverse.
@@ -256,8 +256,8 @@ stir cannot tell you stirring from a dog. so it never proposes a change that is 
 
 **44. an applied change starts with the next night**, never the one running.
 
-**45. no morning check-in.**
-asking "did stir wake you at a good moment?" would tell the dog from you, and it would put a rating prompt at the one moment principle 4 keeps clear.
+**45. no question at the alarm.**
+asking as the alarm is stopped — "did stir wake you at a good moment?", or "did someone else set it off?" — puts a question at the one moment principle 4 keeps clear, and it asks the person who was asleep to explain what happened while they were. the answer would be a guess, stored as a fact. *(see open 11)*
 
 ---
 
@@ -295,7 +295,22 @@ iOS does not let an app start the microphone from the background, and a night op
 
 ---
 
-## part eight — what this does not build
+## part eight — shared rooms
+
+a partner getting up or a child at the door sets stir off the same way you would. when a friend asked about it, the owner's answer was part of the story: at least one of you woke up naturally.
+
+**57. stir hears the room, not a person.**
+it does not try to tell people apart. doing that would mean learning voices or breathing, which needs a model and stored audio, and stir has neither (decisions 12 and 13). so the alarm is gentle whoever sets it off — it still rises from silence over a minute — and history names what set it off, never who.
+
+**58. low sensitivity also asks sound to last longer.**
+at low, sound has to stay above the threshold for about two seconds rather than a fraction of one, so a cough or a door no longer counts and sustained stirring still does. the cost is a missed gentle wake, which falls back to "up by". medium and high are unchanged.
+
+**59. the listening settings say what counts.**
+the note under motion detection says anyone moving the phone sets it off, and that a phone on your side of the bed, on the nightstand, avoids most of it. distance does real work, because the threshold is set against the room's own baseline.
+
+---
+
+## part nine — what this does not build
 
 - no sleep score, readiness measure, or prediction of the day
 - no streaks, goals, badges, points, or counts of nights missed — nothing gamified
@@ -305,13 +320,14 @@ iOS does not let an app start the microphone from the background, and a night op
 - no automatic changes to settings
 - no morning check-in or rating
 - no stored audio, sound levels, motion data or location history
+- no telling whose voice, breathing or movement stir heard
 - no accounts, cloud sync, or export other than Health
 - no Apple Watch app
 - no alternative night faces or planets on the sky — raised in august, and parked: a sky that holds two bodies is the design, and a third ring is the start of a chart
 
 ---
 
-## part nine — open
+## part ten — open
 
 **1. nights stir never finished.** writing the record when a night starts would let history show an interrupted night, which would help diagnose an overnight failure — and it would turn a missing night into a visible one, against principle 2. probably: the unified log keeps it, history does not.
 
@@ -332,6 +348,8 @@ iOS does not let an app start the microphone from the background, and a night op
 **9. three things to correct.** a comment in `NightArcFace.swift` says nothing on the night screen "correlates with the time of day", and the technical details screen says nothing on it "tells the time". the sun's position is local solar time, so the comment is wrong and the screen overstates it; principle 1 is the accurate version. separately, gentle chime and soft bells predate the synthesis script, and their source is not recorded in the repository. and the three error messages shown when a sound import fails, in `CustomSoundManager.swift`, are still capitalized.
 
 **10. the shortest night that counts.** a session started a few minutes before "up by" — a test, a nap — is not a night, and a late bedtime is. the line is a duration from start to "up by", and it needs a number. three hours is the proposal, to be checked against real history once there is some.
+
+**11. marking a night someone else set off.** a question at the alarm is out (decision 45), but the need behind it is real: history should be able to know when it was not you. the version that keeps the morning clear is a mark on the night in history, made whenever you look — "someone else set this off" — after a partner mentions getting up at 6:30. a marked night stays a clean run, and drops out of what set off the alarm and out of suggestions. stir never guesses the mark.
 
 ---
 
