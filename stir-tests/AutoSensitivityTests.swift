@@ -281,6 +281,37 @@ final class AutoSensitivityTests: XCTestCase {
         return tally
     }
 
+    /// Evidence toward too sensitive grows only on a detection, so the question
+    /// can only ever follow a night stir was set off by sound (decision 67)
+    func testEveryAskFollowsANightSetOffBySound() {
+        var generator = SeededGenerator(state: 67)
+        var asks = 0
+        for rate in [25.0, 54, 90] {
+            for _ in 0..<300 {
+                var state = settling()
+                var history: [NightFacts] = []
+                for n in 0..<120 {
+                    let nightly = rate * Foundation.exp(generator.gaussian(mean: -0.125, sd: 0.5))
+                    let hours = -Foundation.log(1 - generator.uniform()) / nightly
+                    let windowHours = [10.0, 20, 30, 45, 60, 90][Int(generator.uniform() * 6)] / 60
+                    let facts = night(n, step: state.step,
+                                      detectedAfterMinutes: hours < windowHours ? hours * 60 : nil,
+                                      windowMinutes: windowHours * 60)
+                    history.append(facts)
+                    let (next, action) = A.evaluate(state, nights: history, now: facts.endedAt.addingTimeInterval(60))
+                    if action == .ask {
+                        asks += 1
+                        XCTAssertEqual(facts.triggeredBy, .sound, "asked after a night set off by \(facts.triggeredBy)")
+                        state = A.answer(next, yes: generator.uniform() < 0.5, now: facts.endedAt.addingTimeInterval(120))
+                    } else {
+                        state = next
+                    }
+                }
+            }
+        }
+        XCTAssertGreaterThan(asks, 100, "the simulation should ask often enough to test anything")
+    }
+
     func testSimulatedSleepersSettleAsTheSpecSays() {
         var generator = SeededGenerator(state: 1815)
         let people = 1000

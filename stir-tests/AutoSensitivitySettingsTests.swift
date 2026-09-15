@@ -160,14 +160,49 @@ final class AutoSensitivitySettingsTests: XCTestCase {
         XCTAssertEqual(store.all().last?.sensitivity, 0.675, "the next night starts at the new step")
     }
 
-    func testAskFlagsTheQuestion() {
+    /// Five stored nights and a sixth lived one, each set off a minute into
+    /// listening: auto asks when the sixth alarm is stopped
+    private func nightsThatAsk() {
         useAuto(at: 2)
         for n in 0..<5 { storedNight(n, sensitivity: 0.5, detectedAfterMinutes: 1) }
-
         liveNight(5, detectedAfterMinutes: 1)
-        XCTAssertTrue(app.sensitivityQuestionPending)
-        XCTAssertEqual(app.settings.autoSensitivity?.questionAsked, true)
+    }
+
+    func testStoppingTheAlarmAsksTheQuestionWhenAutoCannotDecide() {
+        nightsThatAsk()
+        XCTAssertTrue(app.askingSensitivity)
+        XCTAssertEqual(app.currentScreen, .alarm, "the question is asked on the alarm screen")
+        XCTAssertEqual(app.settings.autoSensitivity?.questionAsked, true, "asked before it is answered")
         XCTAssertEqual(app.settings.sensitivityValue, 0.5)
+    }
+
+    func testYesStepsDownAndCapsTheLadder() {
+        nightsThatAsk()
+        app.answerSensitivityQuestion(yes: true)
+
+        XCTAssertEqual(app.settings.autoSensitivity?.step, 1)
+        XCTAssertEqual(app.settings.autoSensitivity?.maxStep, 1)
+        XCTAssertEqual(app.settings.autoSensitivity?.phase, .settling)
+        XCTAssertEqual(app.settings.sensitivityValue, 0.325)
+        XCTAssertFalse(app.askingSensitivity)
+        XCTAssertEqual(app.currentScreen, .setup)
+    }
+
+    func testNoChangesNothing() {
+        nightsThatAsk()
+        let asked = app.settings.autoSensitivity
+        app.answerSensitivityQuestion(yes: false)
+
+        XCTAssertEqual(app.settings.autoSensitivity, asked)
+        XCTAssertEqual(app.settings.sensitivityValue, 0.5)
+        XCTAssertEqual(app.currentScreen, .setup)
+    }
+
+    func testWithoutAQuestionStoppingGoesStraightToSetup() {
+        useAuto(at: 2)
+        liveNight(0, detectedAfterMinutes: 10)
+        XCTAssertFalse(app.askingSensitivity)
+        XCTAssertEqual(app.currentScreen, .setup)
     }
 
     func testAnUncleanNightOnAutoEvaluatesNothing() {

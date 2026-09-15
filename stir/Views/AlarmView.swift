@@ -37,32 +37,11 @@ struct AlarmView: View {
 
                 Spacer()
 
-                // Dismiss button
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        // Haptics first: the engine is attached to the app's
-                        // audio session, so stopping the player deactivates the
-                        // session out from under it, its stoppedHandler sees a
-                        // still-running manager and restarts — one last buzz
-                        // about a second after you asked it to stop.
-                        hapticManager.stop()
-                        alarmPlayer.stop()
-                        StirLiveActivity.stop()
-                        AlarmBackstop.cancelBackstop()
-                        appState.dismissAlarm()
-                    }
-                }) {
-                    Text("stop")
-                        .font(.title.bold())
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 24)
-                        .background(Color.white)
-                        .cornerRadius(20)
+                if appState.askingSensitivity {
+                    sensitivityQuestion
+                } else {
+                    stopButton
                 }
-                .padding(.horizontal, 40)
-                .padding(.bottom, 60)
-                .opacity(appeared ? 1 : 0)
             }
         }
         .onAppear {
@@ -93,6 +72,72 @@ struct AlarmView: View {
         .onReceive(timer) { _ in
             currentTime = Date()
         }
+    }
+
+    private var stopButton: some View {
+        Button(action: {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                // Haptics first: the engine is attached to the app's
+                // audio session, so stopping the player deactivates the
+                // session out from under it, its stoppedHandler sees a
+                // still-running manager and restarts — one last buzz
+                // about a second after you asked it to stop.
+                hapticManager.stop()
+                alarmPlayer.stop()
+                StirLiveActivity.stop()
+                AlarmBackstop.cancelBackstop()
+                appState.dismissAlarm()
+            }
+        }) {
+            Text("stop")
+                .font(.title.bold())
+                .foregroundColor(.black)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 24)
+                .background(Color.white)
+                .cornerRadius(20)
+        }
+        .padding(.horizontal, 40)
+        .padding(.bottom, 60)
+        .opacity(appeared ? 1 : 0)
+        .accessibilityIdentifier("alarm.stop")
+    }
+
+    // Auto sensitivity's one question, asked once the alarm is silent: a noisy
+    // room and a restless sleeper look the same to stir, and only the person
+    // woken can tell them apart (stir.md decision 67)
+    private var sensitivityQuestion: some View {
+        VStack(spacing: 20) {
+            Text("was that too sensitive?")
+                .font(.title2)
+                .foregroundColor(.white)
+                .accessibilityIdentifier("alarm.sensitivityQuestion")
+
+            HStack(spacing: 16) {
+                answerButton("yes", yes: true)
+                answerButton("no", yes: false)
+            }
+        }
+        .padding(.horizontal, 40)
+        .padding(.bottom, 60)
+        .transition(.opacity)
+    }
+
+    private func answerButton(_ label: String, yes: Bool) -> some View {
+        Button(action: {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                appState.answerSensitivityQuestion(yes: yes)
+            }
+        }) {
+            Text(label)
+                .font(.title3.bold())
+                .foregroundColor(.black)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 20)
+                .background(Color.white)
+                .cornerRadius(20)
+        }
+        .accessibilityIdentifier("alarm.\(label)")
     }
 
     private var timeString: String {

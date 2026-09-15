@@ -39,6 +39,7 @@
 		A8958A8B307D863CED15B082 /* SensitivityNoteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566ACB3AA206E8B218C60EB7 /* SensitivityNoteTests.swift */; };
 		AD93BA919195EEE1E8C3FAB2 /* NightArcFace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 129BD251B689B48CAC132AAC /* NightArcFace.swift */; };
 		AED52E8138D86B8281E70B54 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92497362A23FDEB89BC160D0 /* Log.swift */; };
+		B1C7DE5CD8E13FAB80E75707 /* SensitivityQuestionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62C7EBC9FE4C620D947CB9DD /* SensitivityQuestionTests.swift */; };
 		BF47A3D1BE9E3436F2E15BDD /* CopyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A672B1512E49B426FF645346 /* CopyTests.swift */; };
 		C1D175BC7E5D8A2EAFBD58B5 /* SessionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC433593AE06BB9802072BFA /* SessionRecord.swift */; };
 		C6D51E60FE5A12A3449B418F /* SetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDBE9CD3509B6BB7BF2CDD44 /* SetupView.swift */; };
@@ -120,6 +121,7 @@
 		578132549736F67419B80C91 /* AlarmView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmView.swift; sourceTree = "<group>"; };
 		5F7410581F11A69054872151 /* stir.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = stir.entitlements; sourceTree = "<group>"; };
 		5F88DE4B5C74C8EA9970B28D /* NightRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightRecord.swift; sourceTree = "<group>"; };
+		62C7EBC9FE4C620D947CB9DD /* SensitivityQuestionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensitivityQuestionTests.swift; sourceTree = "<group>"; };
 		6909799D538B0A85B5144231 /* stir-uitests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "stir-uitests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6920E7F867445AF620D0B82C /* StirApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StirApp.swift; sourceTree = "<group>"; };
 		700692067C1E213740D598E4 /* ocean_waves.m4a */ = {isa = PBXFileReference; path = ocean_waves.m4a; sourceTree = "<group>"; };
@@ -243,6 +245,7 @@
 			isa = PBXGroup;
 			children = (
 				566ACB3AA206E8B218C60EB7 /* SensitivityNoteTests.swift */,
+				62C7EBC9FE4C620D947CB9DD /* SensitivityQuestionTests.swift */,
 				BA31EB15F4FE753AF25382D2 /* StopButtonTests.swift */,
 			);
 			path = "stir-uitests";
@@ -472,6 +475,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A8958A8B307D863CED15B082 /* SensitivityNoteTests.swift in Sources */,
+				B1C7DE5CD8E13FAB80E75707 /* SensitivityQuestionTests.swift in Sources */,
 				A4AEFF2AC16A32C9952ABE5A /* StopButtonTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
