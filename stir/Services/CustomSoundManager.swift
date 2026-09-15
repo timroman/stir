@@ -115,11 +115,11 @@ enum CustomSoundError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .accessDenied:
-            return "Could not access the selected file"
+            return "could not access the selected file"
         case .directoryNotFound:
-            return "Could not find sounds directory"
+            return "could not find sounds directory"
         case .copyFailed:
-            return "Failed to copy the sound file"
+            return "failed to copy the sound file"
         }
     }
 }

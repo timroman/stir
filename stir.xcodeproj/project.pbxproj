@@ -31,8 +31,10 @@
 		99AD63ECFBFADA2FB18BA31D /* AlarmBackstop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3621C1610B2466A837426511 /* AlarmBackstop.swift */; };
 		A40697DB09197D46B4A1D820 /* TechnicalDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92CE2A370C6733D8946E2B62 /* TechnicalDetailsView.swift */; };
 		A4AEFF2AC16A32C9952ABE5A /* StopButtonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA31EB15F4FE753AF25382D2 /* StopButtonTests.swift */; };
+		A8958A8B307D863CED15B082 /* SensitivityNoteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566ACB3AA206E8B218C60EB7 /* SensitivityNoteTests.swift */; };
 		AD93BA919195EEE1E8C3FAB2 /* NightArcFace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 129BD251B689B48CAC132AAC /* NightArcFace.swift */; };
 		AED52E8138D86B8281E70B54 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92497362A23FDEB89BC160D0 /* Log.swift */; };
+		BF47A3D1BE9E3436F2E15BDD /* CopyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A672B1512E49B426FF645346 /* CopyTests.swift */; };
 		C1D175BC7E5D8A2EAFBD58B5 /* SessionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC433593AE06BB9802072BFA /* SessionRecord.swift */; };
 		C6D51E60FE5A12A3449B418F /* SetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDBE9CD3509B6BB7BF2CDD44 /* SetupView.swift */; };
 		CE6911908594E31752200207 /* brown_noise.m4a in Resources */ = {isa = PBXBuildFile; fileRef = E57D2C7E4F7F1220A0B4E450 /* brown_noise.m4a */; };
@@ -57,6 +59,13 @@
 			remoteInfo = "stir-widgets";
 		};
 		3566BCE9F67342646824F2A5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B43AABF8073846C254D3A09C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EA296BB176E9CCDC4ABAEF39;
+			remoteInfo = stir;
+		};
+		75861121F50FBC73712AAD5A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = B43AABF8073846C254D3A09C /* Project object */;
 			proxyType = 1;
@@ -99,6 +108,7 @@
 		3F4F559E78A903A55E4D4BBB /* MotionMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionMonitor.swift; sourceTree = "<group>"; };
 		4118C77059DF41F2AEAD8B28 /* CustomSoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSoundManager.swift; sourceTree = "<group>"; };
 		47835E81DADDAD004379F272 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		566ACB3AA206E8B218C60EB7 /* SensitivityNoteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensitivityNoteTests.swift; sourceTree = "<group>"; };
 		578132549736F67419B80C91 /* AlarmView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmView.swift; sourceTree = "<group>"; };
 		5F7410581F11A69054872151 /* stir.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = stir.entitlements; sourceTree = "<group>"; };
 		6909799D538B0A85B5144231 /* stir-uitests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "stir-uitests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -110,6 +120,7 @@
 		8E440957EC87E3CD97F463E8 /* pink_noise.m4a */ = {isa = PBXFileReference; path = pink_noise.m4a; sourceTree = "<group>"; };
 		92497362A23FDEB89BC160D0 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		92CE2A370C6733D8946E2B62 /* TechnicalDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnicalDetailsView.swift; sourceTree = "<group>"; };
+		A672B1512E49B426FF645346 /* CopyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyTests.swift; sourceTree = "<group>"; };
 		ACA11DE98D22F3DAA607833D /* WhiteNoisePlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteNoisePlayer.swift; sourceTree = "<group>"; };
 		AEFC8AF87B6E2ECC24F4F346 /* stir.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = stir.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B91E7E22556C9596A1B5132B /* MonitoringView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitoringView.swift; sourceTree = "<group>"; };
@@ -121,6 +132,7 @@
 		CDBE9CD3509B6BB7BF2CDD44 /* SetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupView.swift; sourceTree = "<group>"; };
 		D967D9651F113BF861322057 /* StirWidgetsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StirWidgetsBundle.swift; sourceTree = "<group>"; };
 		DC433593AE06BB9802072BFA /* SessionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionRecord.swift; sourceTree = "<group>"; };
+		E52FF68791C82B3591E15147 /* stir-tests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "stir-tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E57D2C7E4F7F1220A0B4E450 /* brown_noise.m4a */ = {isa = PBXFileReference; path = brown_noise.m4a; sourceTree = "<group>"; };
 		F6E554669BCF3C3AD855F0DD /* soft_bells.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = soft_bells.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -151,10 +163,19 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
+		406D698F0369ACA1A5A45590 /* stir-tests */ = {
+			isa = PBXGroup;
+			children = (
+				A672B1512E49B426FF645346 /* CopyTests.swift */,
+			);
+			path = "stir-tests";
+			sourceTree = "<group>";
+		};
 		57E92CA17EE6E663B3888FCE = {
 			isa = PBXGroup;
 			children = (
 				DB594A77EEF43D3AC5854A3A /* stir */,
+				406D698F0369ACA1A5A45590 /* stir-tests */,
 				B0AECCF608ED29D53E8F4FD8 /* stir-uitests */,
 				7858166B9BE629BAF4EE46FA /* stir-widgets */,
 				A6C2AB7759C42395113BA2DC /* Products */,
@@ -197,6 +218,7 @@
 		A6C2AB7759C42395113BA2DC /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				E52FF68791C82B3591E15147 /* stir-tests.xctest */,
 				6909799D538B0A85B5144231 /* stir-uitests.xctest */,
 				0A071C0386AD2E344CD2F932 /* stir-widgets.appex */,
 				AEFC8AF87B6E2ECC24F4F346 /* stir.app */,
@@ -207,6 +229,7 @@
 		B0AECCF608ED29D53E8F4FD8 /* stir-uitests */ = {
 			isa = PBXGroup;
 			children = (
+				566ACB3AA206E8B218C60EB7 /* SensitivityNoteTests.swift */,
 				BA31EB15F4FE753AF25382D2 /* StopButtonTests.swift */,
 			);
 			path = "stir-uitests";
@@ -301,6 +324,24 @@
 			productReference = 0A071C0386AD2E344CD2F932 /* stir-widgets.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		7EAA0256A52B867397C461CE /* stir-tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 33FB3EFF4386147AD8109BE2 /* Build configuration list for PBXNativeTarget "stir-tests" */;
+			buildPhases = (
+				5CD37790832D9789B5BB3AB4 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7008F3FBC98A51F6D55F9576 /* PBXTargetDependency */,
+			);
+			name = "stir-tests";
+			packageProductDependencies = (
+			);
+			productName = "stir-tests";
+			productReference = E52FF68791C82B3591E15147 /* stir-tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		EA296BB176E9CCDC4ABAEF39 /* stir */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = DC5CEBD74A9A8185B0C772AB /* Build configuration list for PBXNativeTarget "stir" */;
@@ -338,6 +379,9 @@
 						DevelopmentTeam = 86CCQ2AT2P;
 						ProvisioningStyle = Automatic;
 					};
+					7EAA0256A52B867397C461CE = {
+						DevelopmentTeam = 86CCQ2AT2P;
+					};
 					EA296BB176E9CCDC4ABAEF39 = {
 						DevelopmentTeam = 86CCQ2AT2P;
 					};
@@ -358,6 +402,7 @@
 			projectRoot = "";
 			targets = (
 				EA296BB176E9CCDC4ABAEF39 /* stir */,
+				7EAA0256A52B867397C461CE /* stir-tests */,
 				1141CA2A6AA103D4DED709C4 /* stir-uitests */,
 				6A2F584E673A6C413700D5EA /* stir-widgets */,
 			);
@@ -396,10 +441,19 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5CD37790832D9789B5BB3AB4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF47A3D1BE9E3436F2E15BDD /* CopyTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6C57B9FD840DCA921111CD5C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A8958A8B307D863CED15B082 /* SensitivityNoteTests.swift in Sources */,
 				A4AEFF2AC16A32C9952ABE5A /* StopButtonTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -437,6 +491,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		7008F3FBC98A51F6D55F9576 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EA296BB176E9CCDC4ABAEF39 /* stir */;
+			targetProxy = 75861121F50FBC73712AAD5A /* PBXContainerItemProxy */;
+		};
 		B0969B52ED53C2004B9455DC /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 6A2F584E673A6C413700D5EA /* stir-widgets */;
@@ -450,6 +509,23 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		31374B2E8BEC9BE5E11E7731 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.pureinference.stir.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/stir.app/stir";
+			};
+			name = Debug;
+		};
 		3450581912860C648B410097 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -673,9 +749,35 @@
 			};
 			name = Release;
 		};
+		E1D1558AAD50B6FE5F93D63E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.pureinference.stir.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/stir.app/stir";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		33FB3EFF4386147AD8109BE2 /* Build configuration list for PBXNativeTarget "stir-tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				31374B2E8BEC9BE5E11E7731 /* Debug */,
+				E1D1558AAD50B6FE5F93D63E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		51DEF17BECEC66E9DD9E684C /* Build configuration list for PBXNativeTarget "stir-widgets" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

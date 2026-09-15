@@ -12,9 +12,11 @@ schemes:
       targets:
         stir: all
         stir-widgets: all
+        stir-tests: [test]
         stir-uitests: [test]
     test:
       targets:
+        - stir-tests
         - stir-uitests
     run:
       executable: stir
@@ -76,6 +78,20 @@ targets:
         com.apple.security.app-sandbox: true
     dependencies:
       - target: stir-widgets
+
+  # The logic that decides things — which nights count, what auto sensitivity
+  # does with them — runs here, hosted in the app, without driving any UI.
+  stir-tests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: stir-tests
+    dependencies:
+      - target: stir
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.pureinference.stir.tests
+        GENERATE_INFOPLIST_FILE: YES
 
   # Drives the real UI on a simulator. Exists because "the stop button doesn't
   # work" is not something screenshots or logs can settle — it needs taps.
