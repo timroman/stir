@@ -1,25 +1,15 @@
-# stir Privacy Policy
+# stir privacy policy
 
-**Last updated: December 2025**
+## everything stays on your phone
 
-stir is built with your privacy at its core.
+**what we collect: nothing.** stir does not collect, store, or transmit any personal data. no accounts, no analytics, no tracking, no advertising, no servers.
 
-## What We Collect
+**microphone.** the microphone is used solely to detect the sounds of you stirring, and only evaluated during your wake window. audio is processed on your device in real time — nothing is ever recorded, stored, or sent anywhere. in no-alarm mode the microphone is never activated at all.
 
-Nothing. stir does not collect, store, or transmit any personal data.
+**location.** your approximate location is used only to place the real sun and moon on the night screen. it is computed against on-device astronomy and never leaves your phone. decline it and the app works the same, minus the sky.
 
-## Microphone Access
+**storage.** your settings live locally on your device. nothing leaves your phone.
 
-stir uses your microphone solely to detect movement sounds during your wake window. While white noise plays overnight, the microphone session stays ready but no audio is evaluated until your wake window begins. Audio is processed on your device in real-time. Nothing is ever recorded, stored, or sent anywhere. In no-alarm mode (white noise only), the microphone is never activated.
+**contact.** for support or questions, open an issue on [GitHub](https://github.com/timroman/stir).
 
-## Data Storage
-
-Your settings are stored locally on your device only. Nothing leaves your phone.
-
-## Third Parties
-
-stir uses no analytics, tracking, or advertising.
-
-## Contact
-
-For support, visit our [GitHub page](https://github.com/timroman/stir).
+last updated july 2026.
