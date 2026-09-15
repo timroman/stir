@@ -38,8 +38,10 @@ these govern every surface stir has and every feature proposed here. a feature t
 **1. the night shows nothing to calculate with.**
 no clock, no countdown, no status bar, no progress. the night screen carries the real sun and moon. anyone who reads the sun can tell roughly what time it is — that is accepted, because it cannot be read to the minute and it answers only if you ask it.
 
-**2. absence is not zero.**
-stir counts nights it ran. a night without stir — travel, a different alarm, forgetting — is not recorded, not averaged, and not held against anything. nothing counts a streak, because a streak is a count of absences.
+**2. honesty with the data stir has.**
+stir counts clean runs — nights that ran the way a night is designed to (decision 31) — and nothing else. a night without stir — travel, a different alarm, forgetting — is not recorded, not averaged, and not held against anything. there are no streaks and nothing is gamified. a streak is a count of absences, and the owner on the rest:
+
+> streaks are "device use" shaming, which frankly we should all be trying to minimize. it's counterproductive. streaks and gamification are actually terrible for our health — especially when they're about our health, they masquerade as intelligence when they're really product adoption.
 
 **3. describe, never judge.**
 "most nights you started between 10:30 and 11:05", never "poor consistency". no scores, no grades, no red or green, no good or bad.
@@ -188,8 +190,16 @@ a way to see how consistent your nights are, and nothing else.
 
 consistency rather than duration is the choice principles 3 and 5 already force, and it is also where the research points. in 60,997 UK Biobank participants, [sleep regularity predicted all-cause mortality better than sleep duration](https://academic.oup.com/sleep/article/47/1/zsad253/7280269) (Windred et al., *SLEEP*, 2024). that study measured sleep and wake from actigraphy; stir measures when a night starts and ends, which is coarser, and history says so rather than borrowing the study's claims.
 
-**31. history keeps one record per night stir ran.**
-it extends the record in decision 26 with two fields:
+**31. history keeps one record per clean run.**
+a clean run is a night that reached its end the way stir is designed to end one:
+
+- the alarm sounded and was stopped, whatever woke you
+- a no-alarm night reached silence
+- it was ended by hand inside its wake window, before the alarm — you were up before stir
+
+and that started long enough before "up by" to be a night rather than a test or a nap *(see open 10)*. a late bedtime is a clean run: leaving late nights out would make consistency look better than it is, which is the opposite of honest.
+
+the record extends the one in decision 26 with two fields:
 
 - **what woke you:** sound, motion, the "up by" alarm, or nothing (ended by hand, or a no-alarm night)
 - **the phone's media volume when the alarm started**
@@ -197,11 +207,11 @@ it extends the record in decision 26 with two fields:
 **32. the line is drawn at the record, not in a policy.**
 a record holds what stir did. no sound levels, no motion samples, no calibration values, no location, no inferred sleep. each of those is individually defensible — a sensitivity suggestion would like to have the sound levels — and together they are a sleep tracker. a feature that needs one of them is a different feature and gets its own decision.
 
-**33. a record is written when the night ends.**
-a night stir never finished — the app killed or crashed overnight — leaves no record rather than half of one. *(see open 1)*
+**33. a record is written when a clean run ends, and only then.**
+a night that did not run cleanly is not written to history at all, rather than stored and filtered out. a night stir never finished, because the app was killed or crashed, leaves nothing either *(see open 1)*. the most recent night, clean or not, still shows on the technical details screen, and the unified log keeps every night for diagnosis.
 
-**34. the unit is nights stir ran, not days.**
-every figure reads "across your last 14 nights", even when 14 nights span three weeks. there is no calendar, and a gap is never drawn as a gap.
+**34. the unit is clean runs, not days.**
+every figure reads "across your last 14 nights", counting only clean runs, even when 14 of them span three weeks. there is no calendar, and a gap is never drawn as a gap.
 
 **35. what history shows, and nothing more:**
 
@@ -215,8 +225,8 @@ written as sentences — "most nights you started between 10:30 and 11:05" — a
 **36. one late night does not rewrite the week.**
 the typical time and its spread come from the middle of your nights, not the extremes, so a single 2am start reads as one night rather than as your pattern.
 
-**37. a night ended by hand before its wake window is not a wake.**
-it appears in the list, marked as ended early, and is left out of "up". a night ended by hand inside the window, before the alarm, is a wake, and the list says you were up before stir.
+**37. a night ended by hand before its wake window is not a clean run.**
+it does not appear in history. a night ended by hand inside the window, before the alarm, is a clean run, and the list says you were up before stir.
 
 **38. history is in settings, and nowhere else.**
 never the setup screen, the night screen, the alarm screen, the lock screen, the Live Activity, or a notification.
@@ -260,7 +270,7 @@ asking "did stir wake you at a good moment?" would tell the dog from you, and it
 **48. only facts go.**
 *in bed*, never *asleep*, because stir cannot know when you fell asleep. nothing derived. once data is in Health, Apple's own features decide what to do with it, which is exactly why stir sends nothing it inferred.
 
-**49. Health gets the nights history keeps**, less nights ended by hand before their wake window. *(see open 6)*
+**49. Health gets the clean runs history keeps**, and nothing else.
 
 ---
 
@@ -288,7 +298,7 @@ iOS does not let an app start the microphone from the background, and a night op
 ## part eight — what this does not build
 
 - no sleep score, readiness measure, or prediction of the day
-- no streaks, goals, badges, or counts of nights missed
+- no streaks, goals, badges, points, or counts of nights missed — nothing gamified
 - no notifications, reminders or widgets for history
 - no charts of hours slept
 - no reading from Health, and nothing written to it as *asleep*
@@ -313,13 +323,15 @@ iOS does not let an app start the microphone from the background, and a night op
 
 **5. the Live Activity.** all night it shows "up by 7:30 am", a status and a sound-level meter on the lock screen. that is the time you chose rather than the time now, and the lock screen shows a clock regardless — but it is the one stir surface that shows anything during the night, and principle 4 has not been held against it.
 
-**6. whether Health gets nights ended early.**
+**6. resolved:** Health gets only clean runs (decision 49), and a night ended before its wake window is not one.
 
 **7. the rules before part six is built.** App Review has requirements for health data (section 5.1.3 of the guidelines) that need reading, and the privacy policy needs a Health sentence. `PRIVACY.md` is already out of date: dated december 2025, it predates location and the backstop, and it does not match the privacy section on the site.
 
 **8. storage.** SwiftData is the platform's path; a file in stir's container is smaller. history is one small record a night, so either holds a lifetime. the choice is about how the record migrates when it gains a field, not about size.
 
 **9. three things to correct.** a comment in `NightArcFace.swift` says nothing on the night screen "correlates with the time of day", and the technical details screen says nothing on it "tells the time". the sun's position is local solar time, so the comment is wrong and the screen overstates it; principle 1 is the accurate version. separately, gentle chime and soft bells predate the synthesis script, and their source is not recorded in the repository. and the three error messages shown when a sound import fails, in `CustomSoundManager.swift`, are still capitalized.
+
+**10. the shortest night that counts.** a session started a few minutes before "up by" — a test, a nap — is not a night, and a late bedtime is. the line is a duration from start to "up by", and it needs a number. three hours is the proposal, to be checked against real history once there is some.
 
 ---
 

@@ -7,8 +7,9 @@
 - history has no charts in 1.1: sentences and a plain list (stir.md open 3)
 - a night stir never finished stays out of history; the unified log keeps it (open 1)
 - a Siri start during a running night moves "up by" if the wake window has not opened, and otherwise says the night is already running and changes nothing (open 4)
-- Health does not get nights ended before their wake window (open 6)
 - history is stored with SwiftData (open 8)
+
+**set by the owner, 15 september:** history counts clean runs only (stir.md principle 2, decisions 31, 33, 37). the shortest night that counts is still open (stir.md open 10); phase 1 holds it as a single named constant until it is decided.
 
 ---
 
@@ -70,15 +71,18 @@ when a finished no-alarm night is dismissed, `MonitoringView.endNight()` calls `
 
 - `triggerAlarm` carries its reason from the three places that call it: the sound monitor, the motion monitor, and the "up by" fallback in `MonitoringView.tick()`.
 - `AlarmPlayer` hands back the media volume it already reads when the alarm starts.
-- `AppState.recordSessionEnd` writes a `NightRecord` rather than the single `lastSessionRecord`, and only when a night ends (decision 33). the technical details screen keeps showing the most recent night.
-- on first launch, the existing `lastSessionRecord` in `UserDefaults` becomes one `NightRecord`, and the old key is removed.
+- `AppState.recordSessionEnd` keeps writing the single `lastSessionRecord`, which the technical details screen shows for every night, clean or not. alongside it, and only for a clean run (decisions 31, 33), it writes a `NightRecord`.
+- whether a night is a clean run is decided in one function, so history, Health and 1.2's suggestions share one definition.
+- no migration. history starts empty in 1.1; the night in `lastSessionRecord` is diagnostics, not history.
 
 ### tests (unit)
 
 - each wake reason reaches the record.
 - a finished no-alarm night records `completed`, with `windowStart` `nil`.
 - a night that never ends writes nothing.
-- the migration produces exactly one record and removes the old key; a second launch migrates nothing.
+- a night ended by hand before its wake window writes no `NightRecord`, and still updates `lastSessionRecord`.
+- a night ended by hand inside its window, before the alarm, is a clean run.
+- a night started less than the minimum before "up by" writes no `NightRecord`; a late bedtime above it is a clean run.
 - a test fails if `NightRecord` gains a stored field not in the table above, so the line in decision 32 is enforced by the build, not remembered.
 
 ---
@@ -94,7 +98,7 @@ over the most recent 14 records — nights, not days (decision 34):
 - **lights out** and **up**: the median, and the range from the 10th to the 90th percentile, rounded to 5 minutes. with 14 nights that range sets aside the single earliest and latest night, which is what "most nights" means and what keeps one late night from rewriting the week (decision 36).
 - **how you woke**: a count by `wokeBy`, and for sound and motion, how many minutes after `windowStart` it happened.
 - **alarm ring**: `endedAt − alarmFiredAt`, on `alarmDismissed` nights.
-- **ended early**: `stopped` with `endedAt` before `windowStart`. listed, left out of **up** (decision 37). `stopped` inside the window before any alarm is a wake, and reads as up before stir.
+- **up before stir**: `stopped` inside the window before any alarm, which the list says in those words.
 - **too few nights**: under 3 records, no sentences at all — only the list. a spread of two nights describes nothing.
 
 ### the two traps
@@ -140,13 +144,13 @@ one per rule above, and:
 
 - the HealthKit capability and entitlement in `project.yml`, and `NSHealthUpdateUsageDescription`, lowercase.
 - a `health` toggle in settings, off by default. turning it on asks to write sleep analysis and asks to read nothing (decision 47).
-- when a night ends and history keeps it, and it did not end before its wake window, one `inBed` sample from `startedAt` to `endedAt` (decisions 46, 48, 49).
+- for every clean run history keeps, one `inBed` sample from `startedAt` to `endedAt` (decisions 46, 48, 49).
 - access denied or later revoked: the toggle turns itself off and says so. no retry, and no prompt outside settings.
 
 ### tests (unit, against a protocol standing in for `HKHealthStore`)
 
 - one `inBed` sample per kept night, with the right interval.
-- nothing written with the toggle off, for a night ended early, or for a night that never ended.
+- nothing written with the toggle off, or for a night that is not a clean run.
 - no read authorization is ever requested.
 
 **device check:** a real night appears in Health as in bed, and as nothing else.
@@ -182,7 +186,7 @@ one per rule above, and:
 
 ## effort
 
-held loosely; estimates here have run high. phase 0: an hour. phase 1: two to three hours, mostly the migration and its tests. phase 2: two to three hours, mostly the tests. phase 3: two hours. phase 4: two hours, after the guideline. phase 5: two hours and a session on a device. about a day and a half.
+held loosely; estimates here have run high. phase 0: an hour. phase 1: about two hours, mostly the clean-run tests. phase 2: two to three hours, mostly the tests. phase 3: two hours. phase 4: two hours, after the guideline. phase 5: two hours and a session on a device. about a day and a half.
 
 ---
 
