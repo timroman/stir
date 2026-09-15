@@ -18,6 +18,7 @@ every constant and rule in phases 2 to 4 is in stir.md decisions 60–74 and in 
 
 - one branch and one pull request per phase, off `main`. nothing goes to `main` directly.
 - tests are the gate. a phase merges with its unit and UI tests green on an iPhone 15 simulator, and after any device check the phase names.
+- boot the simulator and wait for it before testing: `xcrun simctl bootstatus <udid> -b`. a unit test host launched while the simulator is still booting logs "test daemon not ready" and fails as "the test runner hung before establishing connection" — a slow full build hides it, and a fast incremental one exposes it.
 - one decision per commit: `scope: decision — reason`.
 - the owner merges, and the owner submits to App Review.
 - a phase that finds the spec wrong stops and says so. the spec changes before the code does.
