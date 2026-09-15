@@ -17,6 +17,10 @@ class AppState: ObservableObject {
     }
     @Published var currentDecibelLevel: Float = -160.0
     @Published var isMonitoring: Bool = false
+    // Auto sensitivity asked "was that too sensitive?" at the end of this
+    // night (stir.md decision 67). Not persisted: the state already records
+    // that it was asked, so leaving the app is an answer of no.
+    @Published var sensitivityQuestionPending = false
     @Published var hasCompletedOnboarding: Bool {
         didSet { defaults.set(hasCompletedOnboarding, forKey: onboardingKey) }
     }
@@ -242,12 +246,43 @@ class AppState: ObservableObject {
                                        alarmVolume: alarmVolume))
         }
         Logger.session.notice("night \(clean ? "kept as a clean run" : "not a clean run, not kept", privacy: .public)")
+        if clean {
+            evaluateAutoSensitivity()
+        }
 
         sessionStartedAt = nil
         listeningStartedAt = nil
         alarmFiredAt = nil
         triggeredBy = .none
         alarmVolume = nil
+    }
+
+    // MARK: - Auto sensitivity
+
+    // After a clean run on auto: read every night, and apply what auto decides.
+    // A step up changes the value the next night starts with, never the night
+    // that just ended (stir.md decision 44).
+    private func evaluateAutoSensitivity() {
+        guard settings.sensitivityMode == .auto, let nightStore,
+              let state = settings.autoSensitivity else { return }
+        let nights = nightStore.all().map(NightFacts.init)
+        let (next, action) = AutoSensitivity.evaluate(state, nights: nights, now: now())
+
+        var updated = settings
+        updated.autoSensitivity = next
+        if action == .stepUp {
+            updated.sensitivityValue = AutoSensitivity.ladder[next.step]
+        }
+        settings = updated
+        if action == .ask {
+            sensitivityQuestionPending = true
+        }
+    }
+
+    /// How many nights auto is reading at its current step, for technical details
+    var autoSensitivityNightsCounted: Int {
+        guard let state = settings.autoSensitivity, let nightStore else { return 0 }
+        return AutoSensitivity.countedEvidence(state, nights: nightStore.all().map(NightFacts.init)).count
     }
 
     func completeOnboarding() {

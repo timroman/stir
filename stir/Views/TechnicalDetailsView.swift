@@ -3,8 +3,24 @@ import SwiftUI
 // How the app actually works, for the curious. Reachable from settings and
 // from onboarding.
 struct TechnicalDetailsView: View {
+    @EnvironmentObject var appState: AppState
+
     var body: some View {
         List {
+            // Where auto sensitivity is, so a morning's decision can be checked
+            // against the log (stir.md decision 72)
+            if appState.settings.sensitivityMode == .auto, let auto = appState.settings.autoSensitivity {
+                Section {
+                    LabeledContent("setting", value: "\(AutoSensitivity.ladder[auto.step]) · closest to \(appState.settings.sensitivityLabel)")
+                    LabeledContent("state", value: auto.phase.rawValue)
+                    LabeledContent("nights counted", value: "\(appState.autoSensitivityNightsCounted)")
+                } header: {
+                    Text("auto sensitivity")
+                } footer: {
+                    Text("auto moves sensitivity one step at a time, from what your nights show. it only becomes less sensitive when you say so.")
+                }
+            }
+
             // Only appears once a night has actually run; the answer to "what
             // happened last night?" without needing a Mac attached
             if let last = SessionRecord.last {
@@ -64,5 +80,6 @@ struct TechnicalDetailsView: View {
 #Preview {
     NavigationStack {
         TechnicalDetailsView()
+            .environmentObject(AppState())
     }
 }

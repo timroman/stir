@@ -25,13 +25,15 @@ final class SensitivityNoteTests: XCTestCase {
         XCTAssertTrue(picker.waitForExistence(timeout: 5), "sensitivity picker missing")
         let note = app.staticTexts["wake.sensitivityNote"]
 
+        XCTAssertEqual(picker.buttons.count, 4, "the picker should offer auto, low, medium and high")
+
         var notes: [String: String] = [:]
-        for choice in ["low", "medium", "high"] {
+        for choice in ["low", "medium", "high", "auto"] {
             picker.buttons[choice].tap()
             XCTAssertTrue(note.waitForExistence(timeout: 5), "no note under the picker")
             XCTAssertFalse(note.label.isEmpty, "\(choice) has an empty note")
             notes[choice] = note.label
         }
-        XCTAssertEqual(Set(notes.values).count, 3, "sensitivity choices share a note: \(notes)")
+        XCTAssertEqual(Set(notes.values).count, 4, "sensitivity choices share a note: \(notes)")
     }
 }

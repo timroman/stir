@@ -28,6 +28,11 @@ struct AlarmSettings: Codable {
     var fadeOutMinutes: Int      // How long the fade-out takes (5-60 minutes)
     var quietGapMinutes: Int     // Silence between fade complete and listening start (0-120)
 
+    // Auto finds sensitivityValue from the nights themselves (stir.md part nine);
+    // manual is low, medium or high as chosen
+    var sensitivityMode: SensitivityMode
+    var autoSensitivity: AutoSensitivityState?
+
     var isUsingCustomSound: Bool {
         customSoundId != nil
     }
@@ -56,11 +61,31 @@ struct AlarmSettings: Codable {
         return 5.0 - (sensitivityValue * 3.0)
     }
 
+    // The nearest of the three named settings. Auto's in-between steps land
+    // exactly halfway, and a tie reads as medium.
     var sensitivityLabel: String {
-        switch sensitivityValue {
-        case 0.0..<0.33: return "low"
-        case 0.33..<0.66: return "medium"
-        default: return "high"
+        let named: [(label: String, value: Float)] = [("low", 0.15), ("medium", 0.5), ("high", 0.85)]
+        let distances = named.map { abs(Double($0.value) - Double(sensitivityValue)) }
+        let nearest = distances.min() ?? 0
+        let tied = named.indices.filter { distances[$0] - nearest < 0.0001 }
+        return tied.contains(1) ? "medium" : named[tied.first ?? 1].label
+    }
+
+    /// The sensitivity picker: "auto", "low", "medium" or "high" (decisions 60, 69).
+    mutating func chooseSensitivity(_ choice: String, now: Date) {
+        switch choice {
+        case "auto":
+            guard sensitivityMode != .auto else { return }
+            let state = AutoSensitivity.starting(at: sensitivityValue, now: now)
+            sensitivityMode = .auto
+            autoSensitivity = state
+            sensitivityValue = AutoSensitivity.ladder[state.step]
+        case "low", "medium", "high":
+            sensitivityMode = .manual
+            autoSensitivity = nil
+            sensitivityValue = choice == "low" ? 0.15 : choice == "high" ? 0.85 : 0.5
+        default:
+            break
         }
     }
 
@@ -87,7 +112,11 @@ struct AlarmSettings: Codable {
             whiteNoiseVolume: 0.7,
             whiteNoiseCustomSoundId: nil,
             fadeOutMinutes: 10,
-            quietGapMinutes: 30
+            quietGapMinutes: 30,
+            // A new install starts on auto; an existing one keeps its setting,
+            // because an update is not somebody choosing (decision 60)
+            sensitivityMode: .auto,
+            autoSensitivity: AutoSensitivity.starting(at: 0.5, now: now)
         )
     }
 
@@ -99,6 +128,7 @@ struct AlarmSettings: Codable {
         case hapticEnabled, hapticType, hapticIntensity, motionDetectionEnabled
         case whiteNoiseEnabled, whiteNoiseSound, whiteNoiseVolume, whiteNoiseCustomSoundId
         case fadeOutMinutes, quietGapMinutes
+        case sensitivityMode, autoSensitivity
         // Legacy keys (pre-merge stir), read-only
         case wakeWindowStart, wakeWindowEnd
     }
@@ -107,7 +137,8 @@ struct AlarmSettings: Codable {
          volume: Float, selectedSound: AlarmSound, customSoundId: UUID?, tagline: String,
          hapticEnabled: Bool, hapticType: HapticType, hapticIntensity: Float,
          motionDetectionEnabled: Bool, whiteNoiseEnabled: Bool, whiteNoiseSound: WhiteNoiseSound,
-         whiteNoiseVolume: Float, whiteNoiseCustomSoundId: UUID?, fadeOutMinutes: Int, quietGapMinutes: Int) {
+         whiteNoiseVolume: Float, whiteNoiseCustomSoundId: UUID?, fadeOutMinutes: Int, quietGapMinutes: Int,
+         sensitivityMode: SensitivityMode = .manual, autoSensitivity: AutoSensitivityState? = nil) {
         self.wakeUpBy = wakeUpBy
         self.wakeWindowMinutes = wakeWindowMinutes
         self.alarmEnabled = alarmEnabled
@@ -126,6 +157,8 @@ struct AlarmSettings: Codable {
         self.whiteNoiseCustomSoundId = whiteNoiseCustomSoundId
         self.fadeOutMinutes = fadeOutMinutes
         self.quietGapMinutes = quietGapMinutes
+        self.sensitivityMode = sensitivityMode
+        self.autoSensitivity = autoSensitivity
     }
 
     init(from decoder: Decoder) throws {
@@ -163,6 +196,13 @@ struct AlarmSettings: Codable {
         whiteNoiseCustomSoundId = try container.decodeIfPresent(UUID.self, forKey: .whiteNoiseCustomSoundId)
         fadeOutMinutes = try container.decodeIfPresent(Int.self, forKey: .fadeOutMinutes) ?? defaults.fadeOutMinutes
         quietGapMinutes = try container.decodeIfPresent(Int.self, forKey: .quietGapMinutes) ?? defaults.quietGapMinutes
+
+        // Settings saved before auto existed stay as they were chosen: manual
+        sensitivityMode = try container.decodeIfPresent(SensitivityMode.self, forKey: .sensitivityMode) ?? .manual
+        autoSensitivity = try container.decodeIfPresent(AutoSensitivityState.self, forKey: .autoSensitivity)
+        if sensitivityMode == .auto && autoSensitivity == nil {
+            autoSensitivity = AutoSensitivity.starting(at: sensitivityValue, now: Date())
+        }
     }
 
     func encode(to encoder: Encoder) throws {
@@ -185,7 +225,14 @@ struct AlarmSettings: Codable {
         try container.encodeIfPresent(whiteNoiseCustomSoundId, forKey: .whiteNoiseCustomSoundId)
         try container.encode(fadeOutMinutes, forKey: .fadeOutMinutes)
         try container.encode(quietGapMinutes, forKey: .quietGapMinutes)
+        try container.encode(sensitivityMode, forKey: .sensitivityMode)
+        try container.encodeIfPresent(autoSensitivity, forKey: .autoSensitivity)
     }
+}
+
+enum SensitivityMode: String, Codable {
+    case auto
+    case manual
 }
 
 enum AlarmSound: String, Codable, CaseIterable, Identifiable {

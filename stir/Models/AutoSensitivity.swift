@@ -139,6 +139,14 @@ enum AutoSensitivity {
 
     // MARK: - the evaluator (decisions 64–69)
 
+    /// The evidence from the nights that count: started after `since`, at the
+    /// step auto is on, with listening that began (decision 62)
+    static func countedEvidence(_ state: AutoSensitivityState, nights: [NightFacts]) -> [Evidence] {
+        nights
+            .filter { $0.startedAt > state.since && abs($0.sensitivity - ladder[state.step]) < 0.001 }
+            .compactMap(evidence)
+    }
+
     private enum Verdict {
         case problem
         case fine
@@ -170,9 +178,7 @@ enum AutoSensitivity {
     /// runs, oldest first.
     static func evaluate(_ state: AutoSensitivityState, nights: [NightFacts],
                          now: Date) -> (AutoSensitivityState, AutoSensitivityAction) {
-        let counted = nights
-            .filter { $0.startedAt > state.since && abs($0.sensitivity - ladder[state.step]) < 0.001 }
-            .compactMap(evidence)
+        let counted = countedEvidence(state, nights: nights)
         let result = decide(state, counted: counted, now: now)
         logEvaluation(state, counted: counted, result: result)
         return result
