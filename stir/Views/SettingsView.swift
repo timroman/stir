@@ -371,6 +371,20 @@ struct WakeSettingsView: View {
         appState.settings.sensitivityLabel
     }
 
+    // Sorted by how much of the room's sound comes and goes, not how loud it
+    // is: steady sound calibrates into the baseline, and what sets stir off by
+    // mistake is sound that arrives and leaves (stir.md decision 59)
+    private var sensitivityNote: String {
+        switch sensitivity {
+        case "low":
+            return "for a shared bed, pets, or children nearby. it takes a bigger sound to wake you."
+        case "high":
+            return "for sleeping alone in a quiet room, or one with steady sound like a fan. it hears you roll over or move the covers."
+        default:
+            return "for a room with some sound that comes and goes, like occasional traffic or a partner who sleeps still."
+        }
+    }
+
     var body: some View {
         List {
             Section {
@@ -389,12 +403,19 @@ struct WakeSettingsView: View {
                     Text("high").tag("high")
                 }
                 .pickerStyle(.segmented)
-
-                Toggle("motion detection", isOn: $appState.settings.motionDetectionEnabled)
+                .accessibilityIdentifier("wake.sensitivity")
             } header: {
                 Text("listening")
             } footer: {
-                Text("higher sensitivity wakes you on smaller sounds. motion detection also wakes you if the phone is picked up or bumped.")
+                Text(sensitivityNote)
+                    .accessibilityIdentifier("wake.sensitivityNote")
+            }
+
+            Section {
+                Toggle("motion detection", isOn: $appState.settings.motionDetectionEnabled)
+            } footer: {
+                // stir hears the room, not a person (stir.md decisions 57, 59)
+                Text("motion detection wakes you when the phone moves, whoever moves it. a phone on the nightstand on your side of the bed avoids most of that.")
             }
 
             Section {

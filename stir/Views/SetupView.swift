@@ -68,6 +68,7 @@ struct SetupView: View {
                 .foregroundColor(.white.opacity(0.55))
             }
             .padding(.bottom, 20)
+            .accessibilityIdentifier("setup.settings")
             }
             .padding()
         }
