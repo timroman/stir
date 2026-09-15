@@ -72,11 +72,12 @@ struct AlarmView: View {
 
             // Start audio after small delay
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                alarmPlayer.play(
+                let mediaVolume = alarmPlayer.play(
                     sound: appState.settings.selectedSound,
                     customSoundId: appState.settings.customSoundId,
                     volume: appState.settings.volume
                 )
+                appState.recordAlarmVolume(mediaVolume)
             }
 
             // Start haptics after audio session is configured
@@ -349,7 +350,10 @@ class AlarmPlayer: ObservableObject {
     private let rampDuration: Float = 60.0 // seconds
     private let crossfadeDuration: TimeInterval = 1.5 // seconds for crossfade
 
-    func play(sound: AlarmSound, customSoundId: UUID?, volume: Float) {
+    /// Starts the alarm and returns the phone's media volume as it started —
+    /// the one volume stir can read but cannot set.
+    @discardableResult
+    func play(sound: AlarmSound, customSoundId: UUID?, volume: Float) -> Float {
         // The slider maps straight through, exactly like the white noise it has
         // to wake you from. Gentleness is the 60-second ramp from silence
         // below, not a ceiling: the old 5% cap left the alarm ~17x quieter than
@@ -366,6 +370,7 @@ class AlarmPlayer: ObservableObject {
         } catch {
             Logger.alarm.error("⚠️ Failed to configure audio session: \(String(describing: error), privacy: .public)")
         }
+        let mediaVolume = AVAudioSession.sharedInstance().outputVolume
 
         // Determine which sound URL to use
         let url: URL?
@@ -381,7 +386,7 @@ class AlarmPlayer: ObservableObject {
         guard let soundURL = url else {
             Logger.alarm.notice("Sound file not found: \(String(describing: sound.rawValue), privacy: .public)")
             playFallbackSound()
-            return
+            return mediaVolume
         }
 
         self.soundURL = soundURL
@@ -417,6 +422,7 @@ class AlarmPlayer: ObservableObject {
             Logger.alarm.error("Failed to play alarm: \(String(describing: error), privacy: .public)")
             playFallbackSound()
         }
+        return mediaVolume
     }
 
     private func startVolumeRamp() {

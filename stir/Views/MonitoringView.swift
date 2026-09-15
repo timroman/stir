@@ -143,19 +143,20 @@ struct MonitoringView: View {
             case .calibrating:
                 StirLiveActivity.updateStatus("calibrating...")
             case .listening:
+                appState.markListeningStarted()
                 StirLiveActivity.updateStatus("listening...")
             }
         }
         .onReceive(audioMonitor.$didTrigger) { triggered in
             if triggered {
                 Logger.session.notice("🚨 Audio trigger received, stopping monitors and switching to alarm")
-                triggerAlarm()
+                triggerAlarm(.sound)
             }
         }
         .onReceive(motionMonitor.$didTrigger) { triggered in
             if triggered {
                 Logger.session.notice("🚨 Motion trigger received, stopping monitors and switching to alarm")
-                triggerAlarm()
+                triggerAlarm(.motion)
             }
         }
         .onDisappear {
@@ -175,7 +176,13 @@ struct MonitoringView: View {
     private func endNight() {
         withAnimation(.easeInOut(duration: 0.3)) {
             endSession()
-            appState.stopMonitoring()
+            // "done" on a finished no-alarm night is the night completing, not
+            // being cut short
+            if phase == .complete {
+                appState.completeNight()
+            } else {
+                appState.stopMonitoring()
+            }
         }
     }
 
@@ -288,7 +295,7 @@ struct MonitoringView: View {
 
             // Fallback alarm at "up by"
             if now >= settings.wakeUpBy && appState.currentScreen == .monitoring {
-                triggerAlarm()
+                triggerAlarm(.upBy)
                 return
             }
         }
@@ -350,13 +357,13 @@ struct MonitoringView: View {
         AlarmBackstop.cancelBackstop()
     }
 
-    private func triggerAlarm() {
+    private func triggerAlarm(_ reason: AlarmTrigger) {
         stopSessionTimer()
         whiteNoisePlayer.stop()
         audioMonitor.stop()
         motionMonitor.stop()
         StirLiveActivity.triggerAlarm(message: appState.settings.tagline)
-        appState.triggerAlarm()
+        appState.triggerAlarm(reason)
     }
 }
 

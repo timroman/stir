@@ -18,20 +18,32 @@ class AppState: ObservableObject {
     @Published var currentDecibelLevel: Float = -160.0
     @Published var isMonitoring: Bool = false
     @Published var hasCompletedOnboarding: Bool {
-        didSet { UserDefaults.standard.set(hasCompletedOnboarding, forKey: onboardingKey) }
+        didSet { defaults.set(hasCompletedOnboarding, forKey: onboardingKey) }
     }
 
     private let settingsKey = "alarmSettings"
     private let onboardingKey = "hasCompletedOnboarding"
+    private let defaults: UserDefaults
+    private let nightStore: NightStore?
 
-    // Live for the length of one session, then folded into a SessionRecord
+    // The clock every session timestamp is read from; tests move it
+    var now: () -> Date = Date.init
+
+    // Live for the length of one session, then folded into a SessionRecord and,
+    // for a clean run, a NightRecord
     private var sessionStartedAt: Date?
+    private var sessionSensitivity: Float = 0
+    private var listeningStartedAt: Date?
     private var alarmFiredAt: Date?
+    private var triggeredBy: AlarmTrigger = .none
+    private var alarmVolume: Float?
 
-    init() {
-        self.hasCompletedOnboarding = UserDefaults.standard.bool(forKey: onboardingKey)
+    init(nightStore: NightStore? = nil, defaults: UserDefaults = .standard) {
+        self.nightStore = nightStore
+        self.defaults = defaults
+        self.hasCompletedOnboarding = defaults.bool(forKey: onboardingKey)
 
-        if let data = UserDefaults.standard.data(forKey: settingsKey),
+        if let data = defaults.data(forKey: settingsKey),
            let decoded = try? JSONDecoder().decode(AlarmSettings.self, from: data) {
             self.settings = decoded
         } else {
@@ -93,7 +105,7 @@ class AppState: ObservableObject {
 
     func saveSettings() {
         if let encoded = try? JSONEncoder().encode(settings) {
-            UserDefaults.standard.set(encoded, forKey: settingsKey)
+            defaults.set(encoded, forKey: settingsKey)
         }
     }
 
@@ -139,9 +151,17 @@ class AppState: ObservableObject {
         whiteNoiseEndTime.addingTimeInterval(-settings.fadeOutSeconds)
     }
 
+    // MARK: - The session
+
     func startMonitoring() {
-        sessionStartedAt = Date()
+        sessionStartedAt = now()
+        // The record keeps the sensitivity the night started with, whatever
+        // settings say by morning
+        sessionSensitivity = settings.sensitivityValue
+        listeningStartedAt = nil
         alarmFiredAt = nil
+        triggeredBy = .none
+        alarmVolume = nil
         currentScreen = .monitoring
         isMonitoring = true
         Logger.session.notice("night started, up by \(self.timeString(self.settings.wakeUpBy), privacy: .public)")
@@ -153,10 +173,35 @@ class AppState: ObservableObject {
         currentScreen = .setup
     }
 
-    func triggerAlarm() {
-        if alarmFiredAt == nil { alarmFiredAt = Date() }
+    // A no-alarm night that reached silence, dismissed with "done" — not the
+    // same as a night ended early by hand
+    func completeNight() {
+        recordSessionEnd(.completed)
+        isMonitoring = false
+        currentScreen = .setup
+    }
+
+    // Room calibration finished. Listening time for auto sensitivity starts
+    // here, not when the window opened, because calibration waits for white
+    // noise to fade and then takes 30 seconds (stir.md decision 62)
+    func markListeningStarted() {
+        guard sessionStartedAt != nil, listeningStartedAt == nil else { return }
+        listeningStartedAt = now()
+        Logger.session.notice("listening started")
+    }
+
+    func triggerAlarm(_ reason: AlarmTrigger) {
+        if alarmFiredAt == nil {
+            alarmFiredAt = now()
+            triggeredBy = reason
+        }
         currentScreen = .alarm
-        Logger.session.notice("alarm fired")
+        Logger.session.notice("alarm fired by \(reason.rawValue, privacy: .public)")
+    }
+
+    func recordAlarmVolume(_ volume: Float) {
+        guard alarmFiredAt != nil, alarmVolume == nil else { return }
+        alarmVolume = volume
     }
 
     func dismissAlarm() {
@@ -166,18 +211,43 @@ class AppState: ObservableObject {
     }
 
     // Written on every exit from a session so the next morning has something to
-    // read, on the phone and in the unified log
+    // read, on the phone and in the unified log. Only a clean run becomes a
+    // NightRecord (stir.md decision 33).
     private func recordSessionEnd(_ ending: SessionRecord.Ending) {
         guard let startedAt = sessionStartedAt else { return }
-        let record = SessionRecord(startedAt: startedAt,
-                                   upBy: settings.wakeUpBy,
-                                   alarmFiredAt: alarmFiredAt,
-                                   endedAt: Date(),
-                                   ending: ending)
-        record.save()
-        Logger.session.notice("night ended after \(record.lengthText, privacy: .public) — \(ending.rawValue, privacy: .public), alarm \(record.alarmText, privacy: .public)")
+        let endedAt = now()
+        let session = SessionRecord(startedAt: startedAt,
+                                    upBy: settings.wakeUpBy,
+                                    alarmFiredAt: alarmFiredAt,
+                                    endedAt: endedAt,
+                                    ending: ending)
+        session.save()
+        Logger.session.notice("night ended after \(session.lengthText, privacy: .public) — \(ending.rawValue, privacy: .public), alarm \(session.alarmText, privacy: .public)")
+
+        let nightEnding = NightEnding(rawValue: ending.rawValue) ?? .stopped
+        let nightWindowStart: Date? = settings.alarmEnabled ? windowStart : nil
+        let clean = CleanRun.isCleanRun(startedAt: startedAt, upBy: settings.wakeUpBy,
+                                        windowStart: nightWindowStart, endedAt: endedAt,
+                                        alarmFiredAt: alarmFiredAt, ending: nightEnding)
+        if clean, let nightStore {
+            nightStore.add(NightRecord(startedAt: startedAt,
+                                       endedAt: endedAt,
+                                       upBy: settings.wakeUpBy,
+                                       windowStart: nightWindowStart,
+                                       listeningStartedAt: listeningStartedAt,
+                                       alarmFiredAt: alarmFiredAt,
+                                       triggeredBy: triggeredBy,
+                                       ending: nightEnding,
+                                       sensitivity: sessionSensitivity,
+                                       alarmVolume: alarmVolume))
+        }
+        Logger.session.notice("night \(clean ? "kept as a clean run" : "not a clean run, not kept", privacy: .public)")
+
         sessionStartedAt = nil
+        listeningStartedAt = nil
         alarmFiredAt = nil
+        triggeredBy = .none
+        alarmVolume = nil
     }
 
     func completeOnboarding() {

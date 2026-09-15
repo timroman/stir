@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		03D40CB0E2DAF91B7EC53D69 /* NightRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F88DE4B5C74C8EA9970B28D /* NightRecord.swift */; };
 		0F08CD2BC5F32273F82B96DD /* StirActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 215AA25344A9487DF7470C5A /* StirActivityAttributes.swift */; };
 		105A817182AF421D5EFB0C31 /* singing_bowl.m4a in Resources */ = {isa = PBXBuildFile; fileRef = C2156F32F69842404E2CCE95 /* singing_bowl.m4a */; };
 		1CECD3B6EEF2C04D67BA8C48 /* StirWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D967D9651F113BF861322057 /* StirWidgetsBundle.swift */; };
@@ -23,6 +24,7 @@
 		7826572FE29DADAAC94558B9 /* stir-widgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0A071C0386AD2E344CD2F932 /* stir-widgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7878A5F394A1701332787793 /* gentle_chime.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 03587498C88B0E56E5EDF7FE /* gentle_chime.mp3 */; };
 		8E05EB85F46DDEF023BD88D5 /* StirApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6920E7F867445AF620D0B82C /* StirApp.swift */; };
+		8F924C5E6DFEF5D107C87AE8 /* NightRecordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3488FDD12FB4DF7BEE7D3484 /* NightRecordTests.swift */; };
 		9035EC9A9EF010110E1EC5CF /* StirLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 013A3DB4AA7DE7AC2CB9AB58 /* StirLiveActivity.swift */; };
 		90407EF71A837592C1778647 /* StirActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 215AA25344A9487DF7470C5A /* StirActivityAttributes.swift */; };
 		92F71D0E19F0E648EE0C49A4 /* pink_noise.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 8E440957EC87E3CD97F463E8 /* pink_noise.m4a */; };
@@ -104,6 +106,7 @@
 		2FD5422326A8AC076F0521A3 /* SpaceBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpaceBackground.swift; sourceTree = "<group>"; };
 		31E8E59A5489F47D0C5609FA /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		3319761B25C1F5A15016A2BA /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		3488FDD12FB4DF7BEE7D3484 /* NightRecordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightRecordTests.swift; sourceTree = "<group>"; };
 		3621C1610B2466A837426511 /* AlarmBackstop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmBackstop.swift; sourceTree = "<group>"; };
 		3F4F559E78A903A55E4D4BBB /* MotionMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionMonitor.swift; sourceTree = "<group>"; };
 		4118C77059DF41F2AEAD8B28 /* CustomSoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSoundManager.swift; sourceTree = "<group>"; };
@@ -111,6 +114,7 @@
 		566ACB3AA206E8B218C60EB7 /* SensitivityNoteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensitivityNoteTests.swift; sourceTree = "<group>"; };
 		578132549736F67419B80C91 /* AlarmView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmView.swift; sourceTree = "<group>"; };
 		5F7410581F11A69054872151 /* stir.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = stir.entitlements; sourceTree = "<group>"; };
+		5F88DE4B5C74C8EA9970B28D /* NightRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightRecord.swift; sourceTree = "<group>"; };
 		6909799D538B0A85B5144231 /* stir-uitests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "stir-uitests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6920E7F867445AF620D0B82C /* StirApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StirApp.swift; sourceTree = "<group>"; };
 		700692067C1E213740D598E4 /* ocean_waves.m4a */ = {isa = PBXFileReference; path = ocean_waves.m4a; sourceTree = "<group>"; };
@@ -167,6 +171,7 @@
 			isa = PBXGroup;
 			children = (
 				A672B1512E49B426FF645346 /* CopyTests.swift */,
+				3488FDD12FB4DF7BEE7D3484 /* NightRecordTests.swift */,
 			);
 			path = "stir-tests";
 			sourceTree = "<group>";
@@ -271,6 +276,7 @@
 			children = (
 				04B3E00A25A378A0362F269D /* AlarmSettings.swift */,
 				3319761B25C1F5A15016A2BA /* AppState.swift */,
+				5F88DE4B5C74C8EA9970B28D /* NightRecord.swift */,
 				DC433593AE06BB9802072BFA /* SessionRecord.swift */,
 				215AA25344A9487DF7470C5A /* StirActivityAttributes.swift */,
 			);
@@ -446,6 +452,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF47A3D1BE9E3436F2E15BDD /* CopyTests.swift in Sources */,
+				8F924C5E6DFEF5D107C87AE8 /* NightRecordTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -474,6 +481,7 @@
 				1EC0E4D1F404A3D35A7D3EA4 /* MoonTracker.swift in Sources */,
 				74977CE7F28C965C76C737F3 /* MotionMonitor.swift in Sources */,
 				AD93BA919195EEE1E8C3FAB2 /* NightArcFace.swift in Sources */,
+				03D40CB0E2DAF91B7EC53D69 /* NightRecord.swift in Sources */,
 				970D17B50020B2BFEB7E12C4 /* OnboardingView.swift in Sources */,
 				C1D175BC7E5D8A2EAFBD58B5 /* SessionRecord.swift in Sources */,
 				346816F88DB0726F288F922B /* SettingsView.swift in Sources */,
