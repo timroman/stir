@@ -379,9 +379,9 @@ struct WakeSettingsView: View {
         case "auto":
             let closest = appState.settings.sensitivityLabel
             if appState.settings.autoSensitivity?.phase == .settled {
-                return "for not knowing yet. stir has settled on a setting closest to \(closest)."
+                return "settled, around \(closest). stir asks again only if your nights change."
             }
-            return "for not knowing yet. stir finds the setting over your first nights — closest to \(closest) so far."
+            return "stir sets this from your nights, and asks after the alarm when it needs to know. still settling, around \(closest)."
         case "low":
             return "for a shared bed, pets, or children nearby. it takes a bigger sound to wake you."
         case "high":

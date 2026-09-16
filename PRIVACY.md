@@ -8,8 +8,8 @@
 
 **location.** your approximate location is used only to place the real sun and moon on the night screen. it is computed against on-device astronomy and never leaves your phone. decline it and the app works the same, minus the sky.
 
-**storage.** your settings live locally on your device. nothing leaves your phone.
+**storage.** your settings live locally on your device. stir also keeps a short record of each night on your phone — when it started, when it ended, and what set off the alarm — and uses it to tune sensitivity. nothing leaves your phone.
 
 **contact.** for support or questions, open an issue on [GitHub](https://github.com/timroman/stir).
 
-last updated july 2026.
+last updated september 2026.
