@@ -340,12 +340,7 @@ struct MonitoringView: View {
 
     private func startWhiteNoise() {
         let settings = appState.settings
-        if let customId = settings.whiteNoiseCustomSoundId,
-           let custom = CustomSoundManager.shared.customSounds.first(where: { $0.id == customId }) {
-            whiteNoisePlayer.playCustomSound(custom, volume: settings.whiteNoiseVolume)
-        } else {
-            whiteNoisePlayer.play(sound: settings.whiteNoiseSound, volume: settings.whiteNoiseVolume)
-        }
+        whiteNoisePlayer.play(sound: settings.whiteNoiseSound, volume: settings.whiteNoiseVolume)
     }
 
     private func endSession() {

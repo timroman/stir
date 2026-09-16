@@ -123,10 +123,19 @@ below 30%, stir says so and lets you start anyway. media volume is the one setti
 
 ### sounds
 
-**22. the night sounds are synthesized. two of the wake tones are not.**
-white, pink and brown noise, fan, wind and ocean waves, from `tools/synthesize-sounds.py`. two of the four wake tones, singing bowl and dawn, come from the same script. imported audio works in either slot. rain was generated and cut for not passing the ear test. *(30 july, 2 august)*
+**22. every sound stir ships is generated.**
+the six looping beds — white, pink and brown noise, fan, wind and ocean waves — and ten wake tones, all from `tools/synthesize-sounds.py`. rain was generated and cut for not passing the ear test. *(30 july, 2 august, 16 september)*
 
-gentle chime and soft bells do not. they arrived in the first commit of the app stir grew out of, in december 2025, when the sounds folder held a placeholder note telling its author to add royalty-free sounds from freesound.org, Pixabay or Mixkit. which one they came from, and under what licence, was never recorded, and the files carry no author or title of their own. the folder's own note claimed every sound was synthesized until 16 september 2026, which was never true of these two *(see open 9)*.
+for six weeks that claim was false. gentle chime and soft bells arrived in the first commit of the app stir grew out of, in december 2025, when the sounds folder held a placeholder note telling its author to add royalty-free sounds from freesound.org, Pixabay or Mixkit. which one they came from, and under what licence, was never recorded, and the files carry no author or title of their own — while the folder's own note said every sound there was synthesized. on 16 september 2026 both were replaced by generated tones of the same names, built from the partial ratios a struck bar and a tuned bell actually ring at.
+
+the same day added six more, since the recipe costs nothing to extend: deep bowl, temple bells, wind chimes, music box, marimba and first light — the last of which has no strike at all, a chord that swells out of silence for waking without an onset.
+
+what this buys is not variety. it is that stir ships no audio it cannot rebuild, and no licence anyone has to keep track of.
+
+**75. no importing your own sounds.**
+the import existed so the bundled set could stay small. with sixteen generated sounds it earns less than it costs: a file importer, a sandboxed copy of somebody's audio, its own storage and error paths, extra rows in two pickers, and a failure nobody would diagnose at 3am — an imported file gone missing, leaving the alarm on a system beep. removed 16 september 2026.
+
+nobody is left silent by the removal: every setting already carried a bundled sound alongside the imported one, so dropping the imported fields falls back to the tone that person last chose by name. *(the owner's call; "nobody is using it", 16 september)*
 
 **23. the night sounds loop gaplessly.**
 each file is built so its end joins its start sample for sample, with an equal-power seam, and it plays on the player's own repeat. *(21 august)*
@@ -447,6 +456,7 @@ its state is the step, the highest step allowed, whether it is settling or settl
 - no morning check-in or rating. auto sensitivity's one question is about the alarm, and is asked only when the evidence cannot decide
 - no stored audio, sound levels, motion data or location history
 - no telling whose voice, breathing or movement stir heard
+- no importing your own sounds (decision 75)
 - no accounts, cloud sync, or export other than Health
 - no Apple Watch app
 - no alternative night faces or planets on the sky — raised in august, and parked: a sky that holds two bodies is the design, and a third ring is the start of a chart
@@ -471,9 +481,7 @@ its state is the step, the highest step allowed, whether it is settling or settl
 
 **8. storage.** SwiftData is the platform's path; a file in stir's container is smaller. history is one small record a night, so either holds a lifetime. the choice is about how the record migrates when it gains a field, not about size.
 
-**9. the provenance of two wake tones.** *(the other two corrections here shipped in 1.1: the `NightArcFace.swift` comment and the technical details screen no longer claim nothing tells the time, and the three sound import errors are lowercase.)*
-
-gentle chime and soft bells cannot be shown to be licensed (decision 22). that matters twice over: the repository is MIT, and the binary ships them. the options are to replace both with generated tones, which `tools/synthesize-sounds.py` can build the way it builds singing bowl and dawn, to establish the licence of the files as they are, or to drop them. the first also answers "we need more sounds anyway", and is the only one that makes the folder's claim true rather than narrower. which sounds ship is the owner's ear, so this is a product decision before it is a build.
+**9. resolved.** the `NightArcFace.swift` comment and the technical details screen no longer claim nothing tells the time; the sound import errors are gone with the import itself (decision 75); and gentle chime and soft bells are generated (decision 22), so nothing stir ships is of unknown origin.
 
 **10. resolved: the shortest night that counts is three hours**, from start to "up by" (decision 31). a session started a few minutes before "up by" — a test, a nap — is not a night, and a late bedtime is. check it against real history once there is some.
 

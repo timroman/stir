@@ -53,7 +53,6 @@ struct AlarmView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 let mediaVolume = alarmPlayer.play(
                     sound: appState.settings.selectedSound,
-                    customSoundId: appState.settings.customSoundId,
                     volume: appState.settings.volume
                 )
                 appState.recordAlarmVolume(mediaVolume)
@@ -398,7 +397,7 @@ class AlarmPlayer: ObservableObject {
     /// Starts the alarm and returns the phone's media volume as it started —
     /// the one volume stir can read but cannot set.
     @discardableResult
-    func play(sound: AlarmSound, customSoundId: UUID?, volume: Float) -> Float {
+    func play(sound: AlarmSound, volume: Float) -> Float {
         // The slider maps straight through, exactly like the white noise it has
         // to wake you from. Gentleness is the 60-second ramp from silence
         // below, not a ceiling: the old 5% cap left the alarm ~17x quieter than
@@ -417,18 +416,7 @@ class AlarmPlayer: ObservableObject {
         }
         let mediaVolume = AVAudioSession.sharedInstance().outputVolume
 
-        // Determine which sound URL to use
-        let url: URL?
-        if let customId = customSoundId,
-           let customSound = CustomSoundManager.shared.customSounds.first(where: { $0.id == customId }),
-           let customURL = customSound.fileURL {
-            url = customURL
-            Logger.alarm.notice("🔔 Playing custom sound: \(String(describing: customSound.name), privacy: .public)")
-        } else {
-            url = bundledSoundURL(sound.rawValue)
-        }
-
-        guard let soundURL = url else {
+        guard let soundURL = bundledSoundURL(sound.rawValue) else {
             Logger.alarm.notice("Sound file not found: \(String(describing: sound.rawValue), privacy: .public)")
             playFallbackSound()
             return mediaVolume
