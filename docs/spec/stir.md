@@ -123,8 +123,10 @@ below 30%, stir says so and lets you start anyway. media volume is the one setti
 
 ### sounds
 
-**22. the night sounds are synthesized.**
+**22. the night sounds are synthesized. two of the wake tones are not.**
 white, pink and brown noise, fan, wind and ocean waves, from `tools/synthesize-sounds.py`. two of the four wake tones, singing bowl and dawn, come from the same script. imported audio works in either slot. rain was generated and cut for not passing the ear test. *(30 july, 2 august)*
+
+gentle chime and soft bells do not. they arrived in the first commit of the app stir grew out of, in december 2025, when the sounds folder held a placeholder note telling its author to add royalty-free sounds from freesound.org, Pixabay or Mixkit. which one they came from, and under what licence, was never recorded, and the files carry no author or title of their own. the folder's own note claimed every sound was synthesized until 16 september 2026, which was never true of these two *(see open 9)*.
 
 **23. the night sounds loop gaplessly.**
 each file is built so its end joins its start sample for sample, with an equal-power seam, and it plays on the player's own repeat. *(21 august)*
@@ -469,7 +471,9 @@ its state is the step, the highest step allowed, whether it is settling or settl
 
 **8. storage.** SwiftData is the platform's path; a file in stir's container is smaller. history is one small record a night, so either holds a lifetime. the choice is about how the record migrates when it gains a field, not about size.
 
-**9. three things to correct.** a comment in `NightArcFace.swift` says nothing on the night screen "correlates with the time of day", and the technical details screen says nothing on it "tells the time". the sun's position is local solar time, so the comment is wrong and the screen overstates it; principle 1 is the accurate version. separately, gentle chime and soft bells predate the synthesis script, and their source is not recorded in the repository. and the three error messages shown when a sound import fails, in `CustomSoundManager.swift`, are still capitalized.
+**9. the provenance of two wake tones.** *(the other two corrections here shipped in 1.1: the `NightArcFace.swift` comment and the technical details screen no longer claim nothing tells the time, and the three sound import errors are lowercase.)*
+
+gentle chime and soft bells cannot be shown to be licensed (decision 22). that matters twice over: the repository is MIT, and the binary ships them. the options are to replace both with generated tones, which `tools/synthesize-sounds.py` can build the way it builds singing bowl and dawn, to establish the licence of the files as they are, or to drop them. the first also answers "we need more sounds anyway", and is the only one that makes the folder's claim true rather than narrower. which sounds ship is the owner's ear, so this is a product decision before it is a build.
 
 **10. resolved: the shortest night that counts is three hours**, from start to "up by" (decision 31). a session started a few minutes before "up by" — a test, a nap — is not a night, and a late bedtime is. check it against real history once there is some.
 
