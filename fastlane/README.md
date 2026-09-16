@@ -31,6 +31,14 @@ Regenerate the Xcode project and build a signed release archive
 
 Upload a new build to TestFlight
 
+### ios notes
+
+```sh
+[bundle exec] fastlane ios notes
+```
+
+Set the what-to-test notes on the latest TestFlight build
+
 ### ios release
 
 ```sh
