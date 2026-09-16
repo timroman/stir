@@ -16,7 +16,7 @@ every constant and rule in phases 2 to 4 is in stir.md decisions 60–74 and in 
 
 ## how the work runs
 
-- one branch and one pull request per phase, off `main`. nothing goes to `main` directly.
+- one branch per phase, and one pull request for the release, off `main`. nothing goes to `main` directly. a pull request per phase was the earlier rule; with one owner and one feature it bought nothing that the per-phase commits do not already give, and cost a merge order to keep straight.
 - tests are the gate. a phase merges with its unit and UI tests green on an iPhone 15 simulator, and after any device check the phase names.
 - build once, then test without building: `xcodebuild build-for-testing`, then `xcodebuild test-without-building`, against a booted simulator (`xcrun simctl bootstatus <udid> -b`). a one-step `xcodebuild test` intermittently launches the unit test host before Xcode's test daemon is ready — the host logs "test daemon not ready", and the run fails as "the test runner hung before establishing connection" with no test having run. waiting for boot alone did not prevent it; the split did, on every run since.
 - one decision per commit: `scope: decision — reason`.
