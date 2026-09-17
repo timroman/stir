@@ -175,6 +175,26 @@ final class NightRecordTests: XCTestCase {
         XCTAssertEqual(record.endedLocalMinute, 6 * 60 + 55)
     }
 
+    // MARK: - the store
+
+    /// Builds a store the way StirApp does: from a container nothing else keeps.
+    private func storeWithoutKeepingItsContainer() throws -> SwiftDataNightStore {
+        SwiftDataNightStore(container: try ModelContainer(for: NightRecord.self,
+                                                          configurations: ModelConfiguration(isStoredInMemoryOnly: true)))
+    }
+
+    // Build 7 crashed on every clean night, the moment the alarm was stopped: the
+    // store kept only the container's context, a context does not keep its
+    // container alive, and StirApp held the container nowhere else. Every other
+    // test here keeps its container in a property, which is why none caught it.
+    func testTheStoreKeepsItsOwnContainerAlive() throws {
+        let store = try storeWithoutKeepingItsContainer()
+        store.add(NightRecord(startedAt: upBy.addingTimeInterval(-8 * 60 * 60), endedAt: upBy, upBy: upBy,
+                              windowStart: windowStart, listeningStartedAt: windowStart, alarmFiredAt: upBy,
+                              triggeredBy: .upBy, ending: .alarmDismissed, sensitivity: 0.5, alarmVolume: 0.7))
+        XCTAssertEqual(store.all().count, 1)
+    }
+
     // MARK: - the line in decision 32, enforced by the build
 
     func testTheRecordHoldsTheSpecifiedFieldsAndNoOthers() {

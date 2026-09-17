@@ -96,10 +96,15 @@ protocol NightStore: AnyObject {
 
 @MainActor
 final class SwiftDataNightStore: NightStore {
-    private let context: ModelContext
+    // Held for as long as the store lives. A ModelContext does not keep its
+    // container alive, and StirApp keeps no other reference: holding only the
+    // context let the container go right after launch, and the first save —
+    // stopping the alarm — trapped on a nil container. That was build 7.
+    private let container: ModelContainer
+    private var context: ModelContext { container.mainContext }
 
     init(container: ModelContainer) {
-        context = container.mainContext
+        self.container = container
     }
 
     func add(_ record: NightRecord) {

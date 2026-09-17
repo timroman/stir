@@ -29,7 +29,7 @@ settings:
   base:
     DEVELOPMENT_TEAM: 86CCQ2AT2P
     MARKETING_VERSION: "1.1.0"
-    CURRENT_PROJECT_VERSION: "7"
+    CURRENT_PROJECT_VERSION: "8"
 
 targets:
   stir:
