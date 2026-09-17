@@ -3,8 +3,24 @@ import SwiftUI
 // How the app actually works, for the curious. Reachable from settings and
 // from onboarding.
 struct TechnicalDetailsView: View {
+    @EnvironmentObject var appState: AppState
+
     var body: some View {
         List {
+            // Where auto sensitivity is, so a morning's decision can be checked
+            // against the log (stir.md decision 72)
+            if appState.settings.sensitivityMode == .auto, let auto = appState.settings.autoSensitivity {
+                Section {
+                    LabeledContent("setting", value: "\(AutoSensitivity.ladder[auto.step]) · closest to \(appState.settings.sensitivityLabel)")
+                    LabeledContent("state", value: auto.phase.rawValue)
+                    LabeledContent("nights counted", value: "\(appState.autoSensitivityNightsCounted)")
+                } header: {
+                    Text("auto sensitivity")
+                } footer: {
+                    Text("auto moves sensitivity one step at a time, from what your nights show. it only becomes less sensitive when you say so.")
+                }
+            }
+
             // Only appears once a night has actually run; the answer to "what
             // happened last night?" without needing a Mac attached
             if let last = SessionRecord.last {
@@ -33,7 +49,7 @@ struct TechnicalDetailsView: View {
             }
 
             Section {
-                Text("the night screen stays black all night — nothing on it tells the time, glows brighter, or counts anything down. the only things on screen are the real sun and moon on their rings. if you wake and glance at it, there is nothing to read unless you want to read the sky itself.")
+                Text("the night screen stays black all night — no clock, no countdown, nothing that glows brighter as morning comes. the only things on screen are the real sun and moon on their rings. anyone who reads the sun can tell roughly what time it is, but never to the minute, and only if you go looking.")
             } header: {
                 Text("the night screen")
             }
@@ -64,5 +80,6 @@ struct TechnicalDetailsView: View {
 #Preview {
     NavigationStack {
         TechnicalDetailsView()
+            .environmentObject(AppState())
     }
 }

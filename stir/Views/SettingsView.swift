@@ -201,11 +201,7 @@ struct NightSettingsView: View {
 
 struct SoundsSettingsView: View {
     @EnvironmentObject var appState: AppState
-    @StateObject private var soundManager = CustomSoundManager.shared
     @State private var previewPlayer: AVAudioPlayer?
-    @State private var showingFilePicker = false
-    @State private var importError: String?
-    @State private var showingImportError = false
 
     var body: some View {
         List {
@@ -217,18 +213,9 @@ struct SoundsSettingsView: View {
                 }
                 ForEach(WhiteNoiseSound.allCases) { sound in
                     selectableRow(sound.displayName,
-                                  isSelected: !appState.settings.isUsingCustomWhiteNoise && appState.settings.whiteNoiseSound == sound,
-                                  onSelect: {
-                                      appState.settings.whiteNoiseSound = sound
-                                      appState.settings.whiteNoiseCustomSoundId = nil
-                                  },
+                                  isSelected: appState.settings.whiteNoiseSound == sound,
+                                  onSelect: { appState.settings.whiteNoiseSound = sound },
                                   onPreview: { previewBundled(sound.rawValue, volume: appState.settings.whiteNoiseVolume) })
-                }
-                ForEach(soundManager.customSounds) { sound in
-                    selectableRow(sound.name,
-                                  isSelected: appState.settings.whiteNoiseCustomSoundId == sound.id,
-                                  onSelect: { appState.settings.whiteNoiseCustomSoundId = sound.id },
-                                  onPreview: { previewCustom(sound, volume: appState.settings.whiteNoiseVolume) })
                 }
             } header: {
                 Text("sleep sound")
@@ -242,64 +229,19 @@ struct SoundsSettingsView: View {
                 }
                 ForEach(AlarmSound.allCases) { sound in
                     selectableRow(sound.displayName,
-                                  isSelected: !appState.settings.isUsingCustomSound && appState.settings.selectedSound == sound,
-                                  onSelect: {
-                                      appState.settings.selectedSound = sound
-                                      appState.settings.customSoundId = nil
-                                  },
+                                  isSelected: appState.settings.selectedSound == sound,
+                                  onSelect: { appState.settings.selectedSound = sound },
                                   onPreview: { previewBundled(sound.rawValue, volume: appState.settings.volume) })
-                }
-                ForEach(soundManager.customSounds) { sound in
-                    selectableRow(sound.name,
-                                  isSelected: appState.settings.customSoundId == sound.id,
-                                  onSelect: { appState.settings.customSoundId = sound.id },
-                                  onPreview: { previewCustom(sound, volume: appState.settings.volume) })
                 }
             } header: {
                 Text("alarm sound")
             } footer: {
                 Text("preview plays at the volume the alarm will use, through your phone's current volume — if it sounds quiet now, it will be quiet then.")
             }
-
-            Section {
-                Button(action: { showingFilePicker = true }) {
-                    HStack {
-                        Image(systemName: "plus.circle.fill")
-                        Text("import your own")
-                    }
-                }
-            } footer: {
-                Text("imported sounds appear in both lists")
-            }
         }
         .navigationTitle("sounds")
         .navigationBarTitleDisplayMode(.inline)
         .onDisappear { stopPreview() }
-        .fileImporter(
-            isPresented: $showingFilePicker,
-            allowedContentTypes: CustomSoundManager.supportedTypes,
-            allowsMultipleSelection: false
-        ) { result in
-            switch result {
-            case .success(let urls):
-                if let url = urls.first {
-                    do {
-                        _ = try soundManager.importSound(from: url)
-                    } catch {
-                        importError = error.localizedDescription
-                        showingImportError = true
-                    }
-                }
-            case .failure(let error):
-                importError = error.localizedDescription
-                showingImportError = true
-            }
-        }
-        .alert("import error", isPresented: $showingImportError) {
-            Button("ok") { }
-        } message: {
-            Text(importError ?? "unknown error")
-        }
     }
 
     private func selectableRow(_ name: String, isSelected: Bool, onSelect: @escaping () -> Void, onPreview: @escaping () -> Void) -> some View {
@@ -328,12 +270,6 @@ struct SoundsSettingsView: View {
     private func previewBundled(_ name: String, volume: Float) {
         stopPreview()
         guard let url = bundledSoundURL(name) else { return }
-        playPreview(url: url, volume: volume)
-    }
-
-    private func previewCustom(_ sound: CustomSound, volume: Float) {
-        stopPreview()
-        guard let url = sound.fileURL else { return }
         playPreview(url: url, volume: volume)
     }
 
@@ -368,7 +304,27 @@ struct WakeSettingsView: View {
     @EnvironmentObject var appState: AppState
 
     private var sensitivity: String {
-        appState.settings.sensitivityLabel
+        appState.settings.sensitivityMode == .auto ? "auto" : appState.settings.sensitivityLabel
+    }
+
+    // Sorted by how much of the room's sound comes and goes, not how loud it
+    // is: steady sound calibrates into the baseline, and what sets stir off by
+    // mistake is sound that arrives and leaves (stir.md decision 59)
+    private var sensitivityNote: String {
+        switch sensitivity {
+        case "auto":
+            let closest = appState.settings.sensitivityLabel
+            if appState.settings.autoSensitivity?.phase == .settled {
+                return "settled, around \(closest). stir asks again only if your nights change."
+            }
+            return "stir sets this from your nights, and asks after the alarm when it needs to know. still settling, around \(closest)."
+        case "low":
+            return "for a shared bed, pets, or children nearby. it takes a bigger sound to wake you."
+        case "high":
+            return "for sleeping alone in a quiet room, or one with steady sound like a fan. it hears you roll over or move the covers."
+        default:
+            return "for a room with some sound that comes and goes, like occasional traffic or a partner who sleeps still."
+        }
     }
 
     var body: some View {
@@ -376,25 +332,29 @@ struct WakeSettingsView: View {
             Section {
                 Picker("sensitivity", selection: Binding(
                     get: { sensitivity },
-                    set: { label in
-                        switch label {
-                        case "low": appState.settings.sensitivityValue = 0.15
-                        case "high": appState.settings.sensitivityValue = 0.85
-                        default: appState.settings.sensitivityValue = 0.5
-                        }
+                    set: { choice in
+                        appState.settings.chooseSensitivity(choice, now: Date())
                     }
                 )) {
+                    Text("auto").tag("auto")
                     Text("low").tag("low")
                     Text("medium").tag("medium")
                     Text("high").tag("high")
                 }
                 .pickerStyle(.segmented)
-
-                Toggle("motion detection", isOn: $appState.settings.motionDetectionEnabled)
+                .accessibilityIdentifier("wake.sensitivity")
             } header: {
                 Text("listening")
             } footer: {
-                Text("higher sensitivity wakes you on smaller sounds. motion detection also wakes you if the phone is picked up or bumped.")
+                Text(sensitivityNote)
+                    .accessibilityIdentifier("wake.sensitivityNote")
+            }
+
+            Section {
+                Toggle("motion detection", isOn: $appState.settings.motionDetectionEnabled)
+            } footer: {
+                // stir hears the room, not a person (stir.md decisions 57, 59)
+                Text("motion detection wakes you when the phone moves, whoever moves it. a phone on the nightstand on your side of the bed avoids most of that.")
             }
 
             Section {

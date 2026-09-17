@@ -37,20 +37,13 @@ class WhiteNoisePlayer: ObservableObject {
         playURL(url, name: sound.displayName, volume: volume, seamless: true)
     }
 
-    func playCustomSound(_ customSound: CustomSound, volume: Float) {
-        guard let url = customSound.fileURL else {
-            Logger.audio.notice("Custom sound file not found: \(String(describing: customSound.name), privacy: .public)")
-            return
-        }
-        playURL(url, name: customSound.name, volume: volume, seamless: false)
-    }
-
     // `seamless` means the file is known to butt-join end-to-start. The bundled
     // beds are built that way by tools/synthesize-sounds.py, so AVAudioPlayer's
     // own repeat is gapless and exact — and crossfading them would blend the tail
     // against a head that already contains that same tail, correlated content
     // summing to a bump. It also retires a 100 ms poll that otherwise runs all
-    // night. Imported sounds carry no such guarantee, so they keep the crossfade.
+    // night. The crossfade path is kept for any file that cannot make that
+    // promise; every sound stir ships can.
     private func playURL(_ url: URL, name: String, volume: Float, seamless: Bool) {
         stop()
 

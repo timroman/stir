@@ -1,0 +1,15 @@
+two things this build: sensitivity can set itself, and the sounds are all ours now.
+
+auto sensitivity. settings → wake has a new "auto" option. it starts from whatever you were already using and moves one step at a time, based on whether stir is hearing you or hearing the room. your setting does not change by itself — this update leaves you exactly where you were, and only auto adjusts anything.
+
+what to try: turn on auto and sleep with it for a couple of weeks. settings tells you whether it is still settling or has settled, and roughly where it landed.
+
+the one question: after an alarm, stir may ask once whether that was too sensitive. yes makes it a step less sensitive and stops it climbing back that high. no changes nothing, and it will not ask again unless your room changes.
+
+new wake sounds. eleven of them now — gentle chime and soft bells are rebuilt, and deep bowl, temple bells, wind chimes, music box, marimba and first light are new. first light has no strike at all: a chord that swells out of silence. every sound in the app is generated from a formula in the repository, so there is nothing licensed and nothing to maintain.
+
+importing your own sound is gone. with sixteen generated sounds it was not worth the file picker, the stored copy, or an imported file going missing at 3am. if you had one selected, you are back on the named tone you chose before it.
+
+what to tell me: did auto wake you gently, or did the room wake you? did it leave you to your "up by" time more often than before? if you got the question, did the answer match what you would have picked by hand? and does anything in the new set beat the singing bowl?
+
+nothing about this leaves your phone. technical details shows the step, the state, and how many nights it has counted.

@@ -14,7 +14,6 @@ struct AlarmSettings: Codable {
     var sensitivityValue: Float  // 0.0 (less sensitive) to 1.0 (more sensitive)
     var volume: Float            // 0.0 to 1.0
     var selectedSound: AlarmSound
-    var customSoundId: UUID?     // If set, use custom sound instead of built-in
     var tagline: String          // Customizable wake message
     var hapticEnabled: Bool
     var hapticType: HapticType
@@ -24,17 +23,13 @@ struct AlarmSettings: Codable {
     var whiteNoiseEnabled: Bool
     var whiteNoiseSound: WhiteNoiseSound
     var whiteNoiseVolume: Float
-    var whiteNoiseCustomSoundId: UUID?  // Points into the shared custom sound library
     var fadeOutMinutes: Int      // How long the fade-out takes (5-60 minutes)
     var quietGapMinutes: Int     // Silence between fade complete and listening start (0-120)
 
-    var isUsingCustomSound: Bool {
-        customSoundId != nil
-    }
-
-    var isUsingCustomWhiteNoise: Bool {
-        whiteNoiseCustomSoundId != nil
-    }
+    // Auto finds sensitivityValue from the nights themselves (stir.md part nine);
+    // manual is low, medium or high as chosen
+    var sensitivityMode: SensitivityMode
+    var autoSensitivity: AutoSensitivityState?
 
     var fadeOutSeconds: TimeInterval {
         TimeInterval(fadeOutMinutes * 60)
@@ -56,11 +51,31 @@ struct AlarmSettings: Codable {
         return 5.0 - (sensitivityValue * 3.0)
     }
 
+    // The nearest of the three named settings. Auto's in-between steps land
+    // exactly halfway, and a tie reads as medium.
     var sensitivityLabel: String {
-        switch sensitivityValue {
-        case 0.0..<0.33: return "low"
-        case 0.33..<0.66: return "medium"
-        default: return "high"
+        let named: [(label: String, value: Float)] = [("low", 0.15), ("medium", 0.5), ("high", 0.85)]
+        let distances = named.map { abs(Double($0.value) - Double(sensitivityValue)) }
+        let nearest = distances.min() ?? 0
+        let tied = named.indices.filter { distances[$0] - nearest < 0.0001 }
+        return tied.contains(1) ? "medium" : named[tied.first ?? 1].label
+    }
+
+    /// The sensitivity picker: "auto", "low", "medium" or "high" (decisions 60, 69).
+    mutating func chooseSensitivity(_ choice: String, now: Date) {
+        switch choice {
+        case "auto":
+            guard sensitivityMode != .auto else { return }
+            let state = AutoSensitivity.starting(at: sensitivityValue, now: now)
+            sensitivityMode = .auto
+            autoSensitivity = state
+            sensitivityValue = AutoSensitivity.ladder[state.step]
+        case "low", "medium", "high":
+            sensitivityMode = .manual
+            autoSensitivity = nil
+            sensitivityValue = choice == "low" ? 0.15 : choice == "high" ? 0.85 : 0.5
+        default:
+            break
         }
     }
 
@@ -76,7 +91,6 @@ struct AlarmSettings: Codable {
             sensitivityValue: 0.5,  // Medium by default
             volume: 0.7,
             selectedSound: .gentleChime,
-            customSoundId: nil,
             tagline: "good morning",
             hapticEnabled: true,
             hapticType: .heartbeat,
@@ -85,9 +99,12 @@ struct AlarmSettings: Codable {
             whiteNoiseEnabled: true,
             whiteNoiseSound: .oceanWaves,
             whiteNoiseVolume: 0.7,
-            whiteNoiseCustomSoundId: nil,
             fadeOutMinutes: 10,
-            quietGapMinutes: 30
+            quietGapMinutes: 30,
+            // A new install starts on auto; an existing one keeps its setting,
+            // because an update is not somebody choosing (decision 60)
+            sensitivityMode: .auto,
+            autoSensitivity: AutoSensitivity.starting(at: 0.5, now: now)
         )
     }
 
@@ -95,26 +112,27 @@ struct AlarmSettings: Codable {
 
     private enum CodingKeys: String, CodingKey {
         case wakeUpBy, wakeWindowMinutes, alarmEnabled
-        case sensitivityValue, volume, selectedSound, customSoundId, tagline
+        case sensitivityValue, volume, selectedSound, tagline
         case hapticEnabled, hapticType, hapticIntensity, motionDetectionEnabled
-        case whiteNoiseEnabled, whiteNoiseSound, whiteNoiseVolume, whiteNoiseCustomSoundId
+        case whiteNoiseEnabled, whiteNoiseSound, whiteNoiseVolume
         case fadeOutMinutes, quietGapMinutes
+        case sensitivityMode, autoSensitivity
         // Legacy keys (pre-merge stir), read-only
         case wakeWindowStart, wakeWindowEnd
     }
 
     init(wakeUpBy: Date, wakeWindowMinutes: Int, alarmEnabled: Bool, sensitivityValue: Float,
-         volume: Float, selectedSound: AlarmSound, customSoundId: UUID?, tagline: String,
+         volume: Float, selectedSound: AlarmSound, tagline: String,
          hapticEnabled: Bool, hapticType: HapticType, hapticIntensity: Float,
          motionDetectionEnabled: Bool, whiteNoiseEnabled: Bool, whiteNoiseSound: WhiteNoiseSound,
-         whiteNoiseVolume: Float, whiteNoiseCustomSoundId: UUID?, fadeOutMinutes: Int, quietGapMinutes: Int) {
+         whiteNoiseVolume: Float, fadeOutMinutes: Int, quietGapMinutes: Int,
+         sensitivityMode: SensitivityMode = .manual, autoSensitivity: AutoSensitivityState? = nil) {
         self.wakeUpBy = wakeUpBy
         self.wakeWindowMinutes = wakeWindowMinutes
         self.alarmEnabled = alarmEnabled
         self.sensitivityValue = sensitivityValue
         self.volume = volume
         self.selectedSound = selectedSound
-        self.customSoundId = customSoundId
         self.tagline = tagline
         self.hapticEnabled = hapticEnabled
         self.hapticType = hapticType
@@ -123,9 +141,10 @@ struct AlarmSettings: Codable {
         self.whiteNoiseEnabled = whiteNoiseEnabled
         self.whiteNoiseSound = whiteNoiseSound
         self.whiteNoiseVolume = whiteNoiseVolume
-        self.whiteNoiseCustomSoundId = whiteNoiseCustomSoundId
         self.fadeOutMinutes = fadeOutMinutes
         self.quietGapMinutes = quietGapMinutes
+        self.sensitivityMode = sensitivityMode
+        self.autoSensitivity = autoSensitivity
     }
 
     init(from decoder: Decoder) throws {
@@ -151,7 +170,6 @@ struct AlarmSettings: Codable {
         sensitivityValue = try container.decodeIfPresent(Float.self, forKey: .sensitivityValue) ?? defaults.sensitivityValue
         volume = try container.decodeIfPresent(Float.self, forKey: .volume) ?? defaults.volume
         selectedSound = try container.decodeIfPresent(AlarmSound.self, forKey: .selectedSound) ?? defaults.selectedSound
-        customSoundId = try container.decodeIfPresent(UUID.self, forKey: .customSoundId)
         tagline = try container.decodeIfPresent(String.self, forKey: .tagline) ?? defaults.tagline
         hapticEnabled = try container.decodeIfPresent(Bool.self, forKey: .hapticEnabled) ?? defaults.hapticEnabled
         hapticType = try container.decodeIfPresent(HapticType.self, forKey: .hapticType) ?? defaults.hapticType
@@ -160,9 +178,15 @@ struct AlarmSettings: Codable {
         whiteNoiseEnabled = try container.decodeIfPresent(Bool.self, forKey: .whiteNoiseEnabled) ?? defaults.whiteNoiseEnabled
         whiteNoiseSound = try container.decodeIfPresent(WhiteNoiseSound.self, forKey: .whiteNoiseSound) ?? defaults.whiteNoiseSound
         whiteNoiseVolume = try container.decodeIfPresent(Float.self, forKey: .whiteNoiseVolume) ?? defaults.whiteNoiseVolume
-        whiteNoiseCustomSoundId = try container.decodeIfPresent(UUID.self, forKey: .whiteNoiseCustomSoundId)
         fadeOutMinutes = try container.decodeIfPresent(Int.self, forKey: .fadeOutMinutes) ?? defaults.fadeOutMinutes
         quietGapMinutes = try container.decodeIfPresent(Int.self, forKey: .quietGapMinutes) ?? defaults.quietGapMinutes
+
+        // Settings saved before auto existed stay as they were chosen: manual
+        sensitivityMode = try container.decodeIfPresent(SensitivityMode.self, forKey: .sensitivityMode) ?? .manual
+        autoSensitivity = try container.decodeIfPresent(AutoSensitivityState.self, forKey: .autoSensitivity)
+        if sensitivityMode == .auto && autoSensitivity == nil {
+            autoSensitivity = AutoSensitivity.starting(at: sensitivityValue, now: Date())
+        }
     }
 
     func encode(to encoder: Encoder) throws {
@@ -173,7 +197,6 @@ struct AlarmSettings: Codable {
         try container.encode(sensitivityValue, forKey: .sensitivityValue)
         try container.encode(volume, forKey: .volume)
         try container.encode(selectedSound, forKey: .selectedSound)
-        try container.encodeIfPresent(customSoundId, forKey: .customSoundId)
         try container.encode(tagline, forKey: .tagline)
         try container.encode(hapticEnabled, forKey: .hapticEnabled)
         try container.encode(hapticType, forKey: .hapticType)
@@ -182,18 +205,32 @@ struct AlarmSettings: Codable {
         try container.encode(whiteNoiseEnabled, forKey: .whiteNoiseEnabled)
         try container.encode(whiteNoiseSound, forKey: .whiteNoiseSound)
         try container.encode(whiteNoiseVolume, forKey: .whiteNoiseVolume)
-        try container.encodeIfPresent(whiteNoiseCustomSoundId, forKey: .whiteNoiseCustomSoundId)
         try container.encode(fadeOutMinutes, forKey: .fadeOutMinutes)
         try container.encode(quietGapMinutes, forKey: .quietGapMinutes)
+        try container.encode(sensitivityMode, forKey: .sensitivityMode)
+        try container.encodeIfPresent(autoSensitivity, forKey: .autoSensitivity)
     }
 }
 
+enum SensitivityMode: String, Codable {
+    case auto
+    case manual
+}
+
+// Every one of these is generated by tools/synthesize-sounds.py, so stir ships
+// no audio it cannot rebuild and no licence to keep track of (stir.md decision 22)
 enum AlarmSound: String, Codable, CaseIterable, Identifiable {
     // Gentle Tones
     case gentleChime = "gentle_chime"
     case softBells = "soft_bells"
     case singingBowl = "singing_bowl"
+    case deepBowl = "deep_bowl"
+    case templeBells = "temple_bells"
+    case windChimes = "wind_chimes"
+    case musicBox = "music_box"
+    case marimba = "marimba"
     case dawn = "dawn"
+    case firstLight = "first_light"
 
     // Nature Sounds
     case oceanWaves = "ocean_waves"
@@ -205,14 +242,21 @@ enum AlarmSound: String, Codable, CaseIterable, Identifiable {
         case .gentleChime: return "gentle chime"
         case .softBells: return "soft bells"
         case .singingBowl: return "singing bowl"
+        case .deepBowl: return "deep bowl"
+        case .templeBells: return "temple bells"
+        case .windChimes: return "wind chimes"
+        case .musicBox: return "music box"
+        case .marimba: return "marimba"
         case .dawn: return "dawn"
+        case .firstLight: return "first light"
         case .oceanWaves: return "ocean waves"
         }
     }
 
     var category: SoundCategory {
         switch self {
-        case .gentleChime, .softBells, .singingBowl, .dawn:
+        case .gentleChime, .softBells, .singingBowl, .deepBowl, .templeBells,
+             .windChimes, .musicBox, .marimba, .dawn, .firstLight:
             return .gentle
         case .oceanWaves:
             return .nature

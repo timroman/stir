@@ -1,6 +1,7 @@
 # Combined App Spec — white noise + smart wake
 
 **Status:** Approved 2026-07-28. Ships as a yolo-alarm update; reverse-alarm is retired (App Store sunset is Tim's identity-required task).
+**Superseded by:** [`spec/stir.md`](spec/stir.md), 2026-09-15. Kept as the record of the white-noise merge.
 **Base:** `yolo-alarm` repo. `reverse-alarm` is a fork of it; we port its one unique service (`WhiteNoisePlayer` + fade logic) into yolo-alarm and retire the reverse-alarm codebase.
 
 ## The product
