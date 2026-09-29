@@ -23,7 +23,7 @@ each of these was found on a real phone, and each lived in glue no test reached:
 
 - one branch per phase, and one pull request for the release, off `main`. nothing goes to `main` directly.
 - tests are the gate, on an iPhone simulator: `xcodebuild build-for-testing`, then `xcodebuild test-without-building`, against a booted simulator (`xcrun simctl bootstatus <udid> -b`). shut the simulator down afterwards — a UI test can leave the app running, and the alarm loops for ever.
-- **an unsolved flake.** the unit test host intermittently hangs before a single test runs, logging "test daemon not ready" while the run fails as "the test runner hung before establishing connection". it has never coincided with a real test failure. rerun; if it repeats, boot a different simulator. do not read a hang as a failing build.
+- **two unsolved flakes, both in the test runner rather than in stir.** the unit test host intermittently hangs before a single test runs, logging "test daemon not ready" while the run fails as "the test runner hung before establishing connection". separately, a UI test can die mid-test with "Restarting after unexpected exit, crash, or test timeout" and no crash report for the app and no failed assertion. neither has ever coincided with a real failure; both pass on a rerun. rerun once, and if it repeats, boot a different simulator. the tell for a genuine failure is an assertion line — `<file>.swift:<line>: error:` — or a crash report naming stir's own frames.
 - one decision per commit: `scope: decision — reason`.
 - the owner merges, and the owner submits to App Review.
 - a phase that finds the spec wrong stops and says so. the spec changes before the code does.

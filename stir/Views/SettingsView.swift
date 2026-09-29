@@ -70,35 +70,10 @@ struct SettingsView: View {
     }
 }
 
-// MARK: - Night: toggles + timeline presets
-
-private enum TimelinePreset: String, CaseIterable, Identifiable {
-    case gentle, quick, custom
-    var id: String { rawValue }
-
-    // (fade, gap, window)
-    static let gentleValues = (10, 30, 30)
-    static let quickValues = (5, 5, 15)
-
-    static func match(fade: Int, gap: Int, window: Int) -> TimelinePreset {
-        if (fade, gap, window) == gentleValues { return .gentle }
-        if (fade, gap, window) == quickValues { return .quick }
-        return .custom
-    }
-}
+// MARK: - Night: what plays, and how early stir may wake you
 
 struct NightSettingsView: View {
     @EnvironmentObject var appState: AppState
-    // "custom" changes no values, so it must be sticky state — a purely
-    // derived selection would snap back to whichever preset the values match
-    @State private var forcedCustom = false
-
-    private var preset: TimelinePreset {
-        if forcedCustom { return .custom }
-        return TimelinePreset.match(fade: appState.settings.fadeOutMinutes,
-                                    gap: appState.settings.quietGapMinutes,
-                                    window: appState.settings.wakeWindowMinutes)
-    }
 
     var body: some View {
         List {
@@ -124,37 +99,8 @@ struct NightSettingsView: View {
             }
 
             Section {
-                Picker("timeline", selection: Binding(
-                    get: { preset },
-                    set: { newValue in
-                        let values: (Int, Int, Int)
-                        switch newValue {
-                        case .gentle: values = TimelinePreset.gentleValues
-                        case .quick: values = TimelinePreset.quickValues
-                        case .custom:
-                            forcedCustom = true
-                            return   // custom keeps current values; steppers appear below
-                        }
-                        forcedCustom = false
-                        appState.settings.fadeOutMinutes = values.0
-                        appState.settings.quietGapMinutes = values.1
-                        appState.settings.wakeWindowMinutes = values.2
-                    }
-                )) {
-                    ForEach(TimelinePreset.allCases) { p in
-                        Text(p.rawValue).tag(p)
-                    }
-                }
-                .pickerStyle(.segmented)
-
-                if preset == .custom {
-                    timelineStepper("fade-out", value: $appState.settings.fadeOutMinutes, range: 5...60,
-                                    caption: "how long the white noise takes to fade to silence")
-                    timelineStepper("quiet gap", value: $appState.settings.quietGapMinutes, range: 0...120,
-                                    caption: "silence between the fade ending and listening starting — keeps the room quiet so stir can learn its baseline")
-                    timelineStepper("wake window", value: $appState.settings.wakeWindowMinutes, range: 10...90,
-                                    caption: "how long stir listens for you stirring before your \"up by\" time")
-                }
+                timelineStepper("wake window", value: $appState.settings.wakeWindowMinutes, range: 10...90,
+                                caption: "how early stir may wake you — it listens for this long before your \"up by\" time, and nothing can wake you before it")
             } header: {
                 Text("night timeline")
             } footer: {

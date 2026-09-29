@@ -77,8 +77,10 @@ start ────────────────────────�
                                                       and motion
 ```
 
-**9. one nightly input: the time you need to be up by.**
-everything else is set once in settings and counted back from it: a wake window of 10–90 minutes, a quiet gap of 0–120, a fade of 5–60, all in 5-minute steps. two presets cover most people: gentle (fade 10, gap 30, window 30) and quick (5, 5, 15). *(28 july, 2 august)*
+**9. one nightly input: the time you need to be up by, and one setting behind it: the wake window.**
+everything is counted back from "up by". the wake window — 10 to 90 minutes, in 5-minute steps — is how early stir may wake you, and the furthest back a false trigger can reach. *(28 july, 2 august)*
+
+amended 29 september: the fade and the quiet gap are fixed at 10 and 30 minutes, and the two presets and the custom mode are gone. three numbers, a segmented control and a hidden mode asked people to design a night; the wake window is the only one of them anybody can answer, and the other two are behaviour. the fade length is a comfort detail nobody can choose between meaningfully. the gap is there so the white noise ending is not itself what stirs you — it separates "the sound stops" from "stir starts listening", which matters because a stir at the top of the window would be caught and would wake you immediately. anyone who had set custom values keeps their wake window and moves to the standard fade and gap, which changes when their white noise ends; written down here because it changes how somebody is woken (principle 7). *(the owner: "it just feels convoluted to me, especially the custom option")*
 
 **10. white noise always plays when it is enabled.**
 including on a night started inside the fade or the gap. it fades in over 3 seconds after a half-second pause for the audio route to settle, and a late start gets at least 2 minutes of fade. calibration waits until the white noise has stopped, so the room is never measured over stir's own sound. *(2 august)*

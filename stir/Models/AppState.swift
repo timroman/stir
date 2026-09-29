@@ -89,8 +89,6 @@ class AppState: ObservableObject {
             return Int(args[index + 1])
         }
         if let minutes = intArg("-windowMinutes") { settings.wakeWindowMinutes = minutes }
-        if let minutes = intArg("-quietGapMinutes") { settings.quietGapMinutes = minutes }
-        if let minutes = intArg("-fadeMinutes") { settings.fadeOutMinutes = minutes }
         if let index = args.firstIndex(of: "-screen"), index + 1 < args.count {
             switch args[index + 1] {
             case "setup": currentScreen = .setup

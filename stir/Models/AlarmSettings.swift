@@ -23,15 +23,20 @@ struct AlarmSettings: Codable {
     var whiteNoiseEnabled: Bool
     var whiteNoiseSound: WhiteNoiseSound
     var whiteNoiseVolume: Float
-    var fadeOutMinutes: Int      // How long the fade-out takes (5-60 minutes)
-    var quietGapMinutes: Int     // Silence between fade complete and listening start (0-120)
+    // Fixed, not chosen. The fade length is a comfort detail nobody can pick
+    // between meaningfully, and the gap exists so that the white noise ending
+    // is not itself the thing that stirs you — separating "the sound stops"
+    // from "stir starts listening". Both are behaviour, not settings
+    // (stir.md decision 9, amended 29 september).
+    static let fadeOutMinutes = 10
+    static let quietGapMinutes = 30
 
     var fadeOutSeconds: TimeInterval {
-        TimeInterval(fadeOutMinutes * 60)
+        TimeInterval(Self.fadeOutMinutes * 60)
     }
 
     var quietGapSeconds: TimeInterval {
-        TimeInterval(quietGapMinutes * 60)
+        TimeInterval(Self.quietGapMinutes * 60)
     }
 
     var wakeWindowSeconds: TimeInterval {
@@ -82,9 +87,7 @@ struct AlarmSettings: Codable {
             motionDetectionEnabled: true,
             whiteNoiseEnabled: true,
             whiteNoiseSound: .oceanWaves,
-            whiteNoiseVolume: 0.7,
-            fadeOutMinutes: 10,
-            quietGapMinutes: 30
+            whiteNoiseVolume: 0.7
         )
     }
 
@@ -95,7 +98,6 @@ struct AlarmSettings: Codable {
         case sensitivityValue, volume, selectedSound, tagline
         case hapticEnabled, motionDetectionEnabled
         case whiteNoiseEnabled, whiteNoiseSound, whiteNoiseVolume
-        case fadeOutMinutes, quietGapMinutes
         // Legacy keys (pre-merge stir), read-only
         case wakeWindowStart, wakeWindowEnd
     }
@@ -104,7 +106,7 @@ struct AlarmSettings: Codable {
          volume: Float, selectedSound: AlarmSound, tagline: String,
          hapticEnabled: Bool,
          motionDetectionEnabled: Bool, whiteNoiseEnabled: Bool, whiteNoiseSound: WhiteNoiseSound,
-         whiteNoiseVolume: Float, fadeOutMinutes: Int, quietGapMinutes: Int) {
+         whiteNoiseVolume: Float) {
         self.wakeUpBy = wakeUpBy
         self.wakeWindowMinutes = wakeWindowMinutes
         self.alarmEnabled = alarmEnabled
@@ -117,8 +119,6 @@ struct AlarmSettings: Codable {
         self.whiteNoiseEnabled = whiteNoiseEnabled
         self.whiteNoiseSound = whiteNoiseSound
         self.whiteNoiseVolume = whiteNoiseVolume
-        self.fadeOutMinutes = fadeOutMinutes
-        self.quietGapMinutes = quietGapMinutes
     }
 
     init(from decoder: Decoder) throws {
@@ -150,8 +150,6 @@ struct AlarmSettings: Codable {
         whiteNoiseEnabled = try container.decodeIfPresent(Bool.self, forKey: .whiteNoiseEnabled) ?? defaults.whiteNoiseEnabled
         whiteNoiseSound = try container.decodeIfPresent(WhiteNoiseSound.self, forKey: .whiteNoiseSound) ?? defaults.whiteNoiseSound
         whiteNoiseVolume = try container.decodeIfPresent(Float.self, forKey: .whiteNoiseVolume) ?? defaults.whiteNoiseVolume
-        fadeOutMinutes = try container.decodeIfPresent(Int.self, forKey: .fadeOutMinutes) ?? defaults.fadeOutMinutes
-        quietGapMinutes = try container.decodeIfPresent(Int.self, forKey: .quietGapMinutes) ?? defaults.quietGapMinutes
     }
 
     func encode(to encoder: Encoder) throws {
@@ -168,8 +166,6 @@ struct AlarmSettings: Codable {
         try container.encode(whiteNoiseEnabled, forKey: .whiteNoiseEnabled)
         try container.encode(whiteNoiseSound, forKey: .whiteNoiseSound)
         try container.encode(whiteNoiseVolume, forKey: .whiteNoiseVolume)
-        try container.encode(fadeOutMinutes, forKey: .fadeOutMinutes)
-        try container.encode(quietGapMinutes, forKey: .quietGapMinutes)
     }
 }
 
