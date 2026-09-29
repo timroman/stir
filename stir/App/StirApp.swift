@@ -22,6 +22,9 @@ struct StirApp: App {
         // Nothing can be running yet, so anything on the lock screen is left
         // over from a run that never ended it
         StirLiveActivity.endStrays(reason: "at launch")
+        // Finishes a backstop cancel that a crash interrupted; a backstop whose
+        // night never ended is left to fire, which is the point of it
+        AlarmBackstop.clearIfNightEnded()
         Logger.session.notice("🚀 stir app ready")
     }
 

@@ -192,6 +192,9 @@ the haptic engine shares the app's audio session — an earlier version gave it 
 **App Review could not find the background audio.**
 the reviewer notes walked through a short session and never said to leave the app. stir 1.0.0 (3) was rejected on 18 august for the background mode and for an onboarding button that read "allow". the notes now make backgrounding its own labelled step, and they record the approval.
 
+**the backup alarm outlived the night too.**
+cancelling the backstop is asynchronous, and a night that ended by hand or at the alarm could be followed by stir dying before the cancel landed — so the system alarm fired two minutes after "up by" for a night that was already over. it now records that the night ended synchronously, before attempting the cancel, and the next launch finishes the job. a backstop whose night never ended is deliberately left alone: stir dying at 3am is exactly the case the net exists for, and cancelling it then would trade a spurious alarm for an overslept morning. reported on device, 29 september 2026.
+
 **the lock screen widget outlived the night.**
 ending a night ended the activity stir was holding in memory, and nothing else. that reference does not survive the app being killed or crashing, so a widget could sit on the lock screen with no way left to clear it — which is what build 7's crash at the alarm produced, and what a night ended by hand showed on 29 september. stir now ends every activity ActivityKit reports, at launch, before a night starts, and when one ends. reported on device, 29 september 2026.
 

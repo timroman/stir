@@ -54,6 +54,7 @@
 		DAAA9A9E9A8AFA26D311F199 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3319761B25C1F5A15016A2BA /* AppState.swift */; };
 		DE92A3386EA9651D8271E799 /* WhiteNoisePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA11DE98D22F3DAA607833D /* WhiteNoisePlayer.swift */; };
 		E1C1DEEC8095485C1078A3F4 /* StirLiveActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 853556B5111816A761906A57 /* StirLiveActivityWidget.swift */; };
+		E49AE3EF58F563D89208C4E3 /* AlarmBackstopTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62D895751A590AB496FBD4F /* AlarmBackstopTests.swift */; };
 		E6A32E05A09E778639FECB77 /* white_noise.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2A195731ACB8F847E583CED6 /* white_noise.m4a */; };
 		E8F4ABFCC31D358F32387D89 /* wind.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B946CC818CF48A6575FC1764 /* wind.m4a */; };
 		E91C552CD2DA8D221DD1DFC7 /* MonitoringView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B91E7E22556C9596A1B5132B /* MonitoringView.swift */; };
@@ -151,6 +152,7 @@
 		BA31EB15F4FE753AF25382D2 /* StopButtonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopButtonTests.swift; sourceTree = "<group>"; };
 		C096FB9AF8CC1928E5E6D814 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C2156F32F69842404E2CCE95 /* singing_bowl.m4a */ = {isa = PBXFileReference; path = singing_bowl.m4a; sourceTree = "<group>"; };
+		C62D895751A590AB496FBD4F /* AlarmBackstopTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmBackstopTests.swift; sourceTree = "<group>"; };
 		CCB7677DAB034D6E2618FC61 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CDBE9CD3509B6BB7BF2CDD44 /* SetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupView.swift; sourceTree = "<group>"; };
 		D967D9651F113BF861322057 /* StirWidgetsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StirWidgetsBundle.swift; sourceTree = "<group>"; };
@@ -187,6 +189,7 @@
 		406D698F0369ACA1A5A45590 /* stir-tests */ = {
 			isa = PBXGroup;
 			children = (
+				C62D895751A590AB496FBD4F /* AlarmBackstopTests.swift */,
 				9714AE553815832B5520C277 /* AutoSensitivitySettingsTests.swift */,
 				14ECB7A8A9E1C33979A7D1DF /* AutoSensitivityTests.swift */,
 				A672B1512E49B426FF645346 /* CopyTests.swift */,
@@ -484,6 +487,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E49AE3EF58F563D89208C4E3 /* AlarmBackstopTests.swift in Sources */,
 				469630201D2C5AAA1541BEDB /* AutoSensitivitySettingsTests.swift in Sources */,
 				6B08F579706BE52C7DDD758F /* AutoSensitivityTests.swift in Sources */,
 				BF47A3D1BE9E3436F2E15BDD /* CopyTests.swift in Sources */,
@@ -653,7 +657,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 86CCQ2AT2P;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -744,7 +748,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 86CCQ2AT2P;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
