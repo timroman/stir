@@ -1,6 +1,6 @@
 # stir
 
-**status:** proposed, 15 september 2026. parts one through three describe stir 1.0.1 as it shipped. parts four through nine propose new work, and none of it is built. part nine, auto sensitivity, is the 1.1 build; history, suggestions, Health and Siri follow it.
+**status:** 29 september 2026. parts one through three describe stir as it ships, including 1.1. parts four through eight propose new work, and none of it is built. part nine, auto sensitivity, was built and then withdrawn — it is kept as the record of why.
 **supersedes:** [`combined-app-spec.md`](../combined-app-spec.md), approved 28 july 2026, which specified merging white noise into the alarm. it stays as the record of that decision.
 
 ---
@@ -47,7 +47,7 @@ stir counts clean runs — nights that ran the way a night is designed to (decis
 "most nights you started between 10:30 and 11:05", never "poor consistency". no scores, no grades, no red or green, no good or bad.
 
 **4. nothing arrives unasked.**
-no notification, reminder, widget or summary, and nothing on the setup screen, the night screen, the alarm screen or the lock screen. history is opened when somebody wants it. the morning belongs to how you feel. there is one exception, and only on auto sensitivity: a single question after the alarm, asked when stir cannot tell on its own (decision 67).
+no notification, reminder, widget or summary, and nothing on the setup screen, the night screen, the alarm screen or the lock screen. history is opened when somebody wants it. the morning belongs to how you feel. stir asks two things, both before a night starts and both fixable while you are holding the phone: a low volume on a night nothing will play (decision 20) and a low battery (decision 76).
 
 **5. no projections.**
 stir never predicts how today will go, how rested you are, or what a night meant.
@@ -56,9 +56,7 @@ stir never predicts how today will go, how rested you are, or what a night meant
 stir knows when a night started, when and why it woke you, and how the night ended. it does not know when you fell asleep, how well you slept, or what it heard, and it never claims to.
 
 **7. nothing that changes how you are woken happens without your say.**
-stir can suggest a change. only you apply one. an alarm has to be predictable, and a quiet change that ends in an oversleep leaves no way to find out why.
-
-choosing auto sensitivity is saying so, for that one setting (part nine). on its own, auto only ever makes stir more sensitive, which cannot cause an oversleep — "up by" still holds. it becomes less sensitive only when you answer yes. settings always shows where it is, and it touches nothing else.
+stir can suggest a change. only you apply one. an alarm has to be predictable, and a quiet change that ends in an oversleep leaves no way to find out why. the one feature that ever bent this — auto sensitivity — is withdrawn (part nine).
 
 **8. everything stays on the phone.**
 no accounts, no analytics, no servers. data leaves the phone only where you send it, and only facts go (part six).
@@ -227,11 +225,13 @@ the record extends the one in decision 26 with four fields:
 
 - **what set off the alarm:** sound, motion, the "up by" time, or nothing (ended by hand, or a no-alarm night)
 - **the phone's media volume when the alarm started**
-- **when listening started:** when the room calibration finished, which is later than the window opening whenever white noise was still fading (decision 62)
-- **the sensitivity used that night:** the setting, not anything measured (decision 71)
+- **when listening started:** when the room calibration finished, which is later than the window opening whenever white noise was still fading
+- **the sensitivity used that night:** the setting, not anything measured
+
+those last two were added for auto sensitivity and outlived it (part nine). they stay because they are honest facts about what stir did, they cost nothing, and removing a stored field from a model already on phones buys a migration for no gain.
 
 **32. the line is drawn at the record, not in a policy.**
-a record holds what stir did. no sound levels, no motion samples, no calibration values, no location, no inferred sleep. each of those is individually defensible — auto sensitivity would like to have the sound levels — and together they are a sleep tracker. a feature that needs one of them is a different feature and gets its own decision. the sensitivity used is a setting and when listening started is something stir did, so both sit inside the line.
+a record holds what stir did. no sound levels, no motion samples, no calibration values, no location, no inferred sleep. each of those is individually defensible on its own — and together they are a sleep tracker. a feature that needs one of them is a different feature and gets its own decision. the sensitivity used is a setting and when listening started is something stir did, so both sit inside the line.
 
 **33. a record is written when a clean run ends, and only then.**
 a night that did not run cleanly is not written to history at all, rather than stored and filtered out. a night stir never finished, because the app was killed or crashed, leaves nothing either *(see open 1)*. the most recent night, clean or not, still shows on the technical details screen, and the unified log keeps every night for diagnosis.
@@ -265,7 +265,7 @@ never the setup screen, the night screen, the alarm screen, the lock screen, the
 
 ## part five — suggestions
 
-settings are hard to tune by feel, and history can see what feel cannot. stir cannot, however, see why. sensitivity is not among the suggestions: auto sensitivity tunes it (part nine).
+settings are hard to tune by feel, and history can see what feel cannot. stir cannot, however, see why.
 
 **41. stir suggests; you apply.**
 a suggestion says what stir saw, what it would change, and changes nothing until you tap. dismissed, it does not return for 14 nights. suggestions appear only inside history.
@@ -275,7 +275,7 @@ stir cannot tell you stirring from a dog. so it never proposes a change that is 
 
 - **a longer wake window**, when sound or motion set off the alarm on few of your last 14 nights. whether the window was too short, the sensitivity too low, or nothing stirred, a longer window gives stir more chances and moves "up by" nowhere.
 - **turning the phone's volume up**, when media volume was under 30% on most of your last 10 alarms. on 22 august 2026 the owner's alarm started at 25%.
-- **nothing about sensitivity.** on auto, stir tunes it with evidence a suggestion would not have (part nine). set by hand, it is yours.
+- **nothing about sensitivity.** it is three named settings with a note under each saying what it is for (decision 59), chosen by the person who knows their room. part nine is what happened when stir tried to choose it instead.
 
 *(corrected 15 september: this decision said a false wake at 5am was worse than a gentle one at 6:45. stir listens only inside the wake window, so a false trigger can wake you at most one window's length early.)*
 
@@ -283,10 +283,10 @@ stir cannot tell you stirring from a dog. so it never proposes a change that is 
 
 **44. an applied change starts with the next night**, never the one running.
 
-**45. no question at the alarm, but one.**
+**45. no question at the alarm.**
 asking "did someone else set it off?" as the alarm is stopped puts a question at the one moment principle 4 keeps clear. it also asks the person who was asleep to explain what happened while they were, so the answer would be a guess, stored as a fact. *(see open 11)*
 
-the one question stir asks is auto sensitivity's "was that too sensitive?" (decision 67). it asks the person woken how being woken felt, which they do know. it is asked only when the evidence cannot decide on its own, and the answer is acted on, not stored.
+auto sensitivity proposed one exception — "was that too sensitive?", asked when the evidence could not decide on its own — and it went with the rest of it (part nine). stir asks nothing at the alarm.
 
 ---
 
@@ -342,17 +342,26 @@ each sensitivity also says roughly what it is tuned for, in a note under the pic
 - **high** — alone, in a quiet or steady room. the threshold sits about 7 dB above the baseline, near enough to hear a person roll over or move the covers. on 22 august 2026 the owner's room calibrated at −53.2 dB, high set the threshold at −45.8, and stir woke him at −42.7, rolling over.
 - **medium** — some sound that comes and goes: occasional traffic, a partner who sleeps still. about 10.5 dB above the baseline.
 - **low** — a lot of it: a shared bed, pets, children nearby. about 14 dB above the baseline.
-- **auto** — for not knowing yet. stir finds the setting over the first nights, and the note says which of the three it is closest to (part nine).
 
 those figures hold in the stillest room stir can calibrate, where the variation is at its 3 dB floor; a room that varies more gets a proportionally higher threshold at every setting. the descriptions are rough, and so far only high has a real night behind it.
 
 ---
 
-## part nine — auto sensitivity
+## part nine — auto sensitivity, withdrawn
 
-sensitivity is the one setting nobody can tune by feel, because you are asleep for the part that matters. set too low, stir leaves you to "up by" every morning without saying so. set too high, it is set off by the room, which at 6:40 feels exactly like a gentle wake. auto sensitivity finds the setting from the nights themselves: it settles, then goes silent.
+**built 15–16 september 2026, removed 29 september, before it ever shipped.** the decisions below stand as written; what follows is why none of them is in the app.
 
-this part is the 1.1 build. its numbers were derived rather than chosen, and the working is in `tools/auto-sensitivity-sim.py`, which runs every rule below as written.
+sensitivity is the one setting nobody can tune by feel, because you are asleep for the part that matters. that premise is still true. what was wrong was the answer.
+
+- **the owner tuned it by feel anyway.** across a fortnight he tried medium, went back to high, and settled: alone in a quiet room, high is right, which is exactly what decision 59's note now says high is for. the cheap version of this feature — a sentence under each setting saying what it is tuned for — already shipped and does most of the work.
+- **it adapts too slowly to help the case it was for.** each night yields one bit: stir heard you, or it did not. rooms that change — a partner some nights, a fan in summer — change faster than a rate estimated over a week of single bits.
+- **within-night adaptation is not the fix either.** stir listens only inside the wake window, and calibrates at the moment it opens: the room it measures is the room you will wake in. tracking the room through the window would mean estimating the background from a signal that contains the sleeper, and a floor that chases a restless sleeper makes stir quietly deafer to them — a silent failure traded for a rare one. the one case a fixed line genuinely mishandles is a thermostat cycling mid-window; if that ever produces a false wake, the narrow fix is to treat a level shift that persists for minutes as a new room rather than as stirring.
+- **it cost two principles.** principle 4 needed an exception for the morning question, principle 7 an amendment for changes stir made on its own. a feature that requires bending the rules that define the product, for a setting with three values, is not paying for itself.
+- **and the owner's summary, which is the one that decided it:** the app works well, it is simple to use and understand, and auto made it a thing to reason about.
+
+what it leaves behind, deliberately: the night record (decision 31), which history and Health will read; `tools/auto-sensitivity-sim.py` and the research below, which is the working for numbers that may matter again; and the sensitivity notes, which were the real fix all along.
+
+the decisions as they were written:
 
 **60. auto is a choice, and the default for new installs.**
 the sensitivity picker becomes auto, low, medium and high. a new install starts on auto, at medium. an existing install keeps the setting it has: choosing auto is the say principle 7 asks for, and an update is not somebody choosing. picking low, medium or high turns auto off.
@@ -463,8 +472,8 @@ its state is the step, the highest step allowed, whether it is settling or settl
 - no notifications, reminders or widgets for history
 - no charts of hours slept
 - no reading from Health, and nothing written to it as *asleep*
-- no automatic changes to settings, except sensitivity on auto — and never the volume, the wake window or "up by"
-- no morning check-in or rating. auto sensitivity's one question is about the alarm, and is asked only when the evidence cannot decide
+- no automatic changes to settings
+- no morning check-in or rating
 - no stored audio, sound levels, motion data or location history
 - no telling whose voice, breathing or movement stir heard
 - no importing your own sounds (decision 75)

@@ -304,7 +304,7 @@ struct WakeSettingsView: View {
     @EnvironmentObject var appState: AppState
 
     private var sensitivity: String {
-        appState.settings.sensitivityMode == .auto ? "auto" : appState.settings.sensitivityLabel
+        appState.settings.sensitivityLabel
     }
 
     // Sorted by how much of the room's sound comes and goes, not how loud it
@@ -312,12 +312,6 @@ struct WakeSettingsView: View {
     // mistake is sound that arrives and leaves (stir.md decision 59)
     private var sensitivityNote: String {
         switch sensitivity {
-        case "auto":
-            let closest = appState.settings.sensitivityLabel
-            if appState.settings.autoSensitivity?.phase == .settled {
-                return "settled, around \(closest). stir asks again only if your nights change."
-            }
-            return "stir sets this from your nights, and asks after the alarm when it needs to know. still settling, around \(closest)."
         case "low":
             return "for a shared bed, pets, or children nearby. it takes a bigger sound to wake you."
         case "high":
@@ -333,10 +327,9 @@ struct WakeSettingsView: View {
                 Picker("sensitivity", selection: Binding(
                     get: { sensitivity },
                     set: { choice in
-                        appState.settings.chooseSensitivity(choice, now: Date())
+                        appState.settings.chooseSensitivity(choice)
                     }
                 )) {
-                    Text("auto").tag("auto")
                     Text("low").tag("low")
                     Text("medium").tag("medium")
                     Text("high").tag("high")

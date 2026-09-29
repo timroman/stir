@@ -3,6 +3,12 @@
 auto sensitivity — the reference implementation of docs/spec/stir.md part nine,
 decisions 60–74.
 
+WITHDRAWN 29 september 2026, before shipping: a rate estimated one bit per night
+adapts too slowly to help the rooms it was for, and the app is better simple.
+Kept as the working behind the numbers — the bounds come from real sleep
+research and would be the starting point if this is ever revisited. Nothing in
+the app calls any of this; it runs on its own.
+
 every rule here is a rule in the spec, with the same names and the same
 constants. the swift evaluator's unit tests take their exact expected values
 from `worked examples` below, and its seeded simulation test takes its bounds
