@@ -258,10 +258,12 @@ the typical time and its spread come from the middle of your nights, not the ext
 **37. a night ended by hand before its wake window is not a clean run.**
 it does not appear in history. a night ended by hand inside the window, before the alarm, is a clean run, and the list says you were up before stir.
 
-**77. settings are organized by the night, not by the code.**
-two screens: **night**, what plays while you fall asleep, and **wake**, how stir brings you out of it. each holds its own toggle, its own sound and volume, and nothing belonging to the other half. the front page carries the sentence describing tonight — it belongs to neither half and describes both.
+**77. settings are one screen, in the order a night happens.**
+a **night** section — what plays while you fall asleep — and a **wake** section — how stir brings you out of it. the alarm's settings appear when the alarm is on, and vanish when it is off. the only thing a tap deeper is a sound list, because eleven wake tones inline push everything under them off the screen, and a lazy list does not build what it does not show.
 
-before 29 september they were split by kind: a "sounds" screen held the sleep sound and the alarm sound together, so setting up white noise took two screens and the only thing binding them was that both were sounds — a fact about the app, not about anybody's night. the one thing the old shape did better was show both toggles side by side, which made their constraint obvious; each screen now says it in words instead. *(the owner, 29 september)*
+it took two wrong shapes to get here. first, split by kind: a "sounds" screen holding both the sleep sound and the alarm sound, so setting up white noise took two screens and the only thing binding them was that both were sounds — a fact about the app, not about anybody's night. then split by half: a **night** screen with two rows and a **wake** screen with eight, each a tap away for no gain.
+
+**the labels say what happens, and the reasons are one tap away.** "gentle alarm" is just **alarm**. "motion detection" is **wake if the phone moves**. "haptics" — a word nobody outside this trade uses — is **vibration**. each of those carries an information button rather than a paragraph underneath: a switch with an explanation under it, times four, is a wall of prose where a list of settings should be. sensitivity keeps its note inline, because that note changes with the choice and is the only way to tell the three apart. *(the owner, 29 september)* *(the owner, 29 september)*
 
 **38. history is in settings, and nowhere else.**
 never the setup screen, the night screen, the alarm screen, the lock screen, the Live Activity, or a notification.
