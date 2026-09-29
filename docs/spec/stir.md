@@ -116,8 +116,13 @@ a phone left unplugged lets its display sleep. the alarm screen always keeps the
 **19. the alarm rises from silence to your volume over 60 seconds, and the screen's dawn rises with it.**
 volume maps straight from the slider; the gentleness is the ramp, not a ceiling. haptics ramp over the same minute. *(2 and 18 august)*
 
-**20. a low phone volume is caught before the night starts.**
+**20. a low phone volume is caught before the night starts — on nights nothing else will play.**
 below 30%, stir says so and lets you start anyway. media volume is the one setting stir can read but cannot set. *(18 august)*
+
+amended 29 september: the check runs only when white noise is off. with white noise on, the volume is set by ear after the night starts, lying down, and differs by room — so the number read at "start" is not the one the alarm will use, and asking about it is noise. with nothing playing all night, a too-quiet setting is invisible until it fails to wake somebody, which is exactly when it is worth asking. *(the owner: "I usually have my volume all over the place and after I start the alarm I turn the white noise to whatever volume I wanted")*
+
+**76. a low battery is caught the same way.**
+under 30% and not charging, stir says so before the night starts and lets you start anyway. it is asked whether or not the alarm is on: a phone that dies takes the white noise, the alarm and the backstop with it, and a silent oversleep is the one failure every other decision here exists to prevent. nothing is said during the night — at 3am the battery cannot be fixed and the warning would only cost sleep (principle 4). if both the battery and the volume want saying, they arrive as one question, not two. *(29 september)*
 
 **21. sound previews play at the volume the sound will use**, through the same kind of audio session the night uses. *(18 august)*
 
