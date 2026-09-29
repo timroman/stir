@@ -1,9 +1,11 @@
 import SwiftUI
 import AVFoundation
-import UniformTypeIdentifiers
 import os
 
-// Five calm rows; every knob lives one tap deeper
+// Two rows, one per half of the night: what plays while you fall asleep, and
+// how you are brought out of it. Settings used to be split by kind — a "sounds"
+// screen holding both — which meant setting up your sleep sound took two
+// screens and the only thing binding them was that both were sounds.
 struct SettingsView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) var dismiss
@@ -15,8 +17,10 @@ struct SettingsView: View {
             List {
                 Section {
                     NavigationLink("night") { NightSettingsView() }
-                    NavigationLink("sounds") { SoundsSettingsView() }
                     NavigationLink("wake") { WakeSettingsView() }
+                } footer: {
+                    // Belongs to neither half, and describes both
+                    Text(timelineExample)
                 }
 
                 Section {
@@ -68,9 +72,28 @@ struct SettingsView: View {
             }
         }
     }
+
+    // Tonight's schedule with the current settings, so the settings explain
+    // themselves without anybody having to assemble the timeline in their head
+    private var timelineExample: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        let upBy = formatter.string(from: appState.settings.wakeUpBy).lowercased()
+        let fadeStart = formatter.string(from: appState.fadeStartTime).lowercased()
+        let fadeEnd = formatter.string(from: appState.whiteNoiseEndTime).lowercased()
+        let windowStart = formatter.string(from: appState.windowStart).lowercased()
+
+        if !appState.settings.alarmEnabled {
+            return "tonight, with \"up by\" \(upBy): white noise fades from \(fadeStart) and ends at \(upBy) — the silence is your wake-up."
+        }
+        if !appState.settings.whiteNoiseEnabled {
+            return "tonight, with \"up by\" \(upBy): stir listens from \(windowStart), and the alarm sounds at \(upBy) at the latest."
+        }
+        return "tonight, with \"up by\" \(upBy): white noise fades from \(fadeStart) to \(fadeEnd), the room stays quiet until \(windowStart), then stir listens and the alarm sounds at \(upBy) at the latest."
+    }
 }
 
-// MARK: - Night: what plays, and how early stir may wake you
+// MARK: - Night: what plays while you fall asleep
 
 struct NightSettingsView: View {
     @EnvironmentObject var appState: AppState
@@ -85,166 +108,42 @@ struct NightSettingsView: View {
                             appState.settings.alarmEnabled = true
                         }
                     }
-
-                Toggle("gentle alarm", isOn: $appState.settings.alarmEnabled)
-                    .disabled(!appState.settings.whiteNoiseEnabled)
             } footer: {
-                if !appState.settings.alarmEnabled {
-                    Text("alarm off: white noise fades to silence at your \"up by\" time — when you don't hear it, it's time. the microphone is never used.")
-                } else if !appState.settings.whiteNoiseEnabled {
-                    // The toggle above is on but greyed out, which reads as
-                    // "unavailable" without this line
+                if appState.settings.whiteNoiseEnabled {
+                    Text("plays all night and fades to silence before stir starts listening.")
+                } else {
+                    // The constraint is easy to miss now that the two toggles
+                    // live on different screens
                     Text("with white noise off, the gentle alarm stays on — a night needs at least one of the two.")
                 }
             }
 
-            Section {
-                timelineStepper("wake window", value: $appState.settings.wakeWindowMinutes, range: 10...90,
-                                caption: "how early stir may wake you — it listens for this long before your \"up by\" time, and nothing can wake you before it")
-            } header: {
-                Text("night timeline")
-            } footer: {
-                Text(timelineExample)
+            if appState.settings.whiteNoiseEnabled {
+                Section {
+                    NavigationLink {
+                        SoundListView(title: "sleep sound",
+                                      footer: "preview plays at the volume it will use tonight.",
+                                      options: WhiteNoiseSound.allCases.map { ($0.rawValue, $0.displayName) },
+                                      selectedId: Binding(
+                                        get: { appState.settings.whiteNoiseSound.rawValue },
+                                        set: { id in
+                                            if let sound = WhiteNoiseSound(rawValue: id) {
+                                                appState.settings.whiteNoiseSound = sound
+                                            }
+                                        }),
+                                      volume: $appState.settings.whiteNoiseVolume)
+                    } label: {
+                        LabeledContent("sleep sound", value: appState.settings.whiteNoiseSound.displayName)
+                    }
+                }
             }
         }
         .navigationTitle("night")
         .navigationBarTitleDisplayMode(.inline)
     }
-
-    private func timelineStepper(_ title: String, value: Binding<Int>, range: ClosedRange<Int>, caption: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Stepper(value: value, in: range, step: 5) {
-                HStack {
-                    Text(title)
-                    Spacer()
-                    Text("\(value.wrappedValue) min")
-                        .foregroundColor(.gray)
-                }
-            }
-            Text(caption)
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-    }
-
-    // Tonight's schedule with the current settings, so the controls explain themselves
-    private var timelineExample: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm a"
-        let upBy = formatter.string(from: appState.settings.wakeUpBy).lowercased()
-        let fadeStart = formatter.string(from: appState.fadeStartTime).lowercased()
-        let fadeEnd = formatter.string(from: appState.whiteNoiseEndTime).lowercased()
-        let windowStart = formatter.string(from: appState.windowStart).lowercased()
-
-        if !appState.settings.alarmEnabled {
-            return "tonight, with \"up by\" \(upBy): white noise fades from \(fadeStart) and ends at \(upBy) — the silence is your wake-up."
-        }
-        return "tonight, with \"up by\" \(upBy): white noise fades from \(fadeStart) to \(fadeEnd), the room stays quiet until \(windowStart), then stir listens and the alarm sounds at \(upBy) at the latest."
-    }
 }
 
-// MARK: - Sounds: sleep + alarm sounds, volumes, import
-
-struct SoundsSettingsView: View {
-    @EnvironmentObject var appState: AppState
-    @State private var previewPlayer: AVAudioPlayer?
-
-    var body: some View {
-        List {
-            Section {
-                HStack {
-                    Image(systemName: "speaker.fill").foregroundColor(.gray)
-                    Slider(value: $appState.settings.whiteNoiseVolume, in: 0.1...1.0, step: 0.05)
-                    Image(systemName: "speaker.wave.3.fill").foregroundColor(.gray)
-                }
-                ForEach(WhiteNoiseSound.allCases) { sound in
-                    selectableRow(sound.displayName,
-                                  isSelected: appState.settings.whiteNoiseSound == sound,
-                                  onSelect: { appState.settings.whiteNoiseSound = sound },
-                                  onPreview: { previewBundled(sound.rawValue, volume: appState.settings.whiteNoiseVolume) })
-                }
-            } header: {
-                Text("sleep sound")
-            }
-
-            Section {
-                HStack {
-                    Image(systemName: "speaker.fill").foregroundColor(.gray)
-                    Slider(value: $appState.settings.volume, in: 0.1...1.0, step: 0.05)
-                    Image(systemName: "speaker.wave.3.fill").foregroundColor(.gray)
-                }
-                ForEach(AlarmSound.allCases) { sound in
-                    selectableRow(sound.displayName,
-                                  isSelected: appState.settings.selectedSound == sound,
-                                  onSelect: { appState.settings.selectedSound = sound },
-                                  onPreview: { previewBundled(sound.rawValue, volume: appState.settings.volume) })
-                }
-            } header: {
-                Text("alarm sound")
-            } footer: {
-                Text("preview plays at the volume the alarm will use, through your phone's current volume — if it sounds quiet now, it will be quiet then.")
-            }
-        }
-        .navigationTitle("sounds")
-        .navigationBarTitleDisplayMode(.inline)
-        .onDisappear { stopPreview() }
-    }
-
-    private func selectableRow(_ name: String, isSelected: Bool, onSelect: @escaping () -> Void, onPreview: @escaping () -> Void) -> some View {
-        HStack {
-            Button(action: onSelect) {
-                HStack {
-                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                        .foregroundColor(isSelected ? .blue : .gray)
-                    Text(name)
-                        .foregroundColor(.primary)
-                }
-            }
-            .buttonStyle(.plain)
-
-            Spacer()
-
-            Button(action: onPreview) {
-                Image(systemName: "play.circle")
-                    .font(.title2)
-                    .foregroundColor(.blue)
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    private func previewBundled(_ name: String, volume: Float) {
-        stopPreview()
-        guard let url = bundledSoundURL(name) else { return }
-        playPreview(url: url, volume: volume)
-    }
-
-    // An honest preview: the slider's real value through the same .playback
-    // session the night uses, so what you hear now is what will play then —
-    // at whatever the phone's volume happens to be right now. A fixed 0.6
-    // preview made every sound seem fine and taught the slider nothing.
-    private func playPreview(url: URL, volume: Float) {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
-            try AVAudioSession.sharedInstance().setActive(true)
-            previewPlayer = try AVAudioPlayer(contentsOf: url)
-            previewPlayer?.volume = volume
-            previewPlayer?.play()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 8.0) { [self] in
-                stopPreview()
-            }
-        } catch {
-            Logger.sounds.error("Failed to preview sound: \(String(describing: error), privacy: .public)")
-        }
-    }
-
-    private func stopPreview() {
-        previewPlayer?.stop()
-        previewPlayer = nil
-    }
-}
-
-// MARK: - Wake: sensitivity, motion, haptics, wake message
+// MARK: - Wake: how stir brings you out of it
 
 struct WakeSettingsView: View {
     @EnvironmentObject var appState: AppState
@@ -270,50 +169,181 @@ struct WakeSettingsView: View {
     var body: some View {
         List {
             Section {
-                Picker("sensitivity", selection: Binding(
-                    get: { sensitivity },
-                    set: { choice in
-                        appState.settings.chooseSensitivity(choice)
-                    }
-                )) {
-                    Text("low").tag("low")
-                    Text("medium").tag("medium")
-                    Text("high").tag("high")
+                Toggle("gentle alarm", isOn: $appState.settings.alarmEnabled)
+                    .disabled(!appState.settings.whiteNoiseEnabled)
+            } footer: {
+                if !appState.settings.alarmEnabled {
+                    Text("alarm off: white noise fades to silence at your \"up by\" time — when you don't hear it, it's time. the microphone is never used.")
+                } else if !appState.settings.whiteNoiseEnabled {
+                    // The toggle above is on but greyed out, which reads as
+                    // "unavailable" without this line
+                    Text("with white noise off, the gentle alarm stays on — a night needs at least one of the two.")
                 }
-                .pickerStyle(.segmented)
-                .accessibilityIdentifier("wake.sensitivity")
-            } header: {
-                Text("listening")
-            } footer: {
-                Text(sensitivityNote)
-                    .accessibilityIdentifier("wake.sensitivityNote")
             }
 
-            Section {
-                Toggle("motion detection", isOn: $appState.settings.motionDetectionEnabled)
-            } footer: {
-                // stir hears the room, not a person (stir.md decisions 57, 59)
-                Text("motion detection wakes you when the phone moves, whoever moves it. a phone on the nightstand on your side of the bed avoids most of that.")
-            }
+            if appState.settings.alarmEnabled {
+                Section {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Stepper(value: $appState.settings.wakeWindowMinutes, in: 10...90, step: 5) {
+                            HStack {
+                                Text("wake window")
+                                Spacer()
+                                Text("\(appState.settings.wakeWindowMinutes) min")
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                        Text("how early stir may wake you — it listens for this long before your \"up by\" time, and nothing can wake you before it")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                } header: {
+                    Text("when")
+                }
 
-            Section {
-                Toggle("haptics", isOn: $appState.settings.hapticEnabled)
-            } header: {
-                Text("haptics")
-            } footer: {
-                Text("the alarm vibrates as well as sounds, rising over the same minute. turn it off if the phone sleeps on something that rattles.")
-            }
+                Section {
+                    NavigationLink {
+                        SoundListView(title: "alarm sound",
+                                      footer: "preview plays at the volume the alarm will use, through your phone's current volume — if it sounds quiet now, it will be quiet then.",
+                                      options: AlarmSound.allCases.map { ($0.rawValue, $0.displayName) },
+                                      selectedId: Binding(
+                                        get: { appState.settings.selectedSound.rawValue },
+                                        set: { id in
+                                            if let sound = AlarmSound(rawValue: id) {
+                                                appState.settings.selectedSound = sound
+                                            }
+                                        }),
+                                      volume: $appState.settings.volume)
+                    } label: {
+                        LabeledContent("alarm sound", value: appState.settings.selectedSound.displayName)
+                    }
+                }
 
-            Section {
-                TextField("your motivation", text: $appState.settings.tagline)
-            } header: {
-                Text("wake message")
-            } footer: {
-                Text("shown on the alarm screen when it's time")
+                Section {
+                    Picker("sensitivity", selection: Binding(
+                        get: { sensitivity },
+                        set: { choice in
+                            appState.settings.chooseSensitivity(choice)
+                        }
+                    )) {
+                        Text("low").tag("low")
+                        Text("medium").tag("medium")
+                        Text("high").tag("high")
+                    }
+                    .pickerStyle(.segmented)
+                    .accessibilityIdentifier("wake.sensitivity")
+                } header: {
+                    Text("listening")
+                } footer: {
+                    Text(sensitivityNote)
+                        .accessibilityIdentifier("wake.sensitivityNote")
+                }
+
+                Section {
+                    Toggle("motion detection", isOn: $appState.settings.motionDetectionEnabled)
+                } footer: {
+                    // stir hears the room, not a person (stir.md decisions 57, 59)
+                    Text("motion detection wakes you when the phone moves, whoever moves it. a phone on the nightstand on your side of the bed avoids most of that.")
+                }
+
+                Section {
+                    Toggle("haptics", isOn: $appState.settings.hapticEnabled)
+                } footer: {
+                    Text("the alarm vibrates as well as sounds, rising over the same minute. turn it off if the phone sleeps on something that rattles.")
+                }
+
+                Section {
+                    TextField("your motivation", text: $appState.settings.tagline)
+                } header: {
+                    Text("wake message")
+                } footer: {
+                    Text("shown on the alarm screen when it's time")
+                }
             }
         }
         .navigationTitle("wake")
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+// MARK: - One sound list and its volume, shared by both halves of the night
+//
+// A screen rather than a section: eleven wake tones inline pushed everything
+// below them out of reach, and a lazy list does not even build what is off
+// screen — which is how a UI test found this.
+
+private struct SoundListView: View {
+    let title: String
+    let footer: String
+    let options: [(id: String, name: String)]
+    @Binding var selectedId: String
+    @Binding var volume: Float
+
+    @State private var previewPlayer: AVAudioPlayer?
+
+    var body: some View {
+        List {
+            Section {
+                HStack {
+                    Image(systemName: "speaker.fill").foregroundColor(.gray)
+                    Slider(value: $volume, in: 0.1...1.0, step: 0.05)
+                    Image(systemName: "speaker.wave.3.fill").foregroundColor(.gray)
+                }
+
+                ForEach(options, id: \.id) { option in
+                    HStack {
+                        Button(action: { selectedId = option.id }) {
+                            HStack {
+                                Image(systemName: selectedId == option.id ? "checkmark.circle.fill" : "circle")
+                                    .foregroundColor(selectedId == option.id ? .blue : .gray)
+                                Text(option.name)
+                                    .foregroundColor(.primary)
+                            }
+                        }
+                        .buttonStyle(.plain)
+
+                        Spacer()
+
+                        Button(action: { preview(option.id) }) {
+                            Image(systemName: "play.circle")
+                                .font(.title2)
+                                .foregroundColor(.blue)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            } footer: {
+                Text(footer)
+            }
+        }
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
+        .onDisappear { stopPreview() }
+    }
+
+    // An honest preview: the slider's real value through the same .playback
+    // session the night uses, so what you hear now is what will play then —
+    // at whatever the phone's volume happens to be right now. A fixed 0.6
+    // preview made every sound seem fine and taught the slider nothing.
+    private func preview(_ name: String) {
+        stopPreview()
+        guard let url = bundledSoundURL(name) else { return }
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            try AVAudioSession.sharedInstance().setActive(true)
+            previewPlayer = try AVAudioPlayer(contentsOf: url)
+            previewPlayer?.volume = volume
+            previewPlayer?.play()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 8.0) {
+                stopPreview()
+            }
+        } catch {
+            Logger.sounds.error("Failed to preview sound: \(String(describing: error), privacy: .public)")
+        }
+    }
+
+    private func stopPreview() {
+        previewPlayer?.stop()
+        previewPlayer = nil
     }
 }
 

@@ -258,6 +258,11 @@ the typical time and its spread come from the middle of your nights, not the ext
 **37. a night ended by hand before its wake window is not a clean run.**
 it does not appear in history. a night ended by hand inside the window, before the alarm, is a clean run, and the list says you were up before stir.
 
+**77. settings are organized by the night, not by the code.**
+two screens: **night**, what plays while you fall asleep, and **wake**, how stir brings you out of it. each holds its own toggle, its own sound and volume, and nothing belonging to the other half. the front page carries the sentence describing tonight — it belongs to neither half and describes both.
+
+before 29 september they were split by kind: a "sounds" screen held the sleep sound and the alarm sound together, so setting up white noise took two screens and the only thing binding them was that both were sounds — a fact about the app, not about anybody's night. the one thing the old shape did better was show both toggles side by side, which made their constraint obvious; each screen now says it in words instead. *(the owner, 29 september)*
+
 **38. history is in settings, and nowhere else.**
 never the setup screen, the night screen, the alarm screen, the lock screen, the Live Activity, or a notification.
 

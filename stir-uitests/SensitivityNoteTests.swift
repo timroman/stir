@@ -21,6 +21,14 @@ final class SensitivityNoteTests: XCTestCase {
         XCTAssertTrue(wake.waitForExistence(timeout: 5), "settings never opened")
         wake.tap()
 
+        // The alarm's settings only exist when the alarm does, and the
+        // simulator carries whatever state the last run left behind
+        let alarmToggle = app.switches["gentle alarm"]
+        XCTAssertTrue(alarmToggle.waitForExistence(timeout: 5), "wake settings never opened")
+        if alarmToggle.value as? String == "0" {
+            alarmToggle.tap()
+        }
+
         let picker = app.segmentedControls["wake.sensitivity"]
         XCTAssertTrue(picker.waitForExistence(timeout: 5), "sensitivity picker missing")
         let note = app.staticTexts["wake.sensitivityNote"]
