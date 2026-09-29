@@ -114,6 +114,8 @@ a phone left unplugged lets its display sleep. the alarm screen always keeps the
 **19. the alarm rises from silence to your volume over 60 seconds, and the screen's dawn rises with it.**
 volume maps straight from the slider; the gentleness is the ramp, not a ceiling. haptics ramp over the same minute. *(2 and 18 august)*
 
+amended 29 september: haptics are on or off, and nothing else. the intensity dial went — the ramp is already the gentleness, and a strength can only be judged while asleep, which is the same trap auto sensitivity fell into. three of the four haptic patterns went with it: no picker ever reached them. a phone set below full gets full from now on, which is a change in how somebody is woken and is written down here for that reason. the toggle stays, because it decides whether anything happens at all — a phone on a hard nightstand rattles, and that is worth being able to stop. *(the owner: "the more options we have, the harder this is to use rather than it just working")*
+
 **20. a low phone volume is caught before the night starts — on nights nothing else will play.**
 below 30%, stir says so and lets you start anyway. media volume is the one setting stir can read but cannot set. *(18 august)*
 

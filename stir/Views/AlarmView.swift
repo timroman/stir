@@ -57,7 +57,7 @@ struct AlarmView: View {
             // Start haptics after audio session is configured
             if appState.settings.hapticEnabled {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                    hapticManager.start(type: appState.settings.hapticType, targetIntensity: appState.settings.hapticIntensity)
+                    hapticManager.start()
                 }
             }
         }
@@ -123,20 +123,20 @@ class HapticManager: ObservableObject {
     private var intensityRampTimer: Timer?
     private var currentIntensity: Float = 0.3
     private var targetIntensity: Float = 1.0
-    private var hapticType: HapticType = .heartbeat
     private let rampDuration: Float = 60.0
     private let patternDuration: TimeInterval = 10.0 // Loop every 10 seconds
     private var isRunning = false
 
-    func start(type: HapticType, targetIntensity: Float) {
+    // One pattern, always to full strength: the 60-second ramp below is the
+    // gentleness, and three more patterns nobody could reach were dead weight.
+    func start() {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else {
             Logger.haptics.notice("📳 Haptics not supported on this device")
             return
         }
 
-        self.hapticType = type
-        self.targetIntensity = targetIntensity
-        self.currentIntensity = max(0.3, targetIntensity * 0.3) // Start at 30% of target, minimum 0.3
+        self.targetIntensity = 1.0
+        self.currentIntensity = 0.3
         self.isRunning = true
 
         do {
@@ -196,7 +196,7 @@ class HapticManager: ObservableObject {
             // Start intensity ramp
             startIntensityRamp()
 
-            Logger.haptics.notice("📳 Haptic feedback started: \(String(describing: type.displayName), privacy: .public), ramping to intensity \(String(describing: targetIntensity), privacy: .public)")
+            Logger.haptics.notice("📳 Haptic feedback started, ramping to full over \(String(describing: self.rampDuration), privacy: .public)s")
         } catch {
             Logger.haptics.error("📳 Haptic error: \(String(describing: error), privacy: .public)")
         }
@@ -209,7 +209,7 @@ class HapticManager: ObservableObject {
         }
 
         do {
-            let events = createHapticEvents(for: hapticType, intensity: currentIntensity)
+            let events = heartbeatEvents(intensity: currentIntensity)
             let pattern = try CHHapticPattern(events: events, parameters: [])
             hapticPlayer = try engine.makePlayer(with: pattern)
             try hapticPlayer?.start(atTime: CHHapticTimeImmediate)
@@ -247,72 +247,29 @@ class HapticManager: ObservableObject {
         }
     }
 
-    private func createHapticEvents(for type: HapticType, intensity: Float) -> [CHHapticEvent] {
+    // A double tap, like a pulse, repeated — the one pattern stir uses
+    private func heartbeatEvents(intensity: Float) -> [CHHapticEvent] {
         var events: [CHHapticEvent] = []
-        // Ensure minimum intensity of 0.5 for all patterns to be noticeable
-        let effectiveIntensity = max(0.5, intensity)
+        let effectiveIntensity = max(0.5, intensity)   // below this nothing is felt through a mattress
 
-        switch type {
-        case .heartbeat:
-            for i in 0..<7 {
-                let baseTime = Double(i) * 1.4
-                events.append(CHHapticEvent(
-                    eventType: .hapticTransient,
-                    parameters: [
-                        CHHapticEventParameter(parameterID: .hapticIntensity, value: effectiveIntensity),
-                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
-                    ],
-                    relativeTime: baseTime
-                ))
-                events.append(CHHapticEvent(
-                    eventType: .hapticTransient,
-                    parameters: [
-                        CHHapticEventParameter(parameterID: .hapticIntensity, value: effectiveIntensity * 0.8),
-                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
-                    ],
-                    relativeTime: baseTime + 0.2
-                ))
-            }
-
-        case .pulse:
-            // Gentle continuous pulses
-            for i in 0..<10 {
-                events.append(CHHapticEvent(
-                    eventType: .hapticContinuous,
-                    parameters: [
-                        CHHapticEventParameter(parameterID: .hapticIntensity, value: effectiveIntensity * 0.8),
-                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.2)
-                    ],
-                    relativeTime: Double(i) * 1.0,
-                    duration: 0.6
-                ))
-            }
-
-        case .escalating:
-            for i in 0..<7 {
-                let escalatingIntensity = max(0.5, 0.4 + (effectiveIntensity * Float(i) / 7.0))
-                events.append(CHHapticEvent(
-                    eventType: .hapticTransient,
-                    parameters: [
-                        CHHapticEventParameter(parameterID: .hapticIntensity, value: escalatingIntensity),
-                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
-                    ],
-                    relativeTime: Double(i) * 1.4
-                ))
-            }
-
-        case .steady:
-            for i in 0..<5 {
-                events.append(CHHapticEvent(
-                    eventType: .hapticContinuous,
-                    parameters: [
-                        CHHapticEventParameter(parameterID: .hapticIntensity, value: effectiveIntensity),
-                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
-                    ],
-                    relativeTime: Double(i) * 2.0,
-                    duration: 1.5
-                ))
-            }
+        for i in 0..<7 {
+            let baseTime = Double(i) * 1.4
+            events.append(CHHapticEvent(
+                eventType: .hapticTransient,
+                parameters: [
+                    CHHapticEventParameter(parameterID: .hapticIntensity, value: effectiveIntensity),
+                    CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                ],
+                relativeTime: baseTime
+            ))
+            events.append(CHHapticEvent(
+                eventType: .hapticTransient,
+                parameters: [
+                    CHHapticEventParameter(parameterID: .hapticIntensity, value: effectiveIntensity * 0.8),
+                    CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
+                ],
+                relativeTime: baseTime + 0.2
+            ))
         }
 
         return events

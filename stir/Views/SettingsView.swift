@@ -352,15 +352,10 @@ struct WakeSettingsView: View {
 
             Section {
                 Toggle("haptics", isOn: $appState.settings.hapticEnabled)
-                if appState.settings.hapticEnabled {
-                    HStack {
-                        Text("low").font(.caption).foregroundColor(.gray)
-                        Slider(value: $appState.settings.hapticIntensity, in: 0.2...1.0, step: 0.1)
-                        Text("high").font(.caption).foregroundColor(.gray)
-                    }
-                }
             } header: {
                 Text("haptics")
+            } footer: {
+                Text("the alarm vibrates as well as sounds, rising over the same minute. turn it off if the phone sleeps on something that rattles.")
             }
 
             Section {

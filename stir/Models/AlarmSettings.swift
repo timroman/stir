@@ -15,9 +15,9 @@ struct AlarmSettings: Codable {
     var volume: Float            // 0.0 to 1.0
     var selectedSound: AlarmSound
     var tagline: String          // Customizable wake message
+    // On or off, and nothing else: the ramp is the gentleness, and an
+    // intensity dial asks somebody to judge a strength while asleep
     var hapticEnabled: Bool
-    var hapticType: HapticType
-    var hapticIntensity: Float
     var motionDetectionEnabled: Bool  // Trigger alarm on device movement
 
     var whiteNoiseEnabled: Bool
@@ -79,8 +79,6 @@ struct AlarmSettings: Codable {
             selectedSound: .gentleChime,
             tagline: "good morning",
             hapticEnabled: true,
-            hapticType: .heartbeat,
-            hapticIntensity: 0.7,
             motionDetectionEnabled: true,
             whiteNoiseEnabled: true,
             whiteNoiseSound: .oceanWaves,
@@ -95,7 +93,7 @@ struct AlarmSettings: Codable {
     private enum CodingKeys: String, CodingKey {
         case wakeUpBy, wakeWindowMinutes, alarmEnabled
         case sensitivityValue, volume, selectedSound, tagline
-        case hapticEnabled, hapticType, hapticIntensity, motionDetectionEnabled
+        case hapticEnabled, motionDetectionEnabled
         case whiteNoiseEnabled, whiteNoiseSound, whiteNoiseVolume
         case fadeOutMinutes, quietGapMinutes
         // Legacy keys (pre-merge stir), read-only
@@ -104,7 +102,7 @@ struct AlarmSettings: Codable {
 
     init(wakeUpBy: Date, wakeWindowMinutes: Int, alarmEnabled: Bool, sensitivityValue: Float,
          volume: Float, selectedSound: AlarmSound, tagline: String,
-         hapticEnabled: Bool, hapticType: HapticType, hapticIntensity: Float,
+         hapticEnabled: Bool,
          motionDetectionEnabled: Bool, whiteNoiseEnabled: Bool, whiteNoiseSound: WhiteNoiseSound,
          whiteNoiseVolume: Float, fadeOutMinutes: Int, quietGapMinutes: Int) {
         self.wakeUpBy = wakeUpBy
@@ -115,8 +113,6 @@ struct AlarmSettings: Codable {
         self.selectedSound = selectedSound
         self.tagline = tagline
         self.hapticEnabled = hapticEnabled
-        self.hapticType = hapticType
-        self.hapticIntensity = hapticIntensity
         self.motionDetectionEnabled = motionDetectionEnabled
         self.whiteNoiseEnabled = whiteNoiseEnabled
         self.whiteNoiseSound = whiteNoiseSound
@@ -150,8 +146,6 @@ struct AlarmSettings: Codable {
         selectedSound = try container.decodeIfPresent(AlarmSound.self, forKey: .selectedSound) ?? defaults.selectedSound
         tagline = try container.decodeIfPresent(String.self, forKey: .tagline) ?? defaults.tagline
         hapticEnabled = try container.decodeIfPresent(Bool.self, forKey: .hapticEnabled) ?? defaults.hapticEnabled
-        hapticType = try container.decodeIfPresent(HapticType.self, forKey: .hapticType) ?? defaults.hapticType
-        hapticIntensity = try container.decodeIfPresent(Float.self, forKey: .hapticIntensity) ?? defaults.hapticIntensity
         motionDetectionEnabled = try container.decodeIfPresent(Bool.self, forKey: .motionDetectionEnabled) ?? defaults.motionDetectionEnabled
         whiteNoiseEnabled = try container.decodeIfPresent(Bool.self, forKey: .whiteNoiseEnabled) ?? defaults.whiteNoiseEnabled
         whiteNoiseSound = try container.decodeIfPresent(WhiteNoiseSound.self, forKey: .whiteNoiseSound) ?? defaults.whiteNoiseSound
@@ -170,8 +164,6 @@ struct AlarmSettings: Codable {
         try container.encode(selectedSound, forKey: .selectedSound)
         try container.encode(tagline, forKey: .tagline)
         try container.encode(hapticEnabled, forKey: .hapticEnabled)
-        try container.encode(hapticType, forKey: .hapticType)
-        try container.encode(hapticIntensity, forKey: .hapticIntensity)
         try container.encode(motionDetectionEnabled, forKey: .motionDetectionEnabled)
         try container.encode(whiteNoiseEnabled, forKey: .whiteNoiseEnabled)
         try container.encode(whiteNoiseSound, forKey: .whiteNoiseSound)
@@ -269,32 +261,5 @@ enum WhiteNoiseSound: String, Codable, CaseIterable, Identifiable {
     enum SoundCategory: String, CaseIterable {
         case noise = "noise"
         case nature = "nature"
-    }
-}
-
-enum HapticType: String, Codable, CaseIterable, Identifiable {
-    case heartbeat = "heartbeat"
-    case pulse = "pulse"
-    case escalating = "escalating"
-    case steady = "steady"
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .heartbeat: return "heartbeat"
-        case .pulse: return "pulse"
-        case .escalating: return "escalating"
-        case .steady: return "steady"
-        }
-    }
-
-    var description: String {
-        switch self {
-        case .heartbeat: return "rhythmic double-tap pattern"
-        case .pulse: return "gentle pulsing vibration"
-        case .escalating: return "gradually intensifying"
-        case .steady: return "continuous vibration"
-        }
     }
 }
