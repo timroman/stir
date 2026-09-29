@@ -192,6 +192,9 @@ the haptic engine shares the app's audio session — an earlier version gave it 
 **App Review could not find the background audio.**
 the reviewer notes walked through a short session and never said to leave the app. stir 1.0.0 (3) was rejected on 18 august for the background mode and for an onboarding button that read "allow". the notes now make backgrounding its own labelled step, and they record the approval.
 
+**the lock screen widget outlived the night.**
+ending a night ended the activity stir was holding in memory, and nothing else. that reference does not survive the app being killed or crashing, so a widget could sit on the lock screen with no way left to clear it — which is what build 7's crash at the alarm produced, and what a night ended by hand showed on 29 september. stir now ends every activity ActivityKit reports, at launch, before a night starts, and when one ends. reported on device, 29 september 2026.
+
 **the screenshot upload duplicated every image.**
 fastlane verifies a screenshot upload before App Store Connect has finished indexing it, decides it failed, deletes only the incomplete screenshots and uploads all of them again. four screenshots arrived as eight. the release lane no longer touches screenshots.
 

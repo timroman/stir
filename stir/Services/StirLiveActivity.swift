@@ -14,6 +14,9 @@ enum StirLiveActivity {
             return
         }
 
+        // A stray from an earlier run must not sit beside tonight's
+        endStrays(reason: "before starting a night")
+
         let color = accentColor
         currentWakeWindow = wakeWindow
 
@@ -105,6 +108,11 @@ enum StirLiveActivity {
         }
     }
 
+    // Ends every activity stir has on screen, not just the one this launch
+    // started. `currentActivity` lives in memory: a crash or a relaunch between
+    // starting a night and ending it left it nil while the widget stayed on the
+    // lock screen, with nothing able to clear it. ActivityKit knows what is
+    // showing even when stir has forgotten.
     static func stop() {
         let state = StirActivityAttributes.ContentState(
             wakeWindow: "",
@@ -117,13 +125,25 @@ enum StirLiveActivity {
             audioLevel: 0.0
         )
 
+        currentActivity = nil
         Task {
-            await currentActivity?.end(
-                ActivityContent(state: state, staleDate: nil),
-                dismissalPolicy: .immediate
-            )
-            currentActivity = nil
-            Logger.session.notice("Live Activity stopped")
+            for activity in Activity<StirActivityAttributes>.activities {
+                await activity.end(
+                    ActivityContent(state: state, staleDate: nil),
+                    dismissalPolicy: .immediate
+                )
+                Logger.session.notice("Live Activity stopped: \(String(describing: activity.id), privacy: .public)")
+            }
         }
+    }
+
+    /// Clears anything left on the lock screen by a run that never got to end it
+    /// — a crash, or iOS restarting the app. Called at launch, when no night can
+    /// possibly be running, and before a new night starts.
+    static func endStrays(reason: String) {
+        let strays = Activity<StirActivityAttributes>.activities
+        guard !strays.isEmpty else { return }
+        Logger.session.notice("clearing \(strays.count, privacy: .public) stray Live Activity(ies) \(reason, privacy: .public)")
+        stop()
     }
 }

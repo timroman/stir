@@ -19,6 +19,9 @@ struct StirApp: App {
             nightStore = nil
         }
         _appState = StateObject(wrappedValue: AppState(nightStore: nightStore))
+        // Nothing can be running yet, so anything on the lock screen is left
+        // over from a run that never ended it
+        StirLiveActivity.endStrays(reason: "at launch")
         Logger.session.notice("🚀 stir app ready")
     }
 
