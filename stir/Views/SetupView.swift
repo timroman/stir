@@ -5,12 +5,10 @@ import os
 struct SetupView: View {
     @EnvironmentObject var appState: AppState
     @State private var showingSettings = false
-    @State private var showingLowVolume = false
+    @State private var showingStartWarning = false
     @State private var systemVolumePercent = 0
-
-    // Below this, a gentle alarm ramping up from silence has no chance of
-    // being heard. Media volume is the one thing stir can read but not set.
-    private let lowVolumeThreshold: Float = 0.3
+    @State private var batteryPercent = 0
+    @State private var startWarnings: NightStartCheck.Warnings = []
 
     var body: some View {
         ZStack {
@@ -68,6 +66,7 @@ struct SetupView: View {
                 .foregroundColor(.white.opacity(0.55))
             }
             .padding(.bottom, 20)
+            .accessibilityIdentifier("setup.settings")
             }
             .padding()
         }
@@ -75,23 +74,55 @@ struct SetupView: View {
             SettingsView()
                 .presentationDragIndicator(.visible)
         }
-        .alert("your volume is low", isPresented: $showingLowVolume) {
+        .alert(startWarningTitle, isPresented: $showingStartWarning) {
             Button("start anyway") { startNight(force: true) }
             Button("not yet", role: .cancel) { }
         } message: {
-            Text("your phone is at \(systemVolumePercent)% — the alarm may not be loud enough to wake you. raise it with the volume buttons, then start again.")
+            Text(startWarningMessage)
         }
+    }
+
+    private var startWarningTitle: String {
+        if startWarnings.contains(.lowBattery) && startWarnings.contains(.lowVolume) {
+            return "before you start"
+        }
+        return startWarnings.contains(.lowBattery) ? "your battery is low" : "your volume is low"
+    }
+
+    private var startWarningMessage: String {
+        var lines: [String] = []
+        if startWarnings.contains(.lowBattery) {
+            lines.append("your phone is at \(batteryPercent)% and isn't charging. if it dies overnight, neither the alarm nor the backup alarm can wake you. plug it in, then start again.")
+        }
+        if startWarnings.contains(.lowVolume) {
+            lines.append("your volume is at \(systemVolumePercent)% — the alarm may not be loud enough to wake you. raise it with the volume buttons, then start again.")
+        }
+        return lines.joined(separator: "\n\n")
     }
 
     // The last moment you're awake and holding the phone is the only moment a
     // low media volume can still be fixed. Checked here rather than at "up by",
     // when you're asleep and nothing can be done about it.
     private func startNight(force: Bool) {
-        if !force, appState.settings.alarmEnabled, let volume = currentSystemVolume(),
-           volume < lowVolumeThreshold {
-            systemVolumePercent = Int((volume * 100).rounded())
-            showingLowVolume = true
-            return
+        if !force {
+            UIDevice.current.isBatteryMonitoringEnabled = true
+            let level = UIDevice.current.batteryLevel
+            let state = UIDevice.current.batteryState
+            let volume = currentSystemVolume()
+            let warnings = NightStartCheck.warnings(
+                alarmEnabled: appState.settings.alarmEnabled,
+                whiteNoiseEnabled: appState.settings.whiteNoiseEnabled,
+                volume: volume,
+                batteryLevel: level,
+                isCharging: state == .charging || state == .full
+            )
+            if !warnings.isEmpty {
+                systemVolumePercent = Int(((volume ?? 0) * 100).rounded())
+                batteryPercent = Int((level * 100).rounded())
+                startWarnings = warnings
+                showingStartWarning = true
+                return
+            }
         }
         withAnimation(.easeInOut(duration: 0.3)) {
             appState.recalculateWakeUpBy()

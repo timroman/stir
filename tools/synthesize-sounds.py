@@ -135,3 +135,101 @@ dawn = np.zeros(int(5.2 * SR))
 dawn[:len(d1)] += d1
 dawn[int(1.4 * SR):int(1.4 * SR) + len(d2)] += d2
 write_wav("dawn.wav", dawn)
+
+# --- wake tones (16 september 2026) ---
+#
+# gentle chime and soft bells shipped from the first commit of the app stir grew
+# out of, downloaded from somewhere nobody wrote down (stir.md decision 22).
+# These replace them, so every sound stir ships has a recipe here and no licence
+# to keep track of. The rest are candidates for the ear test.
+#
+# What makes a struck sound read as metal, glass or wood is the ratio of its
+# partials to the fundamental, and how fast each one dies. Harmonic ratios
+# (1, 2, 3) sound like a string or a voice; the inharmonic ratios below are
+# what a bar, a bell or a bowl actually does.
+
+def strike(f0, partials, dur, attack=0.004):
+    """One strike. partials: (ratio to f0, amplitude, decay seconds)."""
+    m = int(dur * SR)
+    tt = np.arange(m) / SR
+    out = np.zeros(m)
+    for ratio, amp, dec in partials:
+        out += amp * np.sin(2 * np.pi * f0 * ratio * tt) * np.exp(-tt / dec)
+    return out * np.minimum(tt / attack, 1)   # click-free attack
+
+def sequence(events, dur):
+    """events: (start in seconds, samples). Later strikes ring over earlier ones."""
+    out = np.zeros(int(dur * SR))
+    for start, x in events:
+        i = int(start * SR)
+        end = min(len(out), i + len(x))
+        out[i:end] += x[:end - i]
+    return out
+
+# A free-free bar rings at 1, 2.76, 5.40 — the glassy, pitched-but-not-quite
+# quality of a wind chime or a struck glass.
+BAR = [(1.0, 1.0, 2.4), (2.76, 0.38, 1.1), (5.40, 0.14, 0.5), (8.93, 0.05, 0.25)]
+
+# A tuned bell rings at hum, prime, tierce (minor third), quint, nominal. The
+# minor third is why a bell sounds solemn where a bar sounds bright.
+BELL = [(0.5, 0.55, 4.5), (1.0, 1.0, 3.4), (1.19, 0.5, 2.4),
+        (1.5, 0.28, 1.8), (2.0, 0.33, 1.5), (2.5, 0.12, 0.9)]
+
+# A standing bowl: like a bell but lower, longer, and beating slightly as two
+# nearly-identical partials drift against each other.
+BOWL = [(1.0, 1.0, 7.0), (1.004, 0.9, 7.0), (2.34, 0.45, 4.2),
+        (4.23, 0.22, 2.4), (6.61, 0.10, 1.4)]
+
+# gentle chime: two glass strikes, the second softer and a fifth up
+chime = sequence([(0.0, strike(523.25, BAR, 3.4)),
+                  (0.85, 0.6 * strike(783.99, BAR, 3.0))], 4.6)
+write_wav("gentle_chime.wav", chime)
+
+# soft bells: a bell struck twice, left to ring
+bells = sequence([(0.0, strike(392.00, BELL, 6.0)),
+                  (2.1, 0.7 * strike(392.00, BELL, 5.5))], 8.0)
+write_wav("soft_bells.wav", bells)
+
+# deep bowl: one low strike, very long decay — the singing bowl an octave down
+write_wav("deep_bowl.wav", strike(146.83, BOWL, 14, attack=0.01))
+
+# temple bells: a bowl struck twice a fifth apart, slow and spacious
+temple = sequence([(0.0, strike(196.00, BOWL, 10)),
+                   (3.2, 0.75 * strike(293.66, BOWL, 9))], 13.0)
+write_wav("temple_bells.wav", temple)
+
+# music box: a three-note figure, bright and short — the only tone here that
+# plays something rather than sounding something
+BOX = [(1.0, 1.0, 0.9), (4.0, 0.22, 0.35), (10.4, 0.06, 0.15)]
+box = sequence([(0.0, strike(1046.50, BOX, 1.6)),       # C6
+                (0.42, strike(1318.51, BOX, 1.6)),      # E6
+                (0.84, strike(1567.98, BOX, 2.2))], 3.4)  # G6
+write_wav("music_box.wav", box)
+
+# marimba: warm wooden mallet, a rising third
+WOOD = [(1.0, 1.0, 0.55), (3.9, 0.20, 0.22), (9.2, 0.05, 0.10)]
+marimba = sequence([(0.0, strike(349.23, WOOD, 1.2)),
+                    (0.5, strike(440.00, WOOD, 1.2)),
+                    (1.0, strike(523.25, WOOD, 1.8))], 3.0)
+write_wav("marimba.wav", marimba)
+
+# wind chimes: five bars struck in no particular order, as air moves them
+chimes = sequence(
+    [(float(start), float(amp) * strike(float(f0), BAR, 3.2))
+     for start, f0, amp in zip(
+         [0.0, 0.55, 0.95, 1.7, 2.4],
+         [587.33, 698.46, 880.00, 1046.50, 783.99],   # D5 F5 A5 C6 G5
+         [1.0, 0.7, 0.85, 0.6, 0.75])],
+    5.6)
+write_wav("wind_chimes.wav", chimes)
+
+# first light: no strike at all — a chord that swells out of silence and falls
+# away, for waking without an onset
+swell_dur = 9.0
+tt = np.arange(int(swell_dur * SR)) / SR
+env = np.sin(np.pi * tt / swell_dur) ** 1.5           # slow in, slow out
+first_light = np.zeros(len(tt))
+for fr, amp in [(261.63, 1.0), (392.00, 0.6), (523.25, 0.45), (659.25, 0.3), (784.00, 0.18)]:
+    drift = 1 + 0.0009 * np.sin(2 * np.pi * 0.11 * tt + fr)   # slight chorus
+    first_light += amp * np.sin(2 * np.pi * fr * drift * tt)
+write_wav("first_light.wav", first_light * env)

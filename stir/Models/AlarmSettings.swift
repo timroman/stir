@@ -14,34 +14,29 @@ struct AlarmSettings: Codable {
     var sensitivityValue: Float  // 0.0 (less sensitive) to 1.0 (more sensitive)
     var volume: Float            // 0.0 to 1.0
     var selectedSound: AlarmSound
-    var customSoundId: UUID?     // If set, use custom sound instead of built-in
     var tagline: String          // Customizable wake message
+    // On or off, and nothing else: the ramp is the gentleness, and an
+    // intensity dial asks somebody to judge a strength while asleep
     var hapticEnabled: Bool
-    var hapticType: HapticType
-    var hapticIntensity: Float
     var motionDetectionEnabled: Bool  // Trigger alarm on device movement
 
     var whiteNoiseEnabled: Bool
     var whiteNoiseSound: WhiteNoiseSound
     var whiteNoiseVolume: Float
-    var whiteNoiseCustomSoundId: UUID?  // Points into the shared custom sound library
-    var fadeOutMinutes: Int      // How long the fade-out takes (5-60 minutes)
-    var quietGapMinutes: Int     // Silence between fade complete and listening start (0-120)
-
-    var isUsingCustomSound: Bool {
-        customSoundId != nil
-    }
-
-    var isUsingCustomWhiteNoise: Bool {
-        whiteNoiseCustomSoundId != nil
-    }
+    // Fixed, not chosen. The fade length is a comfort detail nobody can pick
+    // between meaningfully, and the gap exists so that the white noise ending
+    // is not itself the thing that stirs you — separating "the sound stops"
+    // from "stir starts listening". Both are behaviour, not settings
+    // (stir.md decision 9, amended 29 september).
+    static let fadeOutMinutes = 10
+    static let quietGapMinutes = 30
 
     var fadeOutSeconds: TimeInterval {
-        TimeInterval(fadeOutMinutes * 60)
+        TimeInterval(Self.fadeOutMinutes * 60)
     }
 
     var quietGapSeconds: TimeInterval {
-        TimeInterval(quietGapMinutes * 60)
+        TimeInterval(Self.quietGapMinutes * 60)
     }
 
     var wakeWindowSeconds: TimeInterval {
@@ -56,11 +51,22 @@ struct AlarmSettings: Codable {
         return 5.0 - (sensitivityValue * 3.0)
     }
 
+    /// The nearest of the three named settings.
     var sensitivityLabel: String {
-        switch sensitivityValue {
-        case 0.0..<0.33: return "low"
-        case 0.33..<0.66: return "medium"
-        default: return "high"
+        let named: [(label: String, value: Float)] = [("low", 0.15), ("medium", 0.5), ("high", 0.85)]
+        let distances = named.map { abs(Double($0.value) - Double(sensitivityValue)) }
+        let nearest = distances.min() ?? 0
+        let tied = named.indices.filter { distances[$0] - nearest < 0.0001 }
+        return tied.contains(1) ? "medium" : named[tied.first ?? 1].label
+    }
+
+    /// The sensitivity picker: "low", "medium" or "high".
+    mutating func chooseSensitivity(_ choice: String) {
+        switch choice {
+        case "low": sensitivityValue = 0.15
+        case "high": sensitivityValue = 0.85
+        case "medium": sensitivityValue = 0.5
+        default: break
         }
     }
 
@@ -76,18 +82,12 @@ struct AlarmSettings: Codable {
             sensitivityValue: 0.5,  // Medium by default
             volume: 0.7,
             selectedSound: .gentleChime,
-            customSoundId: nil,
             tagline: "good morning",
             hapticEnabled: true,
-            hapticType: .heartbeat,
-            hapticIntensity: 0.7,
             motionDetectionEnabled: true,
             whiteNoiseEnabled: true,
             whiteNoiseSound: .oceanWaves,
-            whiteNoiseVolume: 0.7,
-            whiteNoiseCustomSoundId: nil,
-            fadeOutMinutes: 10,
-            quietGapMinutes: 30
+            whiteNoiseVolume: 0.7
         )
     }
 
@@ -95,37 +95,30 @@ struct AlarmSettings: Codable {
 
     private enum CodingKeys: String, CodingKey {
         case wakeUpBy, wakeWindowMinutes, alarmEnabled
-        case sensitivityValue, volume, selectedSound, customSoundId, tagline
-        case hapticEnabled, hapticType, hapticIntensity, motionDetectionEnabled
-        case whiteNoiseEnabled, whiteNoiseSound, whiteNoiseVolume, whiteNoiseCustomSoundId
-        case fadeOutMinutes, quietGapMinutes
+        case sensitivityValue, volume, selectedSound, tagline
+        case hapticEnabled, motionDetectionEnabled
+        case whiteNoiseEnabled, whiteNoiseSound, whiteNoiseVolume
         // Legacy keys (pre-merge stir), read-only
         case wakeWindowStart, wakeWindowEnd
     }
 
     init(wakeUpBy: Date, wakeWindowMinutes: Int, alarmEnabled: Bool, sensitivityValue: Float,
-         volume: Float, selectedSound: AlarmSound, customSoundId: UUID?, tagline: String,
-         hapticEnabled: Bool, hapticType: HapticType, hapticIntensity: Float,
+         volume: Float, selectedSound: AlarmSound, tagline: String,
+         hapticEnabled: Bool,
          motionDetectionEnabled: Bool, whiteNoiseEnabled: Bool, whiteNoiseSound: WhiteNoiseSound,
-         whiteNoiseVolume: Float, whiteNoiseCustomSoundId: UUID?, fadeOutMinutes: Int, quietGapMinutes: Int) {
+         whiteNoiseVolume: Float) {
         self.wakeUpBy = wakeUpBy
         self.wakeWindowMinutes = wakeWindowMinutes
         self.alarmEnabled = alarmEnabled
         self.sensitivityValue = sensitivityValue
         self.volume = volume
         self.selectedSound = selectedSound
-        self.customSoundId = customSoundId
         self.tagline = tagline
         self.hapticEnabled = hapticEnabled
-        self.hapticType = hapticType
-        self.hapticIntensity = hapticIntensity
         self.motionDetectionEnabled = motionDetectionEnabled
         self.whiteNoiseEnabled = whiteNoiseEnabled
         self.whiteNoiseSound = whiteNoiseSound
         self.whiteNoiseVolume = whiteNoiseVolume
-        self.whiteNoiseCustomSoundId = whiteNoiseCustomSoundId
-        self.fadeOutMinutes = fadeOutMinutes
-        self.quietGapMinutes = quietGapMinutes
     }
 
     init(from decoder: Decoder) throws {
@@ -151,18 +144,12 @@ struct AlarmSettings: Codable {
         sensitivityValue = try container.decodeIfPresent(Float.self, forKey: .sensitivityValue) ?? defaults.sensitivityValue
         volume = try container.decodeIfPresent(Float.self, forKey: .volume) ?? defaults.volume
         selectedSound = try container.decodeIfPresent(AlarmSound.self, forKey: .selectedSound) ?? defaults.selectedSound
-        customSoundId = try container.decodeIfPresent(UUID.self, forKey: .customSoundId)
         tagline = try container.decodeIfPresent(String.self, forKey: .tagline) ?? defaults.tagline
         hapticEnabled = try container.decodeIfPresent(Bool.self, forKey: .hapticEnabled) ?? defaults.hapticEnabled
-        hapticType = try container.decodeIfPresent(HapticType.self, forKey: .hapticType) ?? defaults.hapticType
-        hapticIntensity = try container.decodeIfPresent(Float.self, forKey: .hapticIntensity) ?? defaults.hapticIntensity
         motionDetectionEnabled = try container.decodeIfPresent(Bool.self, forKey: .motionDetectionEnabled) ?? defaults.motionDetectionEnabled
         whiteNoiseEnabled = try container.decodeIfPresent(Bool.self, forKey: .whiteNoiseEnabled) ?? defaults.whiteNoiseEnabled
         whiteNoiseSound = try container.decodeIfPresent(WhiteNoiseSound.self, forKey: .whiteNoiseSound) ?? defaults.whiteNoiseSound
         whiteNoiseVolume = try container.decodeIfPresent(Float.self, forKey: .whiteNoiseVolume) ?? defaults.whiteNoiseVolume
-        whiteNoiseCustomSoundId = try container.decodeIfPresent(UUID.self, forKey: .whiteNoiseCustomSoundId)
-        fadeOutMinutes = try container.decodeIfPresent(Int.self, forKey: .fadeOutMinutes) ?? defaults.fadeOutMinutes
-        quietGapMinutes = try container.decodeIfPresent(Int.self, forKey: .quietGapMinutes) ?? defaults.quietGapMinutes
     }
 
     func encode(to encoder: Encoder) throws {
@@ -173,27 +160,29 @@ struct AlarmSettings: Codable {
         try container.encode(sensitivityValue, forKey: .sensitivityValue)
         try container.encode(volume, forKey: .volume)
         try container.encode(selectedSound, forKey: .selectedSound)
-        try container.encodeIfPresent(customSoundId, forKey: .customSoundId)
         try container.encode(tagline, forKey: .tagline)
         try container.encode(hapticEnabled, forKey: .hapticEnabled)
-        try container.encode(hapticType, forKey: .hapticType)
-        try container.encode(hapticIntensity, forKey: .hapticIntensity)
         try container.encode(motionDetectionEnabled, forKey: .motionDetectionEnabled)
         try container.encode(whiteNoiseEnabled, forKey: .whiteNoiseEnabled)
         try container.encode(whiteNoiseSound, forKey: .whiteNoiseSound)
         try container.encode(whiteNoiseVolume, forKey: .whiteNoiseVolume)
-        try container.encodeIfPresent(whiteNoiseCustomSoundId, forKey: .whiteNoiseCustomSoundId)
-        try container.encode(fadeOutMinutes, forKey: .fadeOutMinutes)
-        try container.encode(quietGapMinutes, forKey: .quietGapMinutes)
     }
 }
 
+// Every one of these is generated by tools/synthesize-sounds.py, so stir ships
+// no audio it cannot rebuild and no licence to keep track of (stir.md decision 22)
 enum AlarmSound: String, Codable, CaseIterable, Identifiable {
     // Gentle Tones
     case gentleChime = "gentle_chime"
     case softBells = "soft_bells"
     case singingBowl = "singing_bowl"
+    case deepBowl = "deep_bowl"
+    case templeBells = "temple_bells"
+    case windChimes = "wind_chimes"
+    case musicBox = "music_box"
+    case marimba = "marimba"
     case dawn = "dawn"
+    case firstLight = "first_light"
 
     // Nature Sounds
     case oceanWaves = "ocean_waves"
@@ -205,14 +194,21 @@ enum AlarmSound: String, Codable, CaseIterable, Identifiable {
         case .gentleChime: return "gentle chime"
         case .softBells: return "soft bells"
         case .singingBowl: return "singing bowl"
+        case .deepBowl: return "deep bowl"
+        case .templeBells: return "temple bells"
+        case .windChimes: return "wind chimes"
+        case .musicBox: return "music box"
+        case .marimba: return "marimba"
         case .dawn: return "dawn"
+        case .firstLight: return "first light"
         case .oceanWaves: return "ocean waves"
         }
     }
 
     var category: SoundCategory {
         switch self {
-        case .gentleChime, .softBells, .singingBowl, .dawn:
+        case .gentleChime, .softBells, .singingBowl, .deepBowl, .templeBells,
+             .windChimes, .musicBox, .marimba, .dawn, .firstLight:
             return .gentle
         case .oceanWaves:
             return .nature
@@ -261,32 +257,5 @@ enum WhiteNoiseSound: String, Codable, CaseIterable, Identifiable {
     enum SoundCategory: String, CaseIterable {
         case noise = "noise"
         case nature = "nature"
-    }
-}
-
-enum HapticType: String, Codable, CaseIterable, Identifiable {
-    case heartbeat = "heartbeat"
-    case pulse = "pulse"
-    case escalating = "escalating"
-    case steady = "steady"
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .heartbeat: return "heartbeat"
-        case .pulse: return "pulse"
-        case .escalating: return "escalating"
-        case .steady: return "steady"
-        }
-    }
-
-    var description: String {
-        switch self {
-        case .heartbeat: return "rhythmic double-tap pattern"
-        case .pulse: return "gentle pulsing vibration"
-        case .escalating: return "gradually intensifying"
-        case .steady: return "continuous vibration"
-        }
     }
 }

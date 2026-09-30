@@ -5,6 +5,7 @@ import SwiftUI
 struct TechnicalDetailsView: View {
     var body: some View {
         List {
+
             // Only appears once a night has actually run; the answer to "what
             // happened last night?" without needing a Mac attached
             if let last = SessionRecord.last {
@@ -33,7 +34,7 @@ struct TechnicalDetailsView: View {
             }
 
             Section {
-                Text("the night screen stays black all night — nothing on it tells the time, glows brighter, or counts anything down. the only things on screen are the real sun and moon on their rings. if you wake and glance at it, there is nothing to read unless you want to read the sky itself.")
+                Text("the night screen stays black all night — no clock, no countdown, nothing that glows brighter as morning comes. the only things on screen are the real sun and moon on their rings. anyone who reads the sun can tell roughly what time it is, but never to the minute, and only if you go looking.")
             } header: {
                 Text("the night screen")
             }

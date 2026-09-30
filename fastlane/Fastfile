@@ -45,6 +45,27 @@ platform :ios do
     upload_to_testflight(skip_waiting_for_build_processing: true)
   end
 
+  # The beta lane uploads a binary but says nothing about what to look at.
+  # This sets the "what to test" notes on the most recent build, uploading
+  # nothing: edit fastlane/metadata/testflight_notes.txt and run it. It waits
+  # for Apple to finish processing, since notes cannot be set before then.
+  desc "Set the what-to-test notes on the latest TestFlight build"
+  lane :notes do
+    require "yaml"
+    asc_auth
+    # The release the project is currently set to build, so the notes always
+    # land on the build that was just uploaded
+    versions = YAML.load_file("../project.yml")["settings"]["base"]
+    upload_to_testflight(
+      distribute_only: true,
+      app_version: versions.fetch("MARKETING_VERSION").to_s,
+      build_number: versions.fetch("CURRENT_PROJECT_VERSION").to_s,
+      distribute_external: false,
+      skip_submission: true,
+      changelog: File.read("metadata/testflight_notes.txt").strip
+    )
+  end
+
   desc "Upload build + metadata to App Store Connect (screenshots untouched)"
   lane :release do
     asc_auth

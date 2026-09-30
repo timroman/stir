@@ -37,32 +37,7 @@ struct AlarmView: View {
 
                 Spacer()
 
-                // Dismiss button
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        // Haptics first: the engine is attached to the app's
-                        // audio session, so stopping the player deactivates the
-                        // session out from under it, its stoppedHandler sees a
-                        // still-running manager and restarts — one last buzz
-                        // about a second after you asked it to stop.
-                        hapticManager.stop()
-                        alarmPlayer.stop()
-                        StirLiveActivity.stop()
-                        AlarmBackstop.cancelBackstop()
-                        appState.dismissAlarm()
-                    }
-                }) {
-                    Text("stop")
-                        .font(.title.bold())
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 24)
-                        .background(Color.white)
-                        .cornerRadius(20)
-                }
-                .padding(.horizontal, 40)
-                .padding(.bottom, 60)
-                .opacity(appeared ? 1 : 0)
+                stopButton
             }
         }
         .onAppear {
@@ -72,17 +47,17 @@ struct AlarmView: View {
 
             // Start audio after small delay
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                alarmPlayer.play(
+                let mediaVolume = alarmPlayer.play(
                     sound: appState.settings.selectedSound,
-                    customSoundId: appState.settings.customSoundId,
                     volume: appState.settings.volume
                 )
+                appState.recordAlarmVolume(mediaVolume)
             }
 
             // Start haptics after audio session is configured
             if appState.settings.hapticEnabled {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                    hapticManager.start(type: appState.settings.hapticType, targetIntensity: appState.settings.hapticIntensity)
+                    hapticManager.start()
                 }
             }
         }
@@ -92,6 +67,35 @@ struct AlarmView: View {
         .onReceive(timer) { _ in
             currentTime = Date()
         }
+    }
+
+    private var stopButton: some View {
+        Button(action: {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                // Haptics first: the engine is attached to the app's
+                // audio session, so stopping the player deactivates the
+                // session out from under it, its stoppedHandler sees a
+                // still-running manager and restarts — one last buzz
+                // about a second after you asked it to stop.
+                hapticManager.stop()
+                alarmPlayer.stop()
+                StirLiveActivity.stop()
+                AlarmBackstop.cancelBackstop()
+                appState.dismissAlarm()
+            }
+        }) {
+            Text("stop")
+                .font(.title.bold())
+                .foregroundColor(.black)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 24)
+                .background(Color.white)
+                .cornerRadius(20)
+        }
+        .padding(.horizontal, 40)
+        .padding(.bottom, 60)
+        .opacity(appeared ? 1 : 0)
+        .accessibilityIdentifier("alarm.stop")
     }
 
     private var timeString: String {
@@ -119,20 +123,20 @@ class HapticManager: ObservableObject {
     private var intensityRampTimer: Timer?
     private var currentIntensity: Float = 0.3
     private var targetIntensity: Float = 1.0
-    private var hapticType: HapticType = .heartbeat
     private let rampDuration: Float = 60.0
     private let patternDuration: TimeInterval = 10.0 // Loop every 10 seconds
     private var isRunning = false
 
-    func start(type: HapticType, targetIntensity: Float) {
+    // One pattern, always to full strength: the 60-second ramp below is the
+    // gentleness, and three more patterns nobody could reach were dead weight.
+    func start() {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else {
             Logger.haptics.notice("📳 Haptics not supported on this device")
             return
         }
 
-        self.hapticType = type
-        self.targetIntensity = targetIntensity
-        self.currentIntensity = max(0.3, targetIntensity * 0.3) // Start at 30% of target, minimum 0.3
+        self.targetIntensity = 1.0
+        self.currentIntensity = 0.3
         self.isRunning = true
 
         do {
@@ -192,7 +196,7 @@ class HapticManager: ObservableObject {
             // Start intensity ramp
             startIntensityRamp()
 
-            Logger.haptics.notice("📳 Haptic feedback started: \(String(describing: type.displayName), privacy: .public), ramping to intensity \(String(describing: targetIntensity), privacy: .public)")
+            Logger.haptics.notice("📳 Haptic feedback started, ramping to full over \(String(describing: self.rampDuration), privacy: .public)s")
         } catch {
             Logger.haptics.error("📳 Haptic error: \(String(describing: error), privacy: .public)")
         }
@@ -205,7 +209,7 @@ class HapticManager: ObservableObject {
         }
 
         do {
-            let events = createHapticEvents(for: hapticType, intensity: currentIntensity)
+            let events = heartbeatEvents(intensity: currentIntensity)
             let pattern = try CHHapticPattern(events: events, parameters: [])
             hapticPlayer = try engine.makePlayer(with: pattern)
             try hapticPlayer?.start(atTime: CHHapticTimeImmediate)
@@ -243,72 +247,29 @@ class HapticManager: ObservableObject {
         }
     }
 
-    private func createHapticEvents(for type: HapticType, intensity: Float) -> [CHHapticEvent] {
+    // A double tap, like a pulse, repeated — the one pattern stir uses
+    private func heartbeatEvents(intensity: Float) -> [CHHapticEvent] {
         var events: [CHHapticEvent] = []
-        // Ensure minimum intensity of 0.5 for all patterns to be noticeable
-        let effectiveIntensity = max(0.5, intensity)
+        let effectiveIntensity = max(0.5, intensity)   // below this nothing is felt through a mattress
 
-        switch type {
-        case .heartbeat:
-            for i in 0..<7 {
-                let baseTime = Double(i) * 1.4
-                events.append(CHHapticEvent(
-                    eventType: .hapticTransient,
-                    parameters: [
-                        CHHapticEventParameter(parameterID: .hapticIntensity, value: effectiveIntensity),
-                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
-                    ],
-                    relativeTime: baseTime
-                ))
-                events.append(CHHapticEvent(
-                    eventType: .hapticTransient,
-                    parameters: [
-                        CHHapticEventParameter(parameterID: .hapticIntensity, value: effectiveIntensity * 0.8),
-                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
-                    ],
-                    relativeTime: baseTime + 0.2
-                ))
-            }
-
-        case .pulse:
-            // Gentle continuous pulses
-            for i in 0..<10 {
-                events.append(CHHapticEvent(
-                    eventType: .hapticContinuous,
-                    parameters: [
-                        CHHapticEventParameter(parameterID: .hapticIntensity, value: effectiveIntensity * 0.8),
-                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.2)
-                    ],
-                    relativeTime: Double(i) * 1.0,
-                    duration: 0.6
-                ))
-            }
-
-        case .escalating:
-            for i in 0..<7 {
-                let escalatingIntensity = max(0.5, 0.4 + (effectiveIntensity * Float(i) / 7.0))
-                events.append(CHHapticEvent(
-                    eventType: .hapticTransient,
-                    parameters: [
-                        CHHapticEventParameter(parameterID: .hapticIntensity, value: escalatingIntensity),
-                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
-                    ],
-                    relativeTime: Double(i) * 1.4
-                ))
-            }
-
-        case .steady:
-            for i in 0..<5 {
-                events.append(CHHapticEvent(
-                    eventType: .hapticContinuous,
-                    parameters: [
-                        CHHapticEventParameter(parameterID: .hapticIntensity, value: effectiveIntensity),
-                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
-                    ],
-                    relativeTime: Double(i) * 2.0,
-                    duration: 1.5
-                ))
-            }
+        for i in 0..<7 {
+            let baseTime = Double(i) * 1.4
+            events.append(CHHapticEvent(
+                eventType: .hapticTransient,
+                parameters: [
+                    CHHapticEventParameter(parameterID: .hapticIntensity, value: effectiveIntensity),
+                    CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                ],
+                relativeTime: baseTime
+            ))
+            events.append(CHHapticEvent(
+                eventType: .hapticTransient,
+                parameters: [
+                    CHHapticEventParameter(parameterID: .hapticIntensity, value: effectiveIntensity * 0.8),
+                    CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
+                ],
+                relativeTime: baseTime + 0.2
+            ))
         }
 
         return events
@@ -349,7 +310,10 @@ class AlarmPlayer: ObservableObject {
     private let rampDuration: Float = 60.0 // seconds
     private let crossfadeDuration: TimeInterval = 1.5 // seconds for crossfade
 
-    func play(sound: AlarmSound, customSoundId: UUID?, volume: Float) {
+    /// Starts the alarm and returns the phone's media volume as it started —
+    /// the one volume stir can read but cannot set.
+    @discardableResult
+    func play(sound: AlarmSound, volume: Float) -> Float {
         // The slider maps straight through, exactly like the white noise it has
         // to wake you from. Gentleness is the 60-second ramp from silence
         // below, not a ceiling: the old 5% cap left the alarm ~17x quieter than
@@ -366,22 +330,12 @@ class AlarmPlayer: ObservableObject {
         } catch {
             Logger.alarm.error("⚠️ Failed to configure audio session: \(String(describing: error), privacy: .public)")
         }
+        let mediaVolume = AVAudioSession.sharedInstance().outputVolume
 
-        // Determine which sound URL to use
-        let url: URL?
-        if let customId = customSoundId,
-           let customSound = CustomSoundManager.shared.customSounds.first(where: { $0.id == customId }),
-           let customURL = customSound.fileURL {
-            url = customURL
-            Logger.alarm.notice("🔔 Playing custom sound: \(String(describing: customSound.name), privacy: .public)")
-        } else {
-            url = bundledSoundURL(sound.rawValue)
-        }
-
-        guard let soundURL = url else {
+        guard let soundURL = bundledSoundURL(sound.rawValue) else {
             Logger.alarm.notice("Sound file not found: \(String(describing: sound.rawValue), privacy: .public)")
             playFallbackSound()
-            return
+            return mediaVolume
         }
 
         self.soundURL = soundURL
@@ -417,6 +371,7 @@ class AlarmPlayer: ObservableObject {
             Logger.alarm.error("Failed to play alarm: \(String(describing: error), privacy: .public)")
             playFallbackSound()
         }
+        return mediaVolume
     }
 
     private func startVolumeRamp() {

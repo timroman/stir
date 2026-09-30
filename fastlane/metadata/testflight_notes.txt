@@ -1,0 +1,13 @@
+the sounds are all ours now, and three crashes are gone.
+
+new wake sounds. eleven of them — gentle chime and soft bells are rebuilt, and deep bowl, temple bells, wind chimes, music box, marimba and first light are new. first light has no strike at all: a chord that swells out of silence. every sound in the app is generated from a formula in the repository, so there is nothing licensed and nothing to maintain.
+
+importing your own sound is gone. with sixteen generated sounds it was not worth the file picker, the stored copy, or an imported file going missing at 3am. if you had one selected, you are back on the named tone you chose before it.
+
+fixed since the last builds: stopping the alarm crashed the app (and lost the night); the lock screen widget could stay up after a night ended; the backup alarm could fire two minutes after "up by" for a night that was already over.
+
+a low battery warning before the night starts, under 30% and unplugged — a phone that dies rings neither alarm. the volume check now only appears when white noise is off, since with white noise on you set the volume by ear after starting.
+
+auto sensitivity is gone. it was in the last few builds and did not earn its place: it needed a week of nights to learn what the notes under low, medium and high already tell you.
+
+what to tell me: does the alarm stop cleanly, does the widget go with the night, and does anything in the new set beat the singing bowl?

@@ -10,11 +10,13 @@ struct SessionRecord: Codable {
     enum Ending: String, Codable {
         case stopped         // the stop button on the night screen
         case alarmDismissed  // the alarm rang and was dismissed
+        case completed       // a no-alarm night reached silence and was dismissed
 
         var label: String {
             switch self {
             case .stopped: return "stopped by hand"
             case .alarmDismissed: return "alarm dismissed"
+            case .completed: return "finished"
             }
         }
     }

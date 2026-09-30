@@ -4,9 +4,11 @@ import SwiftUI
 // circle, the horizon as a line cutting through it, and the moon at its true
 // position on the ring — dim below the horizon, bright above. The ring makes
 // the position legible: you can watch the moon approach the rise or set
-// crossing hours ahead. Position on the ring is the hour angle — astronomy,
-// not the clock — so nothing on this screen correlates with the time of day.
-// The warming sky gradient remains the sole "is it time yet" signal.
+// crossing hours ahead. Position on the ring is the hour angle, which is local
+// solar time: anyone who reads the sun can tell roughly what time it is, never
+// to the minute, and only by going looking. That is accepted (stir.md
+// principle 1). There is no clock, countdown or progress here, and the sky
+// gradient that once warmed toward morning is gone.
 struct SkyFace: View {
     let moonPosition: MoonTracker.MoonPosition?
     let sunPosition: MoonTracker.MoonPosition?

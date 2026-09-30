@@ -1,13 +1,30 @@
 import SwiftUI
+import SwiftData
 import AVFoundation
 import os
 
 @main
 struct StirApp: App {
-    @StateObject private var appState = AppState()
+    @StateObject private var appState: AppState
 
     init() {
         Logger.session.notice("🚀 stir app initializing...")
+        // Night records stay on the phone (stir.md decision 40). If the store
+        // can't open, nights still run; they just aren't kept.
+        let nightStore: NightStore?
+        do {
+            nightStore = SwiftDataNightStore(container: try ModelContainer(for: NightRecord.self))
+        } catch {
+            Logger.session.error("❌ night records unavailable: \(String(describing: error), privacy: .public)")
+            nightStore = nil
+        }
+        _appState = StateObject(wrappedValue: AppState(nightStore: nightStore))
+        // Nothing can be running yet, so anything on the lock screen is left
+        // over from a run that never ended it
+        StirLiveActivity.endStrays(reason: "at launch")
+        // Finishes a backstop cancel that a crash interrupted; a backstop whose
+        // night never ended is left to fire, which is the point of it
+        AlarmBackstop.clearIfNightEnded()
         Logger.session.notice("🚀 stir app ready")
     }
 
