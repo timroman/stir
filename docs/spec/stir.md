@@ -266,6 +266,8 @@ it took two wrong shapes to get here. first, split by kind: a "sounds" screen ho
 **78. settings is where stir explains itself.**
 it opens with three short paragraphs: one time is set, everything counts back from it, and the wake window is how long stir listens for the stirring it wakes you on. that is the whole idea of the app, and settings is the only screen with room to say it — the night screen holds nothing but sky by design, and onboarding is read once and forgotten.
 
+"how it works" sits directly under those paragraphs, where the curiosity is, rather than at the foot of the screen. and there is no "done": the sheet carries a drag indicator, so a swipe closes it and a button that repeats the gesture is a button for nothing.
+
 it closes with a colophon rather than a menu: the wordmark, one paragraph, one line of links, the version. the paragraph says stir is free, open source, without accounts or analytics, and why — software this small is cheap to make now, and the value belongs with the people using it rather than behind a subscription. one paragraph, not a manifesto: longer, under an alarm clock's settings, reads as selling. *(the owner, 30 september)*
 
 **79. settings wears the app's own colours.**

@@ -25,7 +25,11 @@ final class SensitivityNoteTests: XCTestCase {
             alarmToggle.tap()
         }
 
+        // A long screen, and a list only builds what it shows
         let sensitivity = app.buttons["wake.sensitivity"]
+        for _ in 0..<4 where !sensitivity.exists {
+            app.swipeUp()
+        }
         XCTAssertTrue(sensitivity.waitForExistence(timeout: 5), "no way into sensitivity")
         sensitivity.tap()
 

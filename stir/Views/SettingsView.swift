@@ -11,7 +11,6 @@ import os
 // ours, the behaviour and accessibility stay Apple's (stir.md decisions 77, 78).
 struct SettingsView: View {
     @EnvironmentObject var appState: AppState
-    @Environment(\.dismiss) var dismiss
 
     private let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
 
@@ -34,12 +33,6 @@ struct SettingsView: View {
             .navigationTitle("settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("done") { dismiss() }
-                        .foregroundStyle(NightSky.dawnAmber)
-                }
-            }
         }
         .preferredColorScheme(.dark)
     }
@@ -61,6 +54,17 @@ struct SettingsView: View {
             .padding(.vertical, 6)
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
+
+            // Where the curiosity is: right after the short version, not
+            // stranded at the foot of the screen
+            NavigationLink {
+                TechnicalDetailsView()
+            } label: {
+                SettingRow {
+                    Text("how it works")
+                }
+            }
+            .listRowBackground(NightSky.cream.opacity(0.04))
         }
     }
 
@@ -223,15 +227,6 @@ struct SettingsView: View {
             .padding(.vertical, 10)
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
-
-            NavigationLink {
-                TechnicalDetailsView()
-            } label: {
-                SettingRow {
-                    Text("how it works")
-                }
-            }
-            .listRowBackground(NightSky.cream.opacity(0.04))
         }
     }
 
