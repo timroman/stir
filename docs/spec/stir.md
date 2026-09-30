@@ -263,6 +263,14 @@ a **night** section — what plays while you fall asleep — and a **wake** sect
 
 it took two wrong shapes to get here. first, split by kind: a "sounds" screen holding both the sleep sound and the alarm sound, so setting up white noise took two screens and the only thing binding them was that both were sounds — a fact about the app, not about anybody's night. then split by half: a **night** screen with two rows and a **wake** screen with eight, each a tap away for no gain.
 
+**78. settings is where stir explains itself.**
+it opens with three short paragraphs: one time is set, everything counts back from it, and the wake window is how long stir listens for the stirring it wakes you on. that is the whole idea of the app, and settings is the only screen with room to say it — the night screen holds nothing but sky by design, and onboarding is read once and forgotten.
+
+it closes with a colophon rather than a menu: the wordmark, one paragraph, one line of links, the version. the paragraph says stir is free, open source, without accounts or analytics, and why — software this small is cheap to make now, and the value belongs with the people using it rather than behind a subscription. one paragraph, not a manifesto: longer, under an alarm clock's settings, reads as selling. *(the owner, 30 september)*
+
+**79. settings wears the app's own colours.**
+the night sky gradient behind it, moonlight cream type, amber switches, and the sound and sensitivity lists in the same dress. underneath it is a native list with native controls, so the styling is stir's and the behaviour, accessibility and separators stay Apple's. before this it was the one screen that looked like it came from another app. *(30 september)*
+
 **the labels say what happens, and the reasons are one tap away.** "gentle alarm" is just **alarm**. "motion detection" is **wake if the phone moves**. "haptics" — a word nobody outside this trade uses — is **vibration**. each of those carries an information button rather than a paragraph underneath: a switch with an explanation under it, times four, is a wall of prose where a list of settings should be. sensitivity keeps its note inline, because that note changes with the choice and is the only way to tell the three apart. *(the owner, 29 september)* *(the owner, 29 september)*
 
 **38. history is in settings, and nowhere else.**

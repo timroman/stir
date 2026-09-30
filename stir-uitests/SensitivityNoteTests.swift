@@ -1,7 +1,7 @@
 import XCTest
 
 // Sensitivity is hard to choose without knowing what each setting is for, so
-// the note under the picker changes with the choice (stir.md decision 59).
+// its screen describes all three at once (stir.md decision 59).
 final class SensitivityNoteTests: XCTestCase {
 
     override func setUp() {
@@ -25,19 +25,22 @@ final class SensitivityNoteTests: XCTestCase {
             alarmToggle.tap()
         }
 
-        let picker = app.segmentedControls["wake.sensitivity"]
-        XCTAssertTrue(picker.waitForExistence(timeout: 5), "sensitivity picker missing")
-        let note = app.staticTexts["wake.sensitivityNote"]
-
-        XCTAssertEqual(picker.buttons.count, 3, "the picker should offer low, medium and high")
+        let sensitivity = app.buttons["wake.sensitivity"]
+        XCTAssertTrue(sensitivity.waitForExistence(timeout: 5), "no way into sensitivity")
+        sensitivity.tap()
 
         var notes: [String: String] = [:]
         for choice in ["low", "medium", "high"] {
-            picker.buttons[choice].tap()
-            XCTAssertTrue(note.waitForExistence(timeout: 5), "no note under the picker")
+            let note = app.staticTexts["sensitivity.note.\(choice)"]
+            XCTAssertTrue(note.waitForExistence(timeout: 5), "\(choice) has no note")
             XCTAssertFalse(note.label.isEmpty, "\(choice) has an empty note")
             notes[choice] = note.label
         }
         XCTAssertEqual(Set(notes.values).count, 3, "sensitivity choices share a note: \(notes)")
+
+        // Choosing one is what the screen is for
+        app.buttons["sensitivity.low"].tap()
+        XCTAssertTrue(app.images["checkmark.circle.fill"].waitForExistence(timeout: 5),
+                      "choosing a sensitivity showed no mark")
     }
 }
