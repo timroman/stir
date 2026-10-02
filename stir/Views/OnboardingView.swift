@@ -39,7 +39,6 @@ struct OnboardingView: View {
     @State private var microphoneGranted = false
     @State private var alarmsGranted = false
     @StateObject private var location = OnboardingLocation()
-    @State private var showingDetails = false
 
     var body: some View {
         ZStack {
@@ -83,7 +82,7 @@ struct OnboardingView: View {
                 )
 
                 HStack(spacing: 24) {
-                    Button(action: { showingDetails = true }) {
+                    Link(destination: URL(string: "https://timroman.github.io/stir/#how")!) {
                         HStack(spacing: 6) {
                             Image(systemName: "sparkles")
                                 .font(.caption)
@@ -167,12 +166,6 @@ struct OnboardingView: View {
         }
         .onAppear {
             checkExistingPermissions()
-        }
-        .sheet(isPresented: $showingDetails) {
-            NavigationStack {
-                TechnicalDetailsView()
-            }
-            .presentationDragIndicator(.visible)
         }
     }
 

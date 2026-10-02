@@ -24,6 +24,7 @@ struct SettingsView: View {
                     preamble
                     nightSection
                     wakeSection
+                    lastNight
                     colophon
                 }
                 .scrollContentBackground(.hidden)
@@ -41,30 +42,13 @@ struct SettingsView: View {
 
     private var preamble: some View {
         Section {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("you set one time: when you need to be up by. stir does the rest backwards from it.")
-                    .foregroundStyle(NightSky.cream)
-                Text("white noise plays while you fall asleep and fades to silence before morning. then stir listens. the wake window is how long it listens — and the first time it hears you stirring in that window, it wakes you gently.")
-                    .foregroundStyle(NightSky.cream.opacity(0.78))
-                Text("waking as you surface from light sleep beats being pulled out of deep sleep by a clock. nothing wakes you before the window opens, and if it never hears you, the alarm sounds at your \"up by\" time anyway.")
-                    .foregroundStyle(NightSky.cream.opacity(0.5))
-            }
-            .font(.subheadline)
-            .lineSpacing(2)
-            .padding(.vertical, 6)
-            .listRowBackground(Color.clear)
-            .listRowSeparator(.hidden)
-
-            // Where the curiosity is: right after the short version, not
-            // stranded at the foot of the screen
-            NavigationLink {
-                TechnicalDetailsView()
-            } label: {
-                SettingRow {
-                    Text("how it works")
-                }
-            }
-            .listRowBackground(NightSky.cream.opacity(0.04))
+            Text("you set one time: when you need to be up by. everything else counts back from it, and the wake window is how long stir listens for you before it.")
+                .font(.subheadline)
+                .lineSpacing(2)
+                .foregroundStyle(NightSky.cream.opacity(0.75))
+                .padding(.vertical, 4)
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
         }
     }
 
@@ -108,7 +92,7 @@ struct SettingsView: View {
                 SectionFooter("with white noise off, the alarm stays on — a night needs at least one of the two.")
             }
         }
-        .listRowBackground(NightSky.cream.opacity(0.04))
+        .listRowBackground(NightSky.surface)
     }
 
     // MARK: - wake: how stir brings you out of it
@@ -192,7 +176,26 @@ struct SettingsView: View {
                 SectionFooter(timelineExample)
             }
         }
-        .listRowBackground(NightSky.cream.opacity(0.04))
+        .listRowBackground(NightSky.surface)
+    }
+
+    // MARK: - last night, the one thing only the phone knows
+
+    @ViewBuilder
+    private var lastNight: some View {
+        if let last = SessionRecord.last {
+            Section {
+                SettingRow { LabeledContent("started", value: last.startedText) }
+                SettingRow { LabeledContent("alarm", value: last.alarmText) }
+                SettingRow { LabeledContent("ended", value: last.endedText) }
+                SettingRow { LabeledContent("how", value: last.ending.label) }
+            } header: {
+                SectionHeader("last night")
+            } footer: {
+                SectionFooter("the night ran \(last.lengthText).")
+            }
+            .listRowBackground(NightSky.surface)
+        }
     }
 
     // MARK: - who made it, and what they think it should cost
@@ -205,13 +208,14 @@ struct SettingsView: View {
                     .tracking(6)
                     .foregroundStyle(NightSky.cream.opacity(0.85))
 
-                Text("free, open source, no accounts and no analytics. built at pure inference, where we think software this small should cost nothing — it is cheap to make now, and the value belongs with the people using it, not behind a subscription.")
+                Text("free, open source, no accounts, no analytics. built at pure inference, where we think software this small should cost nothing.")
                     .font(.footnote)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(NightSky.cream.opacity(0.6))
                     .lineSpacing(2)
 
                 HStack(spacing: 14) {
+                    Link("how it works", destination: URL(string: "https://timroman.github.io/stir/#how")!)
                     Link("source", destination: URL(string: "https://github.com/timroman/stir")!)
                     Link("privacy", destination: URL(string: "https://timroman.github.io/stir/#privacy")!)
                     Link("pureinference.com", destination: URL(string: "https://www.pureinference.com")!)
@@ -367,7 +371,7 @@ struct SensitivityView: View {
                 } footer: {
                     SectionFooter("stir measures your room when the window opens and listens for sound above it. sensitivity is how far above.")
                 }
-                .listRowBackground(NightSky.cream.opacity(0.04))
+                .listRowBackground(NightSky.surface)
             }
             .scrollContentBackground(.hidden)
             .listRowSeparatorTint(NightSky.cream.opacity(0.1))
@@ -430,7 +434,7 @@ private struct SoundListView: View {
                 } footer: {
                     SectionFooter(footer)
                 }
-                .listRowBackground(NightSky.cream.opacity(0.04))
+                .listRowBackground(NightSky.surface)
             }
             .scrollContentBackground(.hidden)
             .listRowSeparatorTint(NightSky.cream.opacity(0.1))

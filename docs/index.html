@@ -138,6 +138,16 @@
     <p>what's left is a black sky, and the <strong>real sun and moon</strong> riding their daily rings at their true positions, computed on-device. subtle and artistic if you ignore them; honest astronomy if you read them. when the moon touches the horizon line on screen, it's rising or setting outside your window.</p>
   </section>
 
+  <section id="how">
+    <div class="eyebrow">how it works</div>
+    <h2>the whole mechanism, in plain terms</h2>
+    <p><strong>one session, all night.</strong> set the one time that matters — when you need to be up by. white noise plays while you fall asleep and through the night, then fades to silence. after a quiet gap, stir starts listening. when it hears or feels you stirring inside your wake window, it wakes you gently. if the window closes without a stir, the alarm sounds at your "up by" time no matter what.</p>
+    <p><strong>listening is signal processing, not a model.</strong> when your wake window opens, stir measures the room for 30 seconds to learn its baseline level and how much it naturally varies. the wake trigger sits a few standard deviations above that baseline — how many is your sensitivity setting — so a furnace hum or distant traffic never fires it, while the rustle of you turning over does. sound has to stay above the trigger for several readings in a row before the alarm starts. stir hears the room, not a person: it cannot tell your stirring from a partner's, and it never tries.</p>
+    <p><strong>the night screen.</strong> black all night: no clock, no countdown, nothing that brightens as morning comes. the two rings are the real sun and moon, each ring that body's complete daily lap around you — the part above the horizon line is sky, the dimmed part below is its path under the earth. the share of a ring above the line is the share of the day that body spends up, so the sun's ring rides high in summer and low in winter. the moon makes that same sweep every 27 days, and a full moon always rides opposite the sun. anyone who reads the sun can tell roughly what time it is, never to the minute, and only by going looking.</p>
+    <p><strong>the backstop.</strong> on iOS 26 and later, starting a night also schedules a system alarm two minutes after your "up by" time. it fires through silent mode, focus, and even if the app is closed overnight — and it is cancelled the moment you stop the night or the alarm yourself.</p>
+    <p><strong>everything happens on your phone.</strong> the microphone is only evaluated during your wake window, and nothing is ever recorded or sent anywhere. in no-alarm mode the microphone is never activated at all. your approximate location is used only to place the sun and moon, and it never leaves the device.</p>
+  </section>
+
   <section>
     <div class="eyebrow">the story</div>
     <h2>why i made this</h2>
