@@ -8,6 +8,17 @@ final class SensitivityNoteTests: XCTestCase {
         continueAfterFailure = false
     }
 
+    /// A list only builds what it shows, so anything below the fold has to be
+    /// scrolled to before it exists at all — same as it would be for a person.
+    private func scrollTo(_ element: XCUIElement, in app: XCUIApplication, swipes: Int = 5) -> Bool {
+        if element.waitForExistence(timeout: 5) { return true }
+        for _ in 0..<swipes {
+            app.swipeUp()
+            if element.exists { return true }
+        }
+        return false
+    }
+
     func testEachSensitivityShowsItsOwnNote() {
         let app = XCUIApplication()
         app.launchArguments = ["-screen", "setup"]
@@ -20,17 +31,13 @@ final class SensitivityNoteTests: XCTestCase {
         // The alarm's settings only exist when the alarm does, and the
         // simulator carries whatever state the last run left behind
         let alarmToggle = app.switches["alarm"]
-        XCTAssertTrue(alarmToggle.waitForExistence(timeout: 5), "settings never opened")
+        XCTAssertTrue(scrollTo(alarmToggle, in: app), "settings never opened")
         if alarmToggle.value as? String == "0" {
             alarmToggle.tap()
         }
 
-        // A long screen, and a list only builds what it shows
         let sensitivity = app.buttons["wake.sensitivity"]
-        for _ in 0..<4 where !sensitivity.exists {
-            app.swipeUp()
-        }
-        XCTAssertTrue(sensitivity.waitForExistence(timeout: 5), "no way into sensitivity")
+        XCTAssertTrue(scrollTo(sensitivity, in: app), "no way into sensitivity")
         sensitivity.tap()
 
         var notes: [String: String] = [:]

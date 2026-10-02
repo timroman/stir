@@ -21,11 +21,10 @@ struct SettingsView: View {
                     .ignoresSafeArea()
 
                 List {
-                    preamble
+                    masthead
+                    lastNight
                     nightSection
                     wakeSection
-                    lastNight
-                    colophon
                 }
                 .scrollContentBackground(.hidden)
                 .listRowSeparatorTint(NightSky.cream.opacity(0.1))
@@ -38,17 +37,44 @@ struct SettingsView: View {
         .preferredColorScheme(.dark)
     }
 
-    // MARK: - what stir is, before any control
+    // MARK: - who it is, what it does, what it costs — all at the top
 
-    private var preamble: some View {
+    private var masthead: some View {
         Section {
-            Text("you set one time: when you need to be up by. everything else counts back from it, and the wake window is how long stir listens for you before it.")
-                .font(.subheadline)
-                .lineSpacing(2)
-                .foregroundStyle(NightSky.cream.opacity(0.75))
-                .padding(.vertical, 4)
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
+            VStack(spacing: 14) {
+                Text("stir")
+                    .font(.title3)
+                    .tracking(6)
+                    .foregroundStyle(NightSky.cream.opacity(0.85))
+
+                Text("you set one time: when you need to be up by. everything else counts back from it, and the wake window is how long stir listens for you before it.")
+                    .font(.footnote)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(NightSky.cream.opacity(0.7))
+                    .lineSpacing(2)
+
+                Text("free, open source, no accounts, no analytics. built at pure inference, where we think software this small should cost nothing.")
+                    .font(.footnote)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(NightSky.cream.opacity(0.5))
+                    .lineSpacing(2)
+
+                HStack(spacing: 14) {
+                    Link("how it works", destination: URL(string: "https://timroman.github.io/stir/#how")!)
+                    Link("source", destination: URL(string: "https://github.com/timroman/stir")!)
+                    Link("privacy", destination: URL(string: "https://timroman.github.io/stir/#privacy")!)
+                }
+                .font(.footnote)
+                .foregroundStyle(NightSky.dawnAmber)
+
+                Text("version \(appVersion) · pureinference.com")
+                    .font(.caption2)
+                    .foregroundStyle(NightSky.cream.opacity(0.28))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
         }
     }
 
@@ -85,12 +111,11 @@ struct SettingsView: View {
                     }
                 }
             }
+            if !appState.settings.whiteNoiseEnabled {
+                NoteRow("with white noise off, the alarm stays on — a night needs at least one of the two.")
+            }
         } header: {
             SectionHeader("night")
-        } footer: {
-            if !appState.settings.whiteNoiseEnabled {
-                SectionFooter("with white noise off, the alarm stays on — a night needs at least one of the two.")
-            }
         }
         .listRowBackground(NightSky.surface)
     }
@@ -165,16 +190,15 @@ struct SettingsView: View {
                     }
                 }
             }
+            if !appState.settings.alarmEnabled {
+                NoteRow("alarm off: white noise fades to silence at your \"up by\" time — when you don't hear it, it's time. the microphone is never used.")
+            } else if !appState.settings.whiteNoiseEnabled {
+                NoteRow("with white noise off, the alarm stays on — a night needs at least one of the two.")
+            } else {
+                NoteRow(timelineExample)
+            }
         } header: {
             SectionHeader("wake")
-        } footer: {
-            if !appState.settings.alarmEnabled {
-                SectionFooter("alarm off: white noise fades to silence at your \"up by\" time — when you don't hear it, it's time. the microphone is never used.")
-            } else if !appState.settings.whiteNoiseEnabled {
-                SectionFooter("with white noise off, the alarm stays on — a night needs at least one of the two.")
-            } else {
-                SectionFooter(timelineExample)
-            }
         }
         .listRowBackground(NightSky.surface)
     }
@@ -185,52 +209,15 @@ struct SettingsView: View {
     private var lastNight: some View {
         if let last = SessionRecord.last {
             Section {
+                NoteRow("the night ran \(last.lengthText).")
                 SettingRow { LabeledContent("started", value: last.startedText) }
                 SettingRow { LabeledContent("alarm", value: last.alarmText) }
                 SettingRow { LabeledContent("ended", value: last.endedText) }
                 SettingRow { LabeledContent("how", value: last.ending.label) }
             } header: {
                 SectionHeader("last night")
-            } footer: {
-                SectionFooter("the night ran \(last.lengthText).")
             }
             .listRowBackground(NightSky.surface)
-        }
-    }
-
-    // MARK: - who made it, and what they think it should cost
-
-    private var colophon: some View {
-        Section {
-            VStack(spacing: 14) {
-                Text("stir")
-                    .font(.title3)
-                    .tracking(6)
-                    .foregroundStyle(NightSky.cream.opacity(0.85))
-
-                Text("free, open source, no accounts, no analytics. built at pure inference, where we think software this small should cost nothing.")
-                    .font(.footnote)
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(NightSky.cream.opacity(0.6))
-                    .lineSpacing(2)
-
-                HStack(spacing: 14) {
-                    Link("how it works", destination: URL(string: "https://timroman.github.io/stir/#how")!)
-                    Link("source", destination: URL(string: "https://github.com/timroman/stir")!)
-                    Link("privacy", destination: URL(string: "https://timroman.github.io/stir/#privacy")!)
-                    Link("pureinference.com", destination: URL(string: "https://www.pureinference.com")!)
-                }
-                .font(.footnote)
-                .foregroundStyle(NightSky.dawnAmber)
-
-                Text("version \(appVersion)")
-                    .font(.caption2)
-                    .foregroundStyle(NightSky.cream.opacity(0.28))
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 10)
-            .listRowBackground(Color.clear)
-            .listRowSeparator(.hidden)
         }
     }
 
@@ -264,7 +251,9 @@ private struct SectionHeader: View {
     }
 }
 
-private struct SectionFooter: View {
+/// A line of explanation that belongs to the rows around it, so it sits on the
+/// same card rather than floating on the sky underneath.
+private struct NoteRow: View {
     let text: String
 
     init(_ text: String) { self.text = text }
@@ -272,8 +261,10 @@ private struct SectionFooter: View {
     var body: some View {
         Text(text)
             .font(.caption)
-            .foregroundStyle(NightSky.cream.opacity(0.45))
+            .foregroundStyle(NightSky.cream.opacity(0.5))
             .lineSpacing(1)
+            .padding(.vertical, 2)
+            .listRowSeparator(.hidden)
     }
 }
 
@@ -368,8 +359,7 @@ struct SensitivityView: View {
                         .buttonStyle(.plain)
                         .accessibilityIdentifier("sensitivity.\(choice.id)")
                     }
-                } footer: {
-                    SectionFooter("stir measures your room when the window opens and listens for sound above it. sensitivity is how far above.")
+                    NoteRow("stir measures your room when the window opens and listens for sound above it. sensitivity is how far above.")
                 }
                 .listRowBackground(NightSky.surface)
             }
@@ -431,8 +421,7 @@ private struct SoundListView: View {
                             .buttonStyle(.plain)
                         }
                     }
-                } footer: {
-                    SectionFooter(footer)
+                    NoteRow(footer)
                 }
                 .listRowBackground(NightSky.surface)
             }
