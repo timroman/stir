@@ -60,26 +60,27 @@ struct SettingsView: View {
                     .foregroundStyle(NightSky.cream.opacity(0.7))
                     .lineSpacing(2)
 
-                Text("free, open source, no accounts, no analytics. built at pure inference: simple software should be good value without a subscription, and your data should never be the thing that pays for it.")
+                Text("free, open source, no accounts, no analytics. built at [pure inference](https://www.pureinference.com): simple software should be good value without a subscription, and your data should never be the thing that pays for it.")
                     .font(.footnote)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(NightSky.cream.opacity(0.5))
+                    .tint(NightSky.dawnAmber)
                     .lineSpacing(2)
 
-                HStack(spacing: 14) {
-                    Link("how it works", destination: URL(string: "https://timroman.github.io/stir/#how")!)
-                    Link("source", destination: URL(string: "https://github.com/timroman/stir")!)
-                    Link("privacy", destination: URL(string: "https://timroman.github.io/stir/#privacy")!)
-                }
-                .font(.footnote)
-                .foregroundStyle(NightSky.dawnAmber)
+                // One Text rather than a row of links, so four of them wrap
+                // instead of squeezing on a narrow phone
+                Text("[how it works](https://timroman.github.io/stir/#how) · [source](https://github.com/timroman/stir) · [privacy](https://timroman.github.io/stir/#privacy) · [our other apps](https://www.pureinference.com)")
+                    .font(.footnote)
+                    .multilineTextAlignment(.center)
+                    .tint(NightSky.dawnAmber)
 
-                Text("version \(appVersion) · pureinference.com")
+                Text("version \(appVersion)")
                     .font(.caption2)
                     .foregroundStyle(NightSky.cream.opacity(0.28))
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
+            .padding(.top, 2)
+            .padding(.bottom, 14)
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
         }
@@ -316,7 +317,9 @@ private struct RowLabel: View {
                     Image(systemName: "info.circle")
                         .font(.footnote)
                         .foregroundStyle(NightSky.dawnAmber)
-                        .frame(width: 32, height: 44)
+                        // Wide enough to hit, short enough not to stretch the
+                        // row past the ones with nothing to explain
+                        .frame(width: 44, height: 28)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
