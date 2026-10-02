@@ -31,13 +31,13 @@ Regenerate the Xcode project and build a signed release archive
 
 Upload a new build to TestFlight
 
-### ios notes
+### ios distribute
 
 ```sh
-[bundle exec] fastlane ios notes
+[bundle exec] fastlane ios distribute
 ```
 
-Set the what-to-test notes on the latest TestFlight build
+Distribute the current build to the internal testers
 
 ### ios release
 

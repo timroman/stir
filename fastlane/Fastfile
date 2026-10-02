@@ -42,25 +42,33 @@ platform :ios do
   lane :beta do
     asc_auth
     build
-    upload_to_testflight(skip_waiting_for_build_processing: true)
+    # Without a group a build processes, says it is in beta testing, and is
+    # offered to nobody — which is how builds 12 through 20 sat unseen.
+    upload_to_testflight(
+      groups: ["Tim"],
+      distribute_external: false,
+      skip_submission: true,
+      skip_waiting_for_build_processing: false
+    )
   end
 
-  # The beta lane uploads a binary but says nothing about what to look at.
-  # This sets the "what to test" notes on the most recent build, uploading
-  # nothing: edit fastlane/metadata/testflight_notes.txt and run it. It waits
-  # for Apple to finish processing, since notes cannot be set before then.
-  desc "Set the what-to-test notes on the latest TestFlight build"
-  lane :notes do
+  # A build can process, report itself in beta testing, and still be offered to
+  # nobody: internal testers only see builds attached to their group. Builds 12
+  # through 20 sat unseen that way. This attaches the current build and sets its
+  # what-to-test notes; `beta` does the same on upload.
+  desc "Distribute the current build to the internal testers"
+  lane :distribute do
     require "yaml"
     asc_auth
-    # The release the project is currently set to build, so the notes always
-    # land on the build that was just uploaded
     versions = YAML.load_file("../project.yml")["settings"]["base"]
     upload_to_testflight(
       distribute_only: true,
       app_version: versions.fetch("MARKETING_VERSION").to_s,
       build_number: versions.fetch("CURRENT_PROJECT_VERSION").to_s,
+      groups: ["Tim"],
       distribute_external: false,
+      # Internal only: external testing would need a beta app description and
+      # Apple's review, neither of which a one-person test flight wants
       skip_submission: true,
       changelog: File.read("metadata/testflight_notes.txt").strip
     )
