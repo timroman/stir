@@ -111,6 +111,27 @@ platform :ios do
   end
 
 
+  # Sends the version that is already staged — build attached, metadata
+  # uploaded — to review, without touching the binary or the screenshots.
+  desc "Submit the staged version for App Review"
+  lane :submit do
+    asc_auth
+    upload_to_app_store(
+      force: true,
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      skip_metadata: true,
+      precheck_include_in_app_purchases: false,
+      submit_for_review: true,
+      automatic_release: false,
+      submission_information: {
+        add_id_info_uses_idfa: false,
+        export_compliance_uses_encryption: false,
+        content_rights_contains_third_party_content: false
+      }
+    )
+  end
+
   desc "Push metadata (description, keywords, URLs) without a new build"
   lane :metadata do
     asc_auth

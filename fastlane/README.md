@@ -55,6 +55,14 @@ Upload build + metadata to App Store Connect (screenshots untouched)
 
 Replace the App Store screenshots only
 
+### ios submit
+
+```sh
+[bundle exec] fastlane ios submit
+```
+
+Submit the staged version for App Review
+
 ### ios metadata
 
 ```sh
