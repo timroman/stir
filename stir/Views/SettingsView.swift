@@ -3,12 +3,12 @@ import AVFoundation
 import os
 
 // Settings on stir's own ground: the night sky behind it, moonlight cream type,
-// amber switches. It opens by saying what stir does — the wake window is the
-// whole idea, and this is the only screen with room to explain it — and closes
-// with who built it and why it costs nothing.
+// amber switches, and the app's own icon at the head of it. The depth — how a
+// night runs, how the listening works — lives on the website; what stays here
+// is what only the phone knows (stir.md decisions 77, 78, 79).
 //
 // Native List, controls and separators underneath the paint: the styling is
-// ours, the behaviour and accessibility stay Apple's (stir.md decisions 77, 78).
+// ours, the behaviour and accessibility stay Apple's.
 struct SettingsView: View {
     @EnvironmentObject var appState: AppState
 
@@ -30,22 +30,29 @@ struct SettingsView: View {
                 .listRowSeparatorTint(NightSky.cream.opacity(0.1))
                 .tint(NightSky.dawnAmber)
             }
-            .navigationTitle("settings")
+            .navigationTitle("stir")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
         }
         .preferredColorScheme(.dark)
     }
 
-    // MARK: - who it is, what it does, what it costs — all at the top
+    // MARK: - the icon, what stir does, and what it costs
 
     private var masthead: some View {
         Section {
             VStack(spacing: 14) {
-                Text("stir")
-                    .font(.title3)
-                    .tracking(6)
-                    .foregroundStyle(NightSky.cream.opacity(0.85))
+                if let icon = Bundle.main.appIcon {
+                    Image(uiImage: icon)
+                        .resizable()
+                        .frame(width: 68, height: 68)
+                        .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 15, style: .continuous)
+                                .stroke(NightSky.cream.opacity(0.12), lineWidth: 0.5)
+                        )
+                        .accessibilityHidden(true)
+                }
 
                 Text("you set one time: when you need to be up by. everything else counts back from it, and the wake window is how long stir listens for you before it.")
                     .font(.footnote)
@@ -53,7 +60,7 @@ struct SettingsView: View {
                     .foregroundStyle(NightSky.cream.opacity(0.7))
                     .lineSpacing(2)
 
-                Text("free, open source, no accounts, no analytics. built at pure inference, where we think software this small should cost nothing.")
+                Text("free, open source, no accounts, no analytics. built at pure inference: simple software should be good value without a subscription, and your data should never be the thing that pays for it.")
                     .font(.footnote)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(NightSky.cream.opacity(0.5))
@@ -78,24 +85,40 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: - last night, the one thing only the phone knows
+
+    @ViewBuilder
+    private var lastNight: some View {
+        if let last = SessionRecord.last {
+            Section {
+                ValueRow("started", value: last.startedText)
+                ValueRow("alarm", value: last.alarmText)
+                ValueRow("ended", value: last.endedText)
+                ValueRow("ran", value: last.lengthText)
+                ValueRow("how", value: last.ending.label)
+            } header: {
+                SectionHeader("last night")
+            }
+            .listRowBackground(NightSky.surface)
+        }
+    }
+
     // MARK: - night: what plays while you fall asleep
 
     private var nightSection: some View {
         Section {
-            SettingRow {
-                Toggle("white noise", isOn: $appState.settings.whiteNoiseEnabled)
-                    .onChange(of: appState.settings.whiteNoiseEnabled) { _, enabled in
-                        // A night with neither white noise nor alarm is nothing
-                        if !enabled {
-                            appState.settings.alarmEnabled = true
-                        }
+            ToggleRow("white noise", isOn: $appState.settings.whiteNoiseEnabled)
+                .onChange(of: appState.settings.whiteNoiseEnabled) { _, enabled in
+                    // A night with neither white noise nor alarm is nothing
+                    if !enabled {
+                        appState.settings.alarmEnabled = true
                     }
-            }
+                }
 
             if appState.settings.whiteNoiseEnabled {
                 NavigationLink {
                     SoundListView(title: "sleep sound",
-                                  footer: "preview plays at the volume it will use tonight.",
+                                  note: "preview plays at the volume it will use tonight.",
                                   options: WhiteNoiseSound.allCases.map { ($0.rawValue, $0.displayName) },
                                   selectedId: Binding(
                                     get: { appState.settings.whiteNoiseSound.rawValue },
@@ -106,12 +129,9 @@ struct SettingsView: View {
                                     }),
                                   volume: $appState.settings.whiteNoiseVolume)
                 } label: {
-                    SettingRow {
-                        LabeledContent("sound", value: appState.settings.whiteNoiseSound.displayName)
-                    }
+                    ValueRow("sound", value: appState.settings.whiteNoiseSound.displayName)
                 }
-            }
-            if !appState.settings.whiteNoiseEnabled {
+            } else {
                 NoteRow("with white noise off, the alarm stays on — a night needs at least one of the two.")
             }
         } header: {
@@ -124,25 +144,27 @@ struct SettingsView: View {
 
     private var wakeSection: some View {
         Section {
-            SettingRow {
-                Toggle("alarm", isOn: $appState.settings.alarmEnabled)
-                    .disabled(!appState.settings.whiteNoiseEnabled)
-            }
+            ToggleRow("alarm", isOn: $appState.settings.alarmEnabled)
+                .disabled(!appState.settings.whiteNoiseEnabled)
 
             if appState.settings.alarmEnabled {
-                SettingRow(detail: Explanation(
-                    title: "wake window",
-                    body: "stir listens for this long before your \"up by\" time, and wakes you on the first stirring it hears.\n\nit is also the earliest you can be woken: nothing happens before the window opens."
-                )) {
-                    Stepper(value: $appState.settings.wakeWindowMinutes, in: 10...90, step: 5) {
-                        LabeledContent("wake window", value: "\(appState.settings.wakeWindowMinutes) min")
-                    }
-                    .accessibilityIdentifier("wake.window")
+                HStack(spacing: 8) {
+                    RowLabel("wake window", detail: Explanation(
+                        title: "wake window",
+                        body: "stir listens for this long before your \"up by\" time, and wakes you on the first stirring it hears.\n\nit is also the earliest you can be woken: nothing happens before the window opens."
+                    ))
+                    Spacer(minLength: 8)
+                    Text("\(appState.settings.wakeWindowMinutes) min")
+                        .foregroundStyle(NightSky.cream.opacity(0.5))
+                        .monospacedDigit()
+                    Stepper("", value: $appState.settings.wakeWindowMinutes, in: 10...90, step: 5)
+                        .labelsHidden()
+                        .accessibilityIdentifier("wake.window")
                 }
 
                 NavigationLink {
                     SoundListView(title: "alarm sound",
-                                  footer: "preview plays at the volume the alarm will use, through your phone's current volume — if it sounds quiet now, it will be quiet then.",
+                                  note: "preview plays at the volume the alarm will use, through your phone's current volume — if it sounds quiet now, it will be quiet then.",
                                   options: AlarmSound.allCases.map { ($0.rawValue, $0.displayName) },
                                   selectedId: Binding(
                                     get: { appState.settings.selectedSound.rawValue },
@@ -153,72 +175,53 @@ struct SettingsView: View {
                                     }),
                                   volume: $appState.settings.volume)
                 } label: {
-                    SettingRow {
-                        LabeledContent("sound", value: appState.settings.selectedSound.displayName)
-                    }
+                    ValueRow("sound", value: appState.settings.selectedSound.displayName)
                 }
 
                 NavigationLink {
                     SensitivityView()
                 } label: {
-                    SettingRow {
-                        LabeledContent("sensitivity", value: appState.settings.sensitivityLabel)
-                    }
+                    ValueRow("sensitivity", value: appState.settings.sensitivityLabel)
                 }
                 .accessibilityIdentifier("wake.sensitivity")
 
-                SettingRow(detail: Explanation(
-                    title: "wake if the phone moves",
-                    // stir hears the room, not a person (stir.md decisions 57, 59)
-                    body: "anyone moving the phone sets off the alarm, not just you. keeping it on the nightstand, on your side of the bed, avoids most of that."
-                )) {
-                    Toggle("wake if the phone moves", isOn: $appState.settings.motionDetectionEnabled)
-                }
+                ToggleRow("wake if the phone moves",
+                          isOn: $appState.settings.motionDetectionEnabled,
+                          detail: Explanation(
+                            title: "wake if the phone moves",
+                            // stir hears the room, not a person (decisions 57, 59)
+                            body: "anyone moving the phone sets off the alarm, not just you. keeping it on the nightstand, on your side of the bed, avoids most of that."))
 
-                SettingRow(detail: Explanation(
-                    title: "vibration",
-                    body: "the alarm vibrates as well as sounds, rising over the same minute. turn it off if the phone sleeps on something that rattles."
-                )) {
-                    Toggle("vibration", isOn: $appState.settings.hapticEnabled)
-                }
+                ToggleRow("vibration",
+                          isOn: $appState.settings.hapticEnabled,
+                          detail: Explanation(
+                            title: "vibration",
+                            body: "the alarm vibrates as well as sounds, rising over the same minute. turn it off if the phone sleeps on something that rattles."))
 
-                SettingRow {
-                    LabeledContent("wake message") {
-                        TextField("good morning", text: $appState.settings.tagline)
-                            .multilineTextAlignment(.trailing)
-                            .foregroundStyle(NightSky.cream.opacity(0.6))
-                    }
+                // Its own row: a message worth writing runs longer than the
+                // space left beside a label
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("wake message")
+                        .foregroundStyle(NightSky.cream)
+                    TextField("good morning", text: $appState.settings.tagline, axis: .vertical)
+                        .lineLimit(1...3)
+                        .foregroundStyle(NightSky.cream.opacity(0.65))
+                        .textFieldStyle(.plain)
                 }
-            }
-            if !appState.settings.alarmEnabled {
-                NoteRow("alarm off: white noise fades to silence at your \"up by\" time — when you don't hear it, it's time. the microphone is never used.")
-            } else if !appState.settings.whiteNoiseEnabled {
-                NoteRow("with white noise off, the alarm stays on — a night needs at least one of the two.")
+                .padding(.vertical, 2)
+
+                if appState.settings.whiteNoiseEnabled {
+                    NoteRow(timelineExample)
+                } else {
+                    NoteRow("with white noise off, the alarm stays on — a night needs at least one of the two.")
+                }
             } else {
-                NoteRow(timelineExample)
+                NoteRow("alarm off: white noise fades to silence at your \"up by\" time — when you don't hear it, it's time. the microphone is never used.")
             }
         } header: {
             SectionHeader("wake")
         }
         .listRowBackground(NightSky.surface)
-    }
-
-    // MARK: - last night, the one thing only the phone knows
-
-    @ViewBuilder
-    private var lastNight: some View {
-        if let last = SessionRecord.last {
-            Section {
-                NoteRow("the night ran \(last.lengthText).")
-                SettingRow { LabeledContent("started", value: last.startedText) }
-                SettingRow { LabeledContent("alarm", value: last.alarmText) }
-                SettingRow { LabeledContent("ended", value: last.endedText) }
-                SettingRow { LabeledContent("how", value: last.ending.label) }
-            } header: {
-                SectionHeader("last night")
-            }
-            .listRowBackground(NightSky.surface)
-        }
     }
 
     // Tonight's schedule with the current settings, so the settings explain
@@ -237,6 +240,19 @@ struct SettingsView: View {
 
 // MARK: - The pieces every row is built from
 
+extension Bundle {
+    /// The app's own icon, for the head of settings. iOS keeps it in the bundle
+    /// under the name the asset catalogue generated rather than as an asset you
+    /// can name directly.
+    var appIcon: UIImage? {
+        guard let icons = infoDictionary?["CFBundleIcons"] as? [String: Any],
+              let primary = icons["CFBundlePrimaryIcon"] as? [String: Any],
+              let files = primary["CFBundleIconFiles"] as? [String],
+              let name = files.last else { return nil }
+        return UIImage(named: name)
+    }
+}
+
 private struct SectionHeader: View {
     let title: String
 
@@ -245,9 +261,9 @@ private struct SectionHeader: View {
     var body: some View {
         Text(title)
             .font(.caption)
-            .tracking(1.6)
-            .textCase(.uppercase)
-            .foregroundStyle(NightSky.cream.opacity(0.38))
+            .tracking(1.4)
+            .textCase(nil)   // lowercase, like every other word stir shows
+            .foregroundStyle(NightSky.cream.opacity(0.4))
     }
 }
 
@@ -274,45 +290,85 @@ struct Explanation {
     let body: String
 }
 
-/// A row in stir's colours, with its explanation on the left where a thumb can
-/// reach it — beside the label, not jammed against the switch.
-private struct SettingRow<Content: View>: View {
+/// A label with its explanation beside it, rather than in a column of its own —
+/// most rows have nothing to explain, and an empty column down the left is a
+/// column of nothing.
+private struct RowLabel: View {
+    let title: String
     let detail: Explanation?
-    let content: Content
 
     @State private var showingDetail = false
 
-    init(detail: Explanation? = nil, @ViewBuilder content: () -> Content) {
+    init(_ title: String, detail: Explanation? = nil) {
+        self.title = title
         self.detail = detail
-        self.content = content()
     }
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 6) {
+            Text(title)
+                .foregroundStyle(NightSky.cream)
+
             if let detail {
                 Button {
                     showingDetail = true
                 } label: {
                     Image(systemName: "info.circle")
-                        .font(.body)
+                        .font(.footnote)
                         .foregroundStyle(NightSky.dawnAmber)
-                        .frame(width: 30, height: 44)
+                        .frame(width: 32, height: 44)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("about \(detail.title)")
-            } else {
-                // Keeps every label on the same line, explained or not
-                Color.clear.frame(width: 30, height: 1)
+                .accessibilityLabel("about \(title)")
+                .alert(detail.title, isPresented: $showingDetail) {
+                    Button("ok") { }
+                } message: {
+                    Text(detail.body)
+                }
             }
-
-            content
-                .foregroundStyle(NightSky.cream)
         }
-        .alert(detail?.title ?? "", isPresented: $showingDetail) {
-            Button("ok") { }
-        } message: {
-            Text(detail?.body ?? "")
+    }
+}
+
+private struct ToggleRow: View {
+    let title: String
+    @Binding var isOn: Bool
+    let detail: Explanation?
+
+    init(_ title: String, isOn: Binding<Bool>, detail: Explanation? = nil) {
+        self.title = title
+        self._isOn = isOn
+        self.detail = detail
+    }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            RowLabel(title, detail: detail)
+            Spacer(minLength: 8)
+            Toggle("", isOn: $isOn)
+                .labelsHidden()
+                .accessibilityLabel(title)
+        }
+    }
+}
+
+private struct ValueRow: View {
+    let title: String
+    let value: String
+
+    init(_ title: String, value: String) {
+        self.title = title
+        self.value = value
+    }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Text(title)
+                .foregroundStyle(NightSky.cream)
+            Spacer(minLength: 8)
+            Text(value)
+                .foregroundStyle(NightSky.cream.opacity(0.5))
         }
     }
 }
@@ -359,6 +415,7 @@ struct SensitivityView: View {
                         .buttonStyle(.plain)
                         .accessibilityIdentifier("sensitivity.\(choice.id)")
                     }
+
                     NoteRow("stir measures your room when the window opens and listens for sound above it. sensitivity is how far above.")
                 }
                 .listRowBackground(NightSky.surface)
@@ -379,7 +436,7 @@ struct SensitivityView: View {
 
 private struct SoundListView: View {
     let title: String
-    let footer: String
+    let note: String
     let options: [(id: String, name: String)]
     @Binding var selectedId: String
     @Binding var volume: Float
@@ -421,7 +478,8 @@ private struct SoundListView: View {
                             .buttonStyle(.plain)
                         }
                     }
-                    NoteRow(footer)
+
+                    NoteRow(note)
                 }
                 .listRowBackground(NightSky.surface)
             }

@@ -272,7 +272,7 @@ amended 2 october: one sentence, not three paragraphs. the depth — how a night
 
 there is no "done": the sheet carries a drag indicator, so a swipe closes it and a button that repeats the gesture is a button for nothing.
 
-it closes with a colophon rather than a menu: the wordmark, one paragraph, one line of links, the version. the paragraph says stir is free, open source, without accounts or analytics, and why — software this small is cheap to make now, and the value belongs with the people using it rather than behind a subscription. one paragraph, not a manifesto: longer, under an alarm clock's settings, reads as selling. *(the owner, 30 september)*
+amended 2 october: the masthead leads instead of closing — the app's own icon, one line on what stir does, one on what it costs, the links, the version — then last night, then the controls. the second line says simple software should be good value without a subscription, and that your data should never be the thing that pays for it. that is the point, rather than any claim about what software costs to make. one paragraph, not a manifesto: longer, under an alarm clock's settings, reads as selling. *(the owner, 30 september)*
 
 **79. settings wears the app's own colours.**
 the night sky gradient behind it, moonlight cream type, amber switches, and the sound and sensitivity lists in the same dress. underneath it is a native list with native controls, so the styling is stir's and the behaviour, accessibility and separators stay Apple's. before this it was the one screen that looked like it came from another app. *(30 september)*
