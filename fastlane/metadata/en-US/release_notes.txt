@@ -1,5 +1,7 @@
-brown noise, fan and wind now play properly. they were pitched so low that most phones could not reproduce them at all.
+eleven wake sounds, and every one of them made by stir: gentle chime and soft bells are rebuilt, and deep bowl, temple bells, wind chimes, music box, marimba and first light are new. nothing in the app is licensed or downloaded any more — every sound has a recipe in the open source repository.
 
-the stop control on the night screen is now a hold rather than a tap, with a much larger target — it was possible to tap it and have nothing happen.
+settings is redrawn. one screen in the order a night happens, in stir's own colours, with plain words: alarm, wake if the phone moves, vibration. it opens with what stir does and carries how long last night ran.
 
-white noise loops without the small dip it used to have at the seam.
+a word before you start if your battery is low and the phone isn't charging — a phone that dies rings neither the gentle alarm nor the backup one.
+
+importing your own sound is gone. with eleven wake sounds and six to sleep to, it was not worth the file picker — and nobody is left silent: you are back on the named sound you chose before it.
