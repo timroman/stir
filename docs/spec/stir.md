@@ -266,9 +266,13 @@ it took two wrong shapes to get here. first, split by kind: a "sounds" screen ho
 **78. settings is where stir explains itself.**
 it opens with three short paragraphs: one time is set, everything counts back from it, and the wake window is how long stir listens for the stirring it wakes you on. that is the whole idea of the app, and settings is the only screen with room to say it — the night screen holds nothing but sky by design, and onboarding is read once and forgotten.
 
-"how it works" sits directly under those paragraphs, where the curiosity is, rather than at the foot of the screen. and there is no "done": the sheet carries a drag indicator, so a swipe closes it and a button that repeats the gesture is a button for nothing.
+amended 2 october: one sentence, not three paragraphs. the depth — how a night runs, how the listening works, what the rings are, the backstop — moved to the website, where there is room for it and where it can be read without the app. the technical details screen went with it: a second explanation to keep in step with the first, inside an app whose whole argument is that there is less to look at. "how it works" is now a link out, from settings and from onboarding.
 
-it closes with a colophon rather than a menu: the wordmark, one paragraph, one line of links, the version. the paragraph says stir is free, open source, without accounts or analytics, and why — software this small is cheap to make now, and the value belongs with the people using it rather than behind a subscription. one paragraph, not a manifesto: longer, under an alarm clock's settings, reads as selling. *(the owner, 30 september)*
+**last night is the one thing only the phone knows**, so it stays: when the night started, whether the alarm rang, when it ended and how, at the foot of settings. it is the answer to "what happened last night?" without a Mac attached (decision 26).
+
+there is no "done": the sheet carries a drag indicator, so a swipe closes it and a button that repeats the gesture is a button for nothing.
+
+amended 2 october: the masthead leads instead of closing — the app's own icon, one line on what stir does, one on what it costs, the links, the version — then last night, then the controls. the second line says simple software should be good value without a subscription, and that your data should never be the thing that pays for it. that is the point, rather than any claim about what software costs to make. one paragraph, not a manifesto: longer, under an alarm clock's settings, reads as selling. *(the owner, 30 september)*
 
 **79. settings wears the app's own colours.**
 the night sky gradient behind it, moonlight cream type, amber switches, and the sound and sensitivity lists in the same dress. underneath it is a native list with native controls, so the styling is stir's and the behaviour, accessibility and separators stay Apple's. before this it was the one screen that looked like it came from another app. *(30 september)*

@@ -7,9 +7,6 @@ struct ContentView: View {
     // even though the phone is still docked. Sampling the state live meant the
     // night screen went dark ~an hour in, every night.
     @State private var chargerSeenThisSession = false
-    #if DEBUG
-    @State private var debugShowDetails = ProcessInfo.processInfo.arguments.contains("-showDetails")
-    #endif
 
     var body: some View {
         ZStack {
@@ -50,11 +47,6 @@ struct ContentView: View {
             updateIdleTimer()
         }
         #if DEBUG
-        .sheet(isPresented: $debugShowDetails) {
-            NavigationStack {
-                TechnicalDetailsView()
-            }
-        }
         // Screenshot/test driving without relaunching, e.g.
         //   xcrun simctl openurl booted "stir://screen/monitoring?upByMinutes=480"
         .onOpenURL { url in
@@ -69,7 +61,6 @@ struct ContentView: View {
             case "monitoring":
                 appState.startMonitoring()
             case "alarm": appState.currentScreen = .alarm
-            case "details": debugShowDetails = true
             default: break
             }
         }

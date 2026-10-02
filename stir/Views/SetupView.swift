@@ -64,8 +64,12 @@ struct SetupView: View {
                     Text("settings")
                 }
                 .foregroundColor(.white.opacity(0.55))
+                // The glyph and the word alone are a 60x20 target in the dark;
+                // the added area is transparent
+                .frame(minWidth: 120, minHeight: 44)
+                .contentShape(Rectangle())
             }
-            .padding(.bottom, 20)
+            .padding(.bottom, 16)
             .accessibilityIdentifier("setup.settings")
             }
             .padding()

@@ -17,6 +17,9 @@ enum NightSky {
     static let cream = Color(red: 0.95, green: 0.92, blue: 0.84)       // moonlight
     static let dawnAmber = Color(red: 0.91, green: 0.79, blue: 0.63)   // status accent
     static let horizonAmber = Color(red: 0.82, green: 0.60, blue: 0.42)
+    // A row sitting on the sky: lifted just enough to read as a surface, since
+    // a few percent of cream over a near-black gradient reads as nothing
+    static let surface = Color(red: 0.09, green: 0.10, blue: 0.16)
     static let dawnAmberComponents: (red: Double, green: Double, blue: Double) = (0.91, 0.79, 0.63)
 
     static func colors(_ palette: [RGB]) -> [Color] {

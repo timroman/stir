@@ -37,7 +37,6 @@
 		970D17B50020B2BFEB7E12C4 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47835E81DADDAD004379F272 /* OnboardingView.swift */; };
 		994A7A7CCFF102C9C8EB39CC /* NightStartCheckTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F9986216E7CBCC6AE14AFCC /* NightStartCheckTests.swift */; };
 		99AD63ECFBFADA2FB18BA31D /* AlarmBackstop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3621C1610B2466A837426511 /* AlarmBackstop.swift */; };
-		A40697DB09197D46B4A1D820 /* TechnicalDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92CE2A370C6733D8946E2B62 /* TechnicalDetailsView.swift */; };
 		A4AEFF2AC16A32C9952ABE5A /* StopButtonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA31EB15F4FE753AF25382D2 /* StopButtonTests.swift */; };
 		A8958A8B307D863CED15B082 /* SensitivityNoteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566ACB3AA206E8B218C60EB7 /* SensitivityNoteTests.swift */; };
 		AD93BA919195EEE1E8C3FAB2 /* NightArcFace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 129BD251B689B48CAC132AAC /* NightArcFace.swift */; };
@@ -138,7 +137,6 @@
 		8A5607025F6BBB641D36D497 /* fan.m4a */ = {isa = PBXFileReference; path = fan.m4a; sourceTree = "<group>"; };
 		8E440957EC87E3CD97F463E8 /* pink_noise.m4a */ = {isa = PBXFileReference; path = pink_noise.m4a; sourceTree = "<group>"; };
 		92497362A23FDEB89BC160D0 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
-		92CE2A370C6733D8946E2B62 /* TechnicalDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnicalDetailsView.swift; sourceTree = "<group>"; };
 		A672B1512E49B426FF645346 /* CopyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyTests.swift; sourceTree = "<group>"; };
 		AC64C0DE32A54AC75BE64F5D /* music_box.m4a */ = {isa = PBXFileReference; path = music_box.m4a; sourceTree = "<group>"; };
 		ACA11DE98D22F3DAA607833D /* WhiteNoisePlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteNoisePlayer.swift; sourceTree = "<group>"; };
@@ -231,7 +229,6 @@
 				47835E81DADDAD004379F272 /* OnboardingView.swift */,
 				31E8E59A5489F47D0C5609FA /* SettingsView.swift */,
 				CDBE9CD3509B6BB7BF2CDD44 /* SetupView.swift */,
-				92CE2A370C6733D8946E2B62 /* TechnicalDetailsView.swift */,
 				34D89E233C5A20C3266B913E /* Components */,
 			);
 			path = Views;
@@ -523,7 +520,6 @@
 				90407EF71A837592C1778647 /* StirActivityAttributes.swift in Sources */,
 				8E05EB85F46DDEF023BD88D5 /* StirApp.swift in Sources */,
 				9035EC9A9EF010110E1EC5CF /* StirLiveActivity.swift in Sources */,
-				A40697DB09197D46B4A1D820 /* TechnicalDetailsView.swift in Sources */,
 				DE92A3386EA9651D8271E799 /* WhiteNoisePlayer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -649,7 +645,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 22;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 86CCQ2AT2P;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -740,7 +736,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 22;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 86CCQ2AT2P;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
